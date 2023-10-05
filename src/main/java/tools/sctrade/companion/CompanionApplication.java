@@ -2,12 +2,16 @@ package tools.sctrade.companion;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
+import java.awt.AWTException;
 import java.awt.EventQueue;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
 import java.awt.SystemTray;
+import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Arrays;
-import javax.imageio.ImageIO;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -20,11 +24,11 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 public class CompanionApplication extends JFrame {
   private static final long serialVersionUID = 1L;
 
-  public CompanionApplication() throws IOException {
+  public CompanionApplication() throws IOException, AWTException {
     initUI();
   }
 
-  private void initUI() throws IOException {
+  private void initUI() throws IOException, AWTException {
     var quitButton = new JButton("Quit");
 
     quitButton.addActionListener((ActionEvent event) -> {
@@ -33,21 +37,40 @@ public class CompanionApplication extends JFrame {
 
     createLayout(quitButton);
 
-    var iconPaths = Arrays.asList("icons/icon128.png", "/icon64.png", "/icon32.png", "/icon16.png");
-    var iconImages = iconPaths.parallelStream().map(n -> getClass().getResource(n)).map(n -> {
-      try {
-        return ImageIO.read(n);
-      } catch (IOException e) {
-        // TODO Auto-generated catch block
-        return null;
-      }
-    }).filter(n -> n != null).toList();
+    var iconPaths = Arrays.asList("/images/icon128.png", "/images/icon64.png", "/images/icon32.png",
+        "/images/icon16.png");
+    var iconImages = iconPaths.parallelStream().map(n -> getClass().getResource(n))
+        .map(n -> getToolkit().createImage(n)).toList();
     setIconImages(iconImages);
     setTitle("SC Trade Companion");
     setSize(300, 200);
     setLocationRelativeTo(null);
     if (SystemTray.isSupported()) {
       setDefaultCloseOperation(HIDE_ON_CLOSE);
+      SystemTray systemTray = SystemTray.getSystemTray();
+      TrayIcon trayIcon =
+          new TrayIcon(getToolkit().getImage(getClass().getResource("/images/icon16.png")));
+      PopupMenu popupMenu = new PopupMenu();
+      MenuItem openMenuItem = new MenuItem("Open");
+      openMenuItem.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          setVisible(true);
+        }
+      });
+
+      MenuItem exitMenuItem = new MenuItem("Exit");
+      exitMenuItem.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          System.exit(0);
+        }
+      });
+
+      popupMenu.add(openMenuItem);
+      popupMenu.add(exitMenuItem);
+      trayIcon.setPopupMenu(popupMenu);
+      systemTray.add(trayIcon);
     } else {
       setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
