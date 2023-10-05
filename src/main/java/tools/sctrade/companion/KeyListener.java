@@ -9,6 +9,8 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
+import java.util.Random;
 import javax.imageio.ImageIO;
 
 public class KeyListener implements NativeKeyListener {
@@ -21,7 +23,8 @@ public class KeyListener implements NativeKeyListener {
         Rectangle screenRect = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
         BufferedImage capture = new Robot().createScreenCapture(screenRect);
 
-        File imageFile = new File("single-screen.bmp");
+        File imageFile = new File(String.format(Locale.ROOT, "screenshots/%s.bmp",
+            String.valueOf(new Random().nextInt())));
         ImageIO.write(capture, "bmp", imageFile);
       } catch (IOException | AWTException e1) {
         e1.printStackTrace();
