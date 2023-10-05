@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -29,7 +31,9 @@ public class CompanionApplication extends JFrame {
   }
 
   private void initUI() throws IOException, AWTException {
-    var quitButton = new JButton("Quit");
+    ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle", Locale.getDefault());
+
+    var quitButton = new JButton(messages.getString("trayMenuItemExit"));
 
     quitButton.addActionListener((ActionEvent event) -> {
       System.exit(0);
@@ -42,7 +46,7 @@ public class CompanionApplication extends JFrame {
     var iconImages = iconPaths.parallelStream().map(n -> getClass().getResource(n))
         .map(n -> getToolkit().createImage(n)).toList();
     setIconImages(iconImages);
-    setTitle("SC Trade Companion");
+    setTitle(messages.getString("applicationTitle"));
     setSize(300, 200);
     setLocationRelativeTo(null);
     if (SystemTray.isSupported()) {
@@ -51,7 +55,7 @@ public class CompanionApplication extends JFrame {
       TrayIcon trayIcon =
           new TrayIcon(getToolkit().getImage(getClass().getResource("/images/icon16.png")));
       PopupMenu popupMenu = new PopupMenu();
-      MenuItem openMenuItem = new MenuItem("Open");
+      MenuItem openMenuItem = new MenuItem(messages.getString("trayMenuItemOpen"));
       openMenuItem.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -59,7 +63,7 @@ public class CompanionApplication extends JFrame {
         }
       });
 
-      MenuItem exitMenuItem = new MenuItem("Exit");
+      MenuItem exitMenuItem = new MenuItem(messages.getString("trayMenuItemExit"));
       exitMenuItem.addActionListener(new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -70,6 +74,8 @@ public class CompanionApplication extends JFrame {
       popupMenu.add(openMenuItem);
       popupMenu.add(exitMenuItem);
       trayIcon.setPopupMenu(popupMenu);
+      trayIcon.setImageAutoSize(true);
+      trayIcon.setToolTip(messages.getString("applicationTitle"));
       systemTray.add(trayIcon);
     } else {
       setDefaultCloseOperation(EXIT_ON_CLOSE);
