@@ -1,5 +1,7 @@
 package tools.sctrade.companion;
 
+import com.github.kwhat.jnativehook.GlobalScreen;
+import com.github.kwhat.jnativehook.NativeHookException;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import javax.swing.GroupLayout;
@@ -49,8 +51,18 @@ public class CompanionApplication extends JFrame {
     var ctx = new SpringApplicationBuilder(CompanionApplication.class).headless(false)
         .web(WebApplicationType.NONE).run(args);
 
-    EventQueue.invokeLater(() -> {
+    try {
+      GlobalScreen.registerNativeHook();
+    } catch (NativeHookException ex) {
+      System.err.println("There was a problem registering the native hook.");
+      System.err.println(ex.getMessage());
 
+      System.exit(1);
+    }
+
+    GlobalScreen.addNativeKeyListener(new KeyListener());
+
+    EventQueue.invokeLater(() -> {
       var ex = ctx.getBean(CompanionApplication.class);
       ex.setVisible(true);
     });

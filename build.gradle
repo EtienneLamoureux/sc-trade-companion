@@ -16,7 +16,12 @@ repositories {
 }
 
 dependencies {
+	// Spring boot
 	implementation 'org.springframework.boot:spring-boot-starter'
+	
+	// Keybinds
+	implementation 'com.github.kwhat:jnativehook:2.2.2'
+	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
