@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Locale;
 import javax.swing.JFrame;
+import tools.sctrade.companion.utils.LocalizationUtil;
 
 public class CompanionGui extends JFrame {
   private static final long serialVersionUID = -983766141308946535L;
@@ -20,7 +21,7 @@ public class CompanionGui extends JFrame {
     setLookAndFeel();
     setIconImages();
 
-    setTitle(LocalizationUtil.getString("applicationTitle"));
+    setTitle(LocalizationUtil.get("applicationTitle"));
     setSize(300, 200);
     setLocationRelativeTo(null);
 
@@ -49,7 +50,7 @@ public class CompanionGui extends JFrame {
       TrayIcon trayIcon = new TrayIcon(getIcon("icon16"));
       trayIcon.setPopupMenu(popupMenu);
       trayIcon.setImageAutoSize(true);
-      trayIcon.setToolTip(LocalizationUtil.getString("applicationTitle"));
+      trayIcon.setToolTip(LocalizationUtil.get("applicationTitle"));
 
       SystemTray systemTray = SystemTray.getSystemTray();
       systemTray.add(trayIcon);
@@ -59,7 +60,7 @@ public class CompanionGui extends JFrame {
   }
 
   private MenuItem buildOpenMenuItem() {
-    MenuItem openMenuItem = new MenuItem(LocalizationUtil.getString("trayMenuItemOpen"));
+    MenuItem openMenuItem = new MenuItem(LocalizationUtil.get("trayMenuItemOpen"));
     openMenuItem.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -71,7 +72,7 @@ public class CompanionGui extends JFrame {
   }
 
   private MenuItem buildExitMenuItem() {
-    MenuItem exitMenuItem = new MenuItem(LocalizationUtil.getString("trayMenuItemExit"));
+    MenuItem exitMenuItem = new MenuItem(LocalizationUtil.get("trayMenuItemExit"));
     exitMenuItem.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
