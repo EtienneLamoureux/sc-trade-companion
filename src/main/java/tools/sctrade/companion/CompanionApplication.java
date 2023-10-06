@@ -5,6 +5,8 @@ import com.github.kwhat.jnativehook.NativeHookException;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import java.awt.AWTException;
 import java.awt.EventQueue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,6 +15,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class CompanionApplication {
+  private static final Logger logger = LoggerFactory.getLogger(CompanionApplication.class);
+
   @Autowired
   public CompanionApplication(CompanionGui gui) throws AWTException {
     gui.initialize();
@@ -22,16 +26,15 @@ public class CompanionApplication {
     var context = new SpringApplicationBuilder(CompanionApplication.class).headless(false)
         .web(WebApplicationType.NONE).run(args);
 
-    registerKeyListenerOrFail(context);
+    registerKeyListenerOrCrash(context);
     openGui(context);
   }
 
-  private static void registerKeyListenerOrFail(ConfigurableApplicationContext context) {
+  private static void registerKeyListenerOrCrash(ConfigurableApplicationContext context) {
     try {
       GlobalScreen.registerNativeHook();
     } catch (NativeHookException ex) {
-      System.err.println("There was a problem registering the native hook.");
-      System.err.println(ex.getMessage());
+      logger.error("There was a problem registering the native hook.", ex);
 
       System.exit(1);
     }
