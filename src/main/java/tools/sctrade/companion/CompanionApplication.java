@@ -2,6 +2,7 @@ package tools.sctrade.companion;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
+import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import java.awt.AWTException;
 import java.awt.EventQueue;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,11 @@ public class CompanionApplication {
     var context = new SpringApplicationBuilder(CompanionApplication.class).headless(false)
         .web(WebApplicationType.NONE).run(args);
 
+    registerKeyListenerOrFail(context);
+    openGui(context);
+  }
+
+  private static void registerKeyListenerOrFail(ConfigurableApplicationContext context) {
     try {
       GlobalScreen.registerNativeHook();
     } catch (NativeHookException ex) {
@@ -30,9 +36,7 @@ public class CompanionApplication {
       System.exit(1);
     }
 
-    GlobalScreen.addNativeKeyListener(new KeyListener());
-
-    openGui(context);
+    GlobalScreen.addNativeKeyListener(context.getBean(NativeKeyListener.class));
   }
 
   private static void openGui(ConfigurableApplicationContext context) {
