@@ -1,5 +1,6 @@
 package tools.sctrade.companion;
 
+import com.formdev.flatlaf.intellijthemes.FlatArcDarkOrangeIJTheme;
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
 import java.awt.AWTException;
@@ -32,6 +33,8 @@ public class CompanionApplication extends JFrame {
 
   private void initUI() throws IOException, AWTException {
     ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle", Locale.getDefault());
+
+    FlatArcDarkOrangeIJTheme.setup();
 
     var quitButton = new JButton(messages.getString("trayMenuItemExit"));
 
