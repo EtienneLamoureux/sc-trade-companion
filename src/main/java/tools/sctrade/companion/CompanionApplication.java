@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class CompanionApplication {
@@ -31,6 +32,10 @@ public class CompanionApplication {
 
     GlobalScreen.addNativeKeyListener(new KeyListener());
 
+    openGui(context);
+  }
+
+  private static void openGui(ConfigurableApplicationContext context) {
     EventQueue.invokeLater(() -> {
       var ex = context.getBean(CompanionGui.class);
       ex.setVisible(true);
