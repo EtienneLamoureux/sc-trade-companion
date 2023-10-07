@@ -12,6 +12,7 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
+import tools.sctrade.companion.swing.CompanionGui;
 
 @SpringBootApplication
 public class CompanionApplication {
@@ -33,8 +34,8 @@ public class CompanionApplication {
   private static void registerKeyListenerOrCrash(ConfigurableApplicationContext context) {
     try {
       GlobalScreen.registerNativeHook();
-    } catch (NativeHookException ex) {
-      logger.error("There was a problem registering the native hook.", ex);
+    } catch (NativeHookException e) {
+      logger.error("There was a problem registering the native hook", e);
 
       System.exit(1);
     }
