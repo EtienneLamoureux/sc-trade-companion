@@ -12,9 +12,11 @@ import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.scheduling.annotation.EnableAsync;
 import tools.sctrade.companion.swing.CompanionGui;
 
 @SpringBootApplication
+@EnableAsync
 public class CompanionApplication {
   private static final Logger logger = LoggerFactory.getLogger(CompanionApplication.class);
 
