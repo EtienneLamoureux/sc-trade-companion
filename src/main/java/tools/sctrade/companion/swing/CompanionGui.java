@@ -1,4 +1,4 @@
-package tools.sctrade.companion;
+package tools.sctrade.companion.swing;
 
 import com.formdev.flatlaf.intellijthemes.FlatArcDarkOrangeIJTheme;
 import java.awt.AWTException;
