@@ -34,7 +34,7 @@ public class CompanionGui extends JFrame {
 
   private void setIconImages() {
     var iconPaths = Arrays.asList("icon128", "icon64", "icon32", "icon16");
-    var iconImages = iconPaths.parallelStream().map(n -> getIcon(n)).toList();
+    var iconImages = iconPaths.parallelStream().map(this::getIcon).toList();
 
     setIconImages(iconImages);
   }

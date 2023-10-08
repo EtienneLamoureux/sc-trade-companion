@@ -2,21 +2,27 @@ package tools.sctrade.companion.domain.commodity;
 
 import java.awt.image.BufferedImage;
 import java.util.Collection;
-import org.springframework.scheduling.annotation.Async;
+import tools.sctrade.companion.domain.ImageProcessor;
+import tools.sctrade.companion.domain.user.UserService;
 
-public class CommodityService {
-  private Collection<CommodityOutputAdapter> outputAdapters;
+public class CommodityService implements ImageProcessor {
+  private UserService userService;
+  private Collection<CommodityPublisher> outputAdapters;
 
-  public CommodityService(Collection<CommodityOutputAdapter> outputAdapters) {
+  public CommodityService(UserService userService, Collection<CommodityPublisher> outputAdapters) {
+    this.userService = userService;
     this.outputAdapters = outputAdapters;
   }
 
-  @Async
+  @Override
   public void processAsynchronously(BufferedImage screenCapture) {
 
   }
 
   private void publish(Collection<CommodityListing> listings) {
-    outputAdapters.parallelStream().forEach(n -> n.publishAsynchronously(listings));
+    var user = userService.get();
+    var submission = new CommoditySubmission(user, listings);
+
+    outputAdapters.stream().forEach(n -> n.publishAsynchronously(submission));
   }
 }
