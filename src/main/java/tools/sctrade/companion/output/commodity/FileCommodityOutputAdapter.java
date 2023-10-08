@@ -7,7 +7,7 @@ import tools.sctrade.companion.domain.commodity.CommodityOutputAdapter;
 public class FileCommodityOutputAdapter implements CommodityOutputAdapter {
 
   @Override
-  public void publish(Collection<CommodityListing> listings) {
+  public void publishAsynchronously(Collection<CommodityListing> listings) {
     // TODO Auto-generated method stub
 
   }
