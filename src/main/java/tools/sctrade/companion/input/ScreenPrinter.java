@@ -7,11 +7,19 @@ import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Random;
 import javax.imageio.ImageIO;
+import tools.sctrade.companion.domain.ImageProcessor;
 
 public class ScreenPrinter implements Runnable {
+  private Collection<ImageProcessor> imageProcessors;
+
+  public ScreenPrinter(Collection<ImageProcessor> imageProcessors) {
+    this.imageProcessors = imageProcessors; // TODO
+  }
+
   @Override
   public void run() {
     try {
