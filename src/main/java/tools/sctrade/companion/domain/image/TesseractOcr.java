@@ -1,13 +1,16 @@
 package tools.sctrade.companion.domain.image;
 
-import java.awt.image.BufferedImage;
+import net.sourceforge.tess4j.Tesseract;
 
-public class TesseractOcr implements Orc {
+public abstract class TesseractOcr implements Ocr {
+  protected Tesseract tesseract;
 
-  @Override
-  public String read(BufferedImage image) {
-    // TODO Auto-generated method stub
-    return null;
+  public TesseractOcr() {
+    this.tesseract = new Tesseract();
+    tesseract.setDatapath("src/main/resources/tessdata");
+    tesseract.setLanguage("eng");
+    tesseract.setPageSegMode(11);
+    tesseract.setOcrEngineMode(1);
   }
 
 }
