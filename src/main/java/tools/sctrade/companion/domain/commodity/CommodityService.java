@@ -2,6 +2,7 @@ package tools.sctrade.companion.domain.commodity;
 
 import java.awt.image.BufferedImage;
 import java.util.Collection;
+import java.util.Collections;
 import tools.sctrade.companion.domain.image.ImageProcessor;
 import tools.sctrade.companion.domain.image.Ocr;
 import tools.sctrade.companion.domain.user.UserService;
@@ -21,6 +22,8 @@ public class CommodityService extends ImageProcessor {
   @Override
   public void process(BufferedImage screenCapture) {
     String text = ocr.read(screenCapture);
+
+    publish(Collections.emptyList()); // TODO
   }
 
   private void publish(Collection<CommodityListing> listings) {
