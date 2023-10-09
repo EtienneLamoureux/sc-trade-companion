@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Random;
 import javax.imageio.ImageIO;
-import tools.sctrade.companion.domain.ImageProcessor;
+import tools.sctrade.companion.domain.image.ImageProcessor;
 
 public class ScreenPrinter implements Runnable {
   private Collection<ImageProcessor> imageProcessors;

@@ -1,4 +1,4 @@
-package tools.sctrade.companion.domain;
+package tools.sctrade.companion.domain.image;
 
 import java.awt.image.BufferedImage;
 import org.slf4j.Logger;
