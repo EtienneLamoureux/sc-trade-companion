@@ -8,14 +8,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Locale;
-import java.util.Random;
 import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageProcessor;
+import tools.sctrade.companion.utils.TimeFormat;
+import tools.sctrade.companion.utils.TimeUtil;
 
 public class ScreenPrinter implements Runnable {
   private final Logger logger = LoggerFactory.getLogger(ScreenPrinter.class);
+
+  private static final String BMP = "bmp";
 
   private Collection<ImageProcessor> imageProcessors;
 
@@ -38,11 +41,11 @@ public class ScreenPrinter implements Runnable {
   }
 
   private void saveToDisk(BufferedImage screenCapture) {
-    String filename = String.valueOf(new Random().nextInt());
-    File imageFile = new File(String.format(Locale.ROOT, "screenshots/%s.bmp", filename));
+    String filename = TimeUtil.getNowAsString(TimeFormat.SCREENSHOT);
+    File imageFile = new File(String.format(Locale.ROOT, "screenshots/%s.%s", filename, BMP));
 
     try {
-      ImageIO.write(screenCapture, "bmp", imageFile);
+      ImageIO.write(screenCapture, BMP, imageFile);
     } catch (IOException e) {
       logger.error("Error while saving image file to disk", e);
     }
