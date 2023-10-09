@@ -25,6 +25,9 @@ dependencies {
 	// GUI look and feel
 	implementation 'com.formdev:flatlaf-intellij-themes:3.2.1'
 	
+	// OCR
+	implementation 'net.sourceforge.tess4j:tess4j:5.8.0'
+	
 	// Tests	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

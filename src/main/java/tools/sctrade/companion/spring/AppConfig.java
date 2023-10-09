@@ -1,13 +1,14 @@
 package tools.sctrade.companion.spring;
 
-import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.sctrade.companion.domain.commodity.CommodityPublisher;
 import tools.sctrade.companion.domain.commodity.CommodityService;
+import tools.sctrade.companion.domain.commodity.CommodityTesseractOcr;
 import tools.sctrade.companion.domain.image.ImageProcessor;
+import tools.sctrade.companion.domain.image.Ocr;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.input.KeyListener;
 import tools.sctrade.companion.input.ScreenPrinter;
@@ -37,11 +38,18 @@ public class AppConfig {
     return new ScTradeToolsClient();
   }
 
+  @Bean("CommodityTesseractOcr")
+  public CommodityTesseractOcr buildCommodityTesseractOcr() {
+    return new CommodityTesseractOcr();
+  }
+
   @Bean("CommodityService")
   public CommodityService buildCommodityService(UserService userService,
+      @Qualifier("CommodityTesseractOcr") Ocr ocr,
       @Qualifier("CommodityCsvWriter") CommodityPublisher commodityCsvLogger,
       @Qualifier("ScTradeToolsClient") CommodityPublisher scTradeToolsClient) {
-    return new CommodityService(userService, Arrays.asList(commodityCsvLogger, scTradeToolsClient));
+    return new CommodityService(userService, ocr,
+        Arrays.asList(commodityCsvLogger, scTradeToolsClient));
   }
 
   @Bean("ScreenPrinter")
@@ -50,9 +58,8 @@ public class AppConfig {
     return new ScreenPrinter(Arrays.asList(commodityService));
   }
 
-  @Bean("NativeKeyListener")
-  public NativeKeyListener buildNativeKeyListener(
-      @Qualifier("ScreenPrinter") Runnable screenPrinter) {
+  @Bean("KeyListener")
+  public KeyListener buildNativeKeyListener(@Qualifier("ScreenPrinter") Runnable screenPrinter) {
     return new KeyListener(Arrays.asList(screenPrinter));
   }
 
