@@ -5,7 +5,7 @@ import java.util.Collection;
 import tools.sctrade.companion.domain.ImageProcessor;
 import tools.sctrade.companion.domain.user.UserService;
 
-public class CommodityService implements ImageProcessor {
+public class CommodityService extends ImageProcessor {
   private UserService userService;
   private Collection<CommodityPublisher> outputAdapters;
 
@@ -15,8 +15,8 @@ public class CommodityService implements ImageProcessor {
   }
 
   @Override
-  public void processAsynchronously(BufferedImage screenCapture) {
-
+  public void process(BufferedImage screenCapture) {
+    // TODO document why this method is empty
   }
 
   private void publish(Collection<CommodityListing> listings) {
