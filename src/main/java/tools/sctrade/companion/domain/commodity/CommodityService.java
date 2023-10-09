@@ -2,7 +2,7 @@ package tools.sctrade.companion.domain.commodity;
 
 import java.awt.image.BufferedImage;
 import java.util.Collection;
-import tools.sctrade.companion.domain.ImageProcessor;
+import tools.sctrade.companion.domain.image.ImageProcessor;
 import tools.sctrade.companion.domain.user.UserService;
 
 public class CommodityService extends ImageProcessor {

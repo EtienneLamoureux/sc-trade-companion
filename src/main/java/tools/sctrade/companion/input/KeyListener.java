@@ -17,7 +17,7 @@ public class KeyListener implements NativeKeyListener {
 
   @Override
   public void nativeKeyPressed(NativeKeyEvent e) {
-    logger.trace("Key pressed: %s", String.valueOf(NativeKeyEvent.getKeyText(e.getKeyCode())));
+    logger.trace("Key pressed: %s", NativeKeyEvent.getKeyText(e.getKeyCode()));
 
     if (e.getKeyCode() == NativeKeyEvent.VC_F3) {
       runnables.parallelStream().forEach(n -> n.run());
