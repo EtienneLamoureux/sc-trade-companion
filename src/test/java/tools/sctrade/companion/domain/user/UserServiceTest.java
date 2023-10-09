@@ -13,7 +13,7 @@ class UserServiceTest {
   }
 
   @Test
-  public void whenGettingUserThenGetMandatoryFields() {
+  void whenGettingUserThenGetMandatoryFields() {
     var user = userService.get();
 
     assertNotNull(user.id());
