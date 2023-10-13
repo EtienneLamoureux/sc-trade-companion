@@ -1,13 +1,13 @@
 package tools.sctrade.companion.domain.image;
 
 import java.awt.image.BufferedImage;
-import tools.sctrade.companion.utils.ImageUtil;
+import java.util.List;
 
 public abstract class Ocr {
-  private OcrConfiguration configuration;
+  private List<ImageManipulation> preprocessingManipulations;
 
-  public Ocr(OcrConfiguration configuration) {
-    this.configuration = configuration;
+  protected Ocr(List<ImageManipulation> preprocessingManipulations) {
+    this.preprocessingManipulations = preprocessingManipulations;
   }
 
   public final String read(BufferedImage image) {
@@ -19,17 +19,8 @@ public abstract class Ocr {
   protected abstract String process(BufferedImage image);
 
   private BufferedImage preProcess(BufferedImage image) {
-    if (configuration.convertToGreyscale()) {
-      image = ImageUtil.convertToGreyscale(image);
-    }
-
-    if (configuration.invertColors()) {
-      ImageUtil.invertColors(image);
-    }
-
-    if (configuration.shouldRescale()) {
-      ImageUtil.adjustBrightnessAndContrast(image, configuration.brightnessFactor(),
-          configuration.contrastOffset());
+    for (var manipulation : preprocessingManipulations) {
+      image = manipulation.manipulate(image);
     }
 
     return image;

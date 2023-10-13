@@ -8,7 +8,7 @@ import java.awt.image.RescaleOp;
 public class ImageUtil {
   private ImageUtil() {}
 
-  public static BufferedImage convertToGreyscale(BufferedImage image) {
+  public static BufferedImage makeGreyscaleCopy(BufferedImage image) {
     BufferedImage greyscaleImage =
         new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
     Graphics graphics = greyscaleImage.getGraphics();
@@ -33,5 +33,15 @@ public class ImageUtil {
       int contrastOffset) {
     RescaleOp op = new RescaleOp(brightnessFactor, contrastOffset, null);
     op.filter(image, image);
+  }
+
+  public static BufferedImage makeCopy(BufferedImage image) {
+    BufferedImage clonedImage =
+        new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+    Graphics graphics = clonedImage.getGraphics();
+    graphics.drawImage(image, 0, 0, null);
+    graphics.dispose();
+  
+    return clonedImage;
   }
 }
