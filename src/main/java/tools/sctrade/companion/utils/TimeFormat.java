@@ -5,7 +5,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public enum TimeFormat {
-  SCREENSHOT("yyyy-MM-dd_H-m-s-S");
+  SCREENSHOT("yyyy-MM-dd_H-m-s-n");
 
   public final String pattern;
 
