@@ -4,9 +4,20 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+import java.io.File;
+import java.io.IOException;
+import java.util.Locale;
+import javax.imageio.ImageIO;
 
 public class ImageUtil {
+  private static final String JPG = "jpg";
+  private static final String DEFAULT_PATH = "screenshots";
+
   private ImageUtil() {}
+
+  public static BufferedImage getFromResourcePath(String resourcePath) throws IOException {
+    return ImageIO.read(ImageUtil.class.getResourceAsStream(resourcePath));
+  }
 
   public static BufferedImage makeGreyscaleCopy(BufferedImage image) {
     BufferedImage greyscaleImage =
@@ -29,9 +40,8 @@ public class ImageUtil {
     }
   }
 
-  public static void adjustBrightnessAndContrast(BufferedImage image, float brightnessFactor,
-      int contrastOffset) {
-    RescaleOp op = new RescaleOp(brightnessFactor, contrastOffset, null);
+  public static void scaleAndOffsetColors(BufferedImage image, float scale, float offset) {
+    RescaleOp op = new RescaleOp(scale, offset, null);
     op.filter(image, image);
   }
 
@@ -41,7 +51,17 @@ public class ImageUtil {
     Graphics graphics = clonedImage.getGraphics();
     graphics.drawImage(image, 0, 0, null);
     graphics.dispose();
-  
+
     return clonedImage;
+  }
+
+  public static void writeToDisk(BufferedImage screenCapture) throws IOException {
+    writeToDisk(screenCapture, DEFAULT_PATH);
+  }
+
+  public static void writeToDisk(BufferedImage screenCapture, String path) throws IOException {
+    String filename = TimeUtil.getNowAsString(TimeFormat.SCREENSHOT);
+    File imageFile = new File(String.format(Locale.ROOT, "%s/%s.%s", path, filename, JPG));
+    ImageIO.write(screenCapture, JPG, imageFile);
   }
 }

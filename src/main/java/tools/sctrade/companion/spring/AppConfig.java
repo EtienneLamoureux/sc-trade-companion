@@ -12,9 +12,9 @@ import tools.sctrade.companion.domain.commodity.CommodityTesseractOcr;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageProcessor;
 import tools.sctrade.companion.domain.image.Ocr;
-import tools.sctrade.companion.domain.image.manipulations.AdjustBrightnessAndContrast;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
+import tools.sctrade.companion.domain.image.manipulations.ScaleAndOffsetColors;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.input.KeyListener;
 import tools.sctrade.companion.input.ScreenPrinter;
@@ -49,7 +49,7 @@ public class AppConfig {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
-    preprocessingManipulations.add(new AdjustBrightnessAndContrast(0f, 100));
+    preprocessingManipulations.add(new ScaleAndOffsetColors(10.0f, 0.0f));
 
     return new CommodityTesseractOcr(preprocessingManipulations);
   }
