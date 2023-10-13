@@ -1,12 +1,13 @@
 package tools.sctrade.companion.domain.image;
 
+import java.util.List;
 import net.sourceforge.tess4j.Tesseract;
 
 public abstract class TesseractOcr extends Ocr {
   protected Tesseract tesseract;
 
-  public TesseractOcr(OcrConfiguration configuration) {
-    super(configuration);
+  protected TesseractOcr(List<ImageManipulation> preprocessingManipulations) {
+    super(preprocessingManipulations);
 
     this.tesseract = new Tesseract();
     tesseract.setDatapath("src/main/resources/tessdata");
