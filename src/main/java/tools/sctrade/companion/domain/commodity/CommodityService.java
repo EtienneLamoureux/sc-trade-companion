@@ -11,6 +11,10 @@ public class CommodityService extends ImageProcessor {
   private UserService userService;
   private Ocr ocr;
   private Collection<CommodityPublisher> outputAdapters;
+  private final String SEARCH = "([0-9])[\\.\\, ]{2,}([0-9])";
+  private final String SEARCH2 = "$1\\.$2";
+  private final String SEARCH3 =
+      "([a-z ]+) ([0-9,]+ |os).+\\R(.+) [^0-9]?(([0-9]{1,3}[\\.\\,])?[0-9]+[k ]+?)\\/";
 
   public CommodityService(UserService userService, Ocr ocr,
       Collection<CommodityPublisher> outputAdapters) {
