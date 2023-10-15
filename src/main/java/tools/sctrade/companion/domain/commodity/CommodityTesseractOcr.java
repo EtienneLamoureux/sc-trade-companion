@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import net.sourceforge.tess4j.TesseractException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,8 @@ public class CommodityTesseractOcr extends TesseractOcr {
       Rectangle rectangleOfInterest =
           new Rectangle(image.getWidth() / 2, 0, image.getWidth() / 2, image.getHeight());
       String text = tesseract.doOCR(image, rectangleOfInterest);
-      return text;
+      var words = tesseract.getWords(image, 1);
+      return words.stream().map(n -> n.getText()).collect(Collectors.joining(" "));
     } catch (TesseractException e) {
       logger.error("Error wile doing OCR with Tesseract", e);
 
