@@ -1,50 +1,42 @@
 package tools.sctrade.companion.domain.ocr;
 
-import java.awt.Rectangle;
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-class LocatedLine {
-  private Map<Double, LocatedWord> wordsByX;
-  private Rectangle boundingBox;
-
-  LocatedLine(LocatedWord word) {
-    wordsByX = new TreeMap<>();
-    boundingBox = null;
-
-    add(word);
+class LocatedLine extends LocatedFragment {
+  public LocatedLine(LocatedWord word) {
+    super(word);
   }
 
-  Rectangle getBoundingBox() {
-    return boundingBox;
+  public List<LocatedFragment> getFragments() {
+    if (wordsByX.size() <= 1) {
+      return Arrays.asList(this);
+    }
+
+    var fragments = new ArrayList<LocatedFragment>();
+    LocatedWord previousWord = null;
+
+    for (var word : getWordsInReadingOrder()) {
+      if (fragments.isEmpty() || previousWord.isSeparatedFrom(word)) {
+        fragments.add(new LocatedFragment(word));
+      } else {
+        fragments.get(fragments.size() - 1).add(word);
+      }
+
+      previousWord = word;
+    }
+
+    return fragments;
   }
 
-  String getText() {
-    return wordsByX.values().stream().map(n -> n.getText()).collect(Collectors.joining(" "));
-  }
-
-  Collection<LocatedWord> getWords() {
-    return wordsByX.values();
-  }
-
-  boolean shouldContain(LocatedWord word) {
+  public boolean shouldContain(LocatedWord word) {
     return boundingBox.getMaxY() > word.getBoundingBox().getCenterY()
         && word.getBoundingBox().getCenterY() > boundingBox.getMinY();
   }
 
-  void add(LocatedWord word) {
-    wordsByX.put(word.getBoundingBox().getCenterX(), word);
-
-    if (boundingBox != null) {
-      boundingBox.add(word.getBoundingBox());
-    } else
-      boundingBox = new Rectangle(word.getBoundingBox());
-  }
-
-  boolean isSeparatedFrom(LocatedLine line) {
-    return Math.abs(getBoundingBox().getCenterY() - line.getBoundingBox().getCenterY()) > (2.0
-        * Math.min(getBoundingBox().height, line.getBoundingBox().height));
+  public boolean isSeparatedFrom(LocatedLine line) {
+    return Math.abs(boundingBox.getCenterY() - line.getBoundingBox().getCenterY()) > (2.0
+        * Math.min(boundingBox.height, line.getBoundingBox().height));
   }
 }

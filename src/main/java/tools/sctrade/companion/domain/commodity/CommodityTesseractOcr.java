@@ -27,11 +27,9 @@ public class CommodityTesseractOcr extends TesseractOcr {
     var words = tesseract.getWords(image, 0);
     words = onlyKeepWordsInRightHalfOfImage(image, words);
     words = removeWordsRightOfTheListings(words);
-    OcrResult result = new OcrResult();
-    words.stream().map(n -> new LocatedWord(n.getText(), n.getBoundingBox()))
-        .forEach(n -> result.add(n));
 
-    return result;
+    return new OcrResult(
+        words.stream().map(n -> new LocatedWord(n.getText(), n.getBoundingBox())).toList());
   }
 
   private List<Word> onlyKeepWordsInRightHalfOfImage(BufferedImage image, List<Word> words) {

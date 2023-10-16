@@ -18,4 +18,10 @@ public class LocatedWord {
   public Rectangle getBoundingBox() {
     return boundingBox;
   }
+
+  public boolean isSeparatedFrom(LocatedWord word) {
+    return (Math.abs(boundingBox.getMaxX()) - Math.abs(word.getBoundingBox().getMinX())) >= (2
+        * Math.max((boundingBox.getWidth() / text.length()),
+            (word.getBoundingBox().getWidth() / word.getText().length())));
+  }
 }
