@@ -1,7 +1,9 @@
-package tools.sctrade.companion.domain.image;
+package tools.sctrade.companion.ocr;
 
 import java.util.List;
 import net.sourceforge.tess4j.Tesseract;
+import tools.sctrade.companion.domain.image.ImageManipulation;
+import tools.sctrade.companion.domain.ocr.Ocr;
 
 public abstract class TesseractOcr extends Ocr {
   protected Tesseract tesseract;

@@ -3,6 +3,7 @@ package tools.sctrade.companion.domain.commodity;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.domain.image.ImageManipulation;
@@ -10,6 +11,7 @@ import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.ScaleAndOffsetColors;
 import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
+import tools.sctrade.companion.ocr.tesseract.CommodityTesseractOcr;
 import tools.sctrade.companion.utils.ImageUtil;
 
 public class CommodityTesseractOcrAccuracyTest {
@@ -30,8 +32,8 @@ public class CommodityTesseractOcrAccuracyTest {
 
   @Test
   void givenCorrectSreenshotThenReadTextAccurately() throws IOException {
-    var text = ocr.read(ImageUtil
+    var result = ocr.read(ImageUtil
         .getFromResourcePath("/images/kiosks/commodity/ScreenShot-2023-09-26_19-21-00-0BF.jpg"));
-    System.out.println(text);
+    System.out.println(result.getText().toLowerCase(Locale.ROOT));
   }
 }
