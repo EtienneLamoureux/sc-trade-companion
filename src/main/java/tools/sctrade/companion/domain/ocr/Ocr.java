@@ -1,7 +1,8 @@
-package tools.sctrade.companion.domain.image;
+package tools.sctrade.companion.domain.ocr;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
+import tools.sctrade.companion.domain.image.ImageManipulation;
 
 public abstract class Ocr {
   private List<ImageManipulation> preprocessingManipulations;
@@ -10,13 +11,13 @@ public abstract class Ocr {
     this.preprocessingManipulations = preprocessingManipulations;
   }
 
-  public final String read(BufferedImage image) {
+  public final OcrResult read(BufferedImage image) {
     image = preProcess(image);
 
     return process(image);
   }
 
-  protected abstract String process(BufferedImage image);
+  protected abstract OcrResult process(BufferedImage image);
 
   private BufferedImage preProcess(BufferedImage image) {
     for (var manipulation : preprocessingManipulations) {
