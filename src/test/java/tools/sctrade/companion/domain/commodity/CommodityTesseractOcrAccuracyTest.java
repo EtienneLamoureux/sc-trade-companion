@@ -32,6 +32,7 @@ public class CommodityTesseractOcrAccuracyTest {
   void givenCorrectSreenshotThenReadTextAccurately() throws IOException {
     var result = ocr.read(ImageUtil
         .getFromResourcePath("/images/kiosks/commodity/ScreenShot-2023-09-21_20-23-46-D56.jpg"));
+    var words = result.getFragments();
     System.out.println(result.getText().toLowerCase(Locale.ROOT));
   }
 }

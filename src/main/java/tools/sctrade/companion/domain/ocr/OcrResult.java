@@ -8,8 +8,12 @@ import java.util.stream.Collectors;
 public class OcrResult {
   private Map<Double, LocatedLine> linesByY;
 
-  public OcrResult() {
+  public OcrResult(Collection<LocatedWord> words) {
     linesByY = new TreeMap<>();
+
+    for (var word : words) {
+      add(word);
+    }
   }
 
   public String getText() {
@@ -17,11 +21,11 @@ public class OcrResult {
         .collect(Collectors.joining(System.lineSeparator()));
   }
 
-  public Collection<LocatedWord> getWords() {
-    return linesByY.values().stream().flatMap(n -> n.getWords().stream()).toList();
+  public Collection<LocatedFragment> getFragments() {
+    return linesByY.values().stream().flatMap(n -> n.getFragments().stream()).toList();
   }
 
-  public void add(LocatedWord word) {
+  private void add(LocatedWord word) {
     var line = linesByY.values().stream().filter(n -> n.shouldContain(word)).findFirst();
 
     if (line.isPresent()) {
