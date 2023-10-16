@@ -10,8 +10,6 @@ import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.ScaleAndOffsetColors;
-import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
-import tools.sctrade.companion.ocr.tesseract.CommodityTesseractOcr;
 import tools.sctrade.companion.utils.ImageUtil;
 
 public class CommodityTesseractOcrAccuracyTest {
@@ -25,7 +23,7 @@ public class CommodityTesseractOcrAccuracyTest {
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
     preprocessingManipulations.add(new ScaleAndOffsetColors(10.0f, 0.0f));
-    preprocessingManipulations.add(new WriteToDisk(PREPROCESSED_FOLDER_PATH));
+    // preprocessingManipulations.add(new WriteToDisk(PREPROCESSED_FOLDER_PATH));
 
     this.ocr = new CommodityTesseractOcr(preprocessingManipulations);
   }
@@ -33,7 +31,7 @@ public class CommodityTesseractOcrAccuracyTest {
   @Test
   void givenCorrectSreenshotThenReadTextAccurately() throws IOException {
     var result = ocr.read(ImageUtil
-        .getFromResourcePath("/images/kiosks/commodity/ScreenShot-2023-09-26_19-21-00-0BF.jpg"));
+        .getFromResourcePath("/images/kiosks/commodity/ScreenShot-2023-09-21_20-23-46-D56.jpg"));
     System.out.println(result.getText().toLowerCase(Locale.ROOT));
   }
 }

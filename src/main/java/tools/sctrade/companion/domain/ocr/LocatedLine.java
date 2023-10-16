@@ -1,6 +1,7 @@
 package tools.sctrade.companion.domain.ocr;
 
 import java.awt.Rectangle;
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -16,12 +17,16 @@ class LocatedLine {
     add(word);
   }
 
-  public Rectangle getBoundingBox() {
+  Rectangle getBoundingBox() {
     return boundingBox;
   }
 
   String getText() {
     return wordsByX.values().stream().map(n -> n.getText()).collect(Collectors.joining(" "));
+  }
+
+  Collection<LocatedWord> getWords() {
+    return wordsByX.values();
   }
 
   boolean shouldContain(LocatedWord word) {
@@ -39,7 +44,7 @@ class LocatedLine {
   }
 
   boolean isSeparatedFrom(LocatedLine line) {
-    return Math.abs(getBoundingBox().getCenterY() - line.getBoundingBox().getCenterY()) > (2
+    return Math.abs(getBoundingBox().getCenterY() - line.getBoundingBox().getCenterY()) > (2.0
         * Math.min(getBoundingBox().height, line.getBoundingBox().height));
   }
 }

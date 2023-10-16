@@ -1,9 +1,8 @@
-package tools.sctrade.companion.ocr;
+package tools.sctrade.companion.domain.ocr;
 
 import java.util.List;
 import net.sourceforge.tess4j.Tesseract;
 import tools.sctrade.companion.domain.image.ImageManipulation;
-import tools.sctrade.companion.domain.ocr.Ocr;
 
 public abstract class TesseractOcr extends Ocr {
   protected Tesseract tesseract;
@@ -14,7 +13,7 @@ public abstract class TesseractOcr extends Ocr {
     this.tesseract = new Tesseract();
     tesseract.setDatapath("src/main/resources/tessdata");
     tesseract.setLanguage("eng");
-    tesseract.setPageSegMode(11);
+    tesseract.setPageSegMode(12);
     tesseract.setOcrEngineMode(1);
   }
 
