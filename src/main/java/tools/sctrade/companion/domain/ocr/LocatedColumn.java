@@ -1,6 +1,8 @@
 package tools.sctrade.companion.domain.ocr;
 
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -24,8 +26,8 @@ public class LocatedColumn extends LocatedText {
   }
 
   public boolean shouldContain(LocatedFragment fragment) {
-    double fraction = 0.25;
-    
+    double fraction = 0.1;
+
     for (var i = fraction; i < 1.0; i += fraction) {
       if (contains(
           fragment.getBoundingBox().getMinX() + (fragment.getBoundingBox().getWidth() * i))) {
@@ -46,6 +48,60 @@ public class LocatedColumn extends LocatedText {
       boundingBox = new Rectangle(fragment.getBoundingBox());
   }
 
+  public List<LocatedColumn> getParagraphs() {
+    double paragraphGap = getParagraphGap();
+    List<LocatedColumn> paragraphs = new ArrayList<>();
+    LocatedFragment previousFragment = null;
+
+    for (var fragment : fragmentsByY.values()) {
+      if (previousFragment != null) {
+        var currentParagraph = paragraphs.get(paragraphs.size() - 1);
+        var yGap =
+            fragment.getBoundingBox().getMinY() - previousFragment.getBoundingBox().getMaxY();
+
+        if (yGap < paragraphGap) {
+          currentParagraph.add(fragment);
+        } else {
+          paragraphs.add(new LocatedColumn(fragment));
+        }
+      } else {
+        paragraphs.add(new LocatedColumn(fragment));
+      }
+
+      previousFragment = fragment;
+    }
+
+    return paragraphs;
+  }
+
+
+  public boolean hasYOverlapWith(LocatedColumn column) {
+    return ((column.getBoundingBox().getMaxY() - getBoundingBox().getMinY()) > 0)
+        && ((getBoundingBox().getMaxY() - column.getBoundingBox().getMinY()) > 0);
+  }
+
+
+  private double getParagraphGap() {
+    LocatedFragment previousFragment = null;
+    double minYGap = Double.MAX_VALUE;
+
+    for (var fragment : fragmentsByY.values()) {
+      if (previousFragment != null) {
+        var yGap =
+            fragment.getBoundingBox().getMinY() - previousFragment.getBoundingBox().getMaxY();
+
+        if (yGap <= 0) {
+          continue;
+        }
+
+        minYGap = Math.min(minYGap, yGap);
+      }
+
+      previousFragment = fragment;
+    }
+
+    return minYGap * 3;
+  }
 
   private boolean contains(double x) {
     return boundingBox.getMinX() < x && x < boundingBox.getMaxX();
