@@ -2,6 +2,7 @@ package tools.sctrade.companion.domain.ocr;
 
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -83,24 +84,30 @@ public class LocatedColumn extends LocatedText {
 
   private double getParagraphGap() {
     LocatedFragment previousFragment = null;
-    double minYGap = Double.MAX_VALUE;
+    var yGaps = new ArrayList<Double>();
 
     for (var fragment : fragmentsByY.values()) {
       if (previousFragment != null) {
         var yGap =
             fragment.getBoundingBox().getMinY() - previousFragment.getBoundingBox().getMaxY();
-
-        if (yGap <= 0) {
-          continue;
+        if (yGap > 0) {
+          yGaps.add(yGap);
         }
-
-        minYGap = Math.min(minYGap, yGap);
       }
 
       previousFragment = fragment;
     }
 
-    return minYGap * 3;
+    Collections.sort(yGaps);
+    var gapsByScore = new TreeMap<Double, Double>(Collections.reverseOrder());
+    double previousGap = 0.0;
+
+    for (var yGap : yGaps) {
+      gapsByScore.put(yGap - previousGap, yGap);
+      previousGap = yGap;
+    }
+
+    return gapsByScore.values().iterator().next();
   }
 
   private boolean contains(double x) {

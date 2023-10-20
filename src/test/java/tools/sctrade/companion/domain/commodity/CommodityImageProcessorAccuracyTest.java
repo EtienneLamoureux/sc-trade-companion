@@ -32,6 +32,6 @@ public class CommodityImageProcessorAccuracyTest {
   @Test
   void givenCorrectSreenshotThenReadTextAccurately() throws IOException {
     service.process(ImageUtil
-        .getFromResourcePath("/images/kiosks/commodity/ScreenShot-2023-09-26_19-20-49-522.jpg"));
+        .getFromResourcePath("/images/kiosks/commodity/ScreenShot-2023-09-21_20-23-46-D56.jpg"));
   }
 }
