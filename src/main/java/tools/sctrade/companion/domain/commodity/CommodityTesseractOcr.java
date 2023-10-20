@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.List;
 import java.util.OptionalDouble;
+import java.util.stream.Collectors;
 import net.sourceforge.tess4j.Word;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,8 @@ public class CommodityTesseractOcr extends TesseractOcr {
     var words = tesseract.getWords(image, 0);
     words = onlyKeepWordsInRightHalfOfImage(image, words);
     words = removeWordsRightOfTheListings(words);
+    logger.debug(
+        words.stream().map(n -> n.getText()).collect(Collectors.joining(System.lineSeparator())));
 
     return new OcrResult(
         words.stream().map(n -> new LocatedWord(n.getText(), n.getBoundingBox())).toList());
