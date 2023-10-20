@@ -6,9 +6,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-public class LocatedFragment {
+public class LocatedFragment extends LocatedText {
   protected Map<Double, LocatedWord> wordsByX;
-  protected Rectangle boundingBox;
 
   public LocatedFragment(LocatedWord word) {
     super();
@@ -18,10 +17,7 @@ public class LocatedFragment {
     add(word);
   }
 
-  public Rectangle getBoundingBox() {
-    return boundingBox;
-  }
-
+  @Override
   public String getText() {
     return wordsByX.values().stream().map(n -> n.getText()).collect(Collectors.joining(" "));
   }
@@ -39,4 +35,9 @@ public class LocatedFragment {
       boundingBox = new Rectangle(word.getBoundingBox());
   }
 
+  public boolean isInTheSameColumnAs(LocatedFragment fragment) {
+    double threshold = 2 * Math.max(getCharacterWidth(), fragment.getCharacterWidth());
+    return (threshold < Math.abs(boundingBox.getMinX() - fragment.getBoundingBox().getMinX()))
+        || (threshold < Math.abs(boundingBox.getMaxX() - fragment.getBoundingBox().getMaxX()));
+  }
 }
