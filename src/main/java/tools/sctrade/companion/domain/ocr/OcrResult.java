@@ -1,6 +1,7 @@
 package tools.sctrade.companion.domain.ocr;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -50,7 +51,9 @@ public class OcrResult {
   }
 
   private void buildColumns() {
-    var fragments = linesByY.values().stream().flatMap(n -> n.getFragments().stream()).toList();
+    var fragments = linesByY.values().stream().flatMap(n -> n.getFragments().stream())
+        .collect(Collectors.toList());
+    Collections.reverse(fragments);
 
     for (var fragment : fragments) {
       var column = columnsByX.values().stream().filter(n -> n.shouldContain(fragment)).findFirst();
