@@ -24,15 +24,18 @@ public class LocatedColumn extends LocatedText {
   }
 
   public boolean shouldContain(LocatedFragment fragment) {
-    double maxCharacterWidth = Math.max(getCharacterWidth(), fragment.getCharacterWidth());
-    double leeway = 2 * maxCharacterWidth;
-    var firstCharactersAlign =
-        Math.abs(boundingBox.getMinX() - fragment.getBoundingBox().getMinX()) < leeway;
-    var lastCharactersAlign =
-        Math.abs(boundingBox.getMaxX() - fragment.getBoundingBox().getMaxX()) < leeway;
+    double fraction = 0.25;
+    
+    for (var i = fraction; i < 1.0; i += fraction) {
+      if (contains(
+          fragment.getBoundingBox().getMinX() + (fragment.getBoundingBox().getWidth() * i))) {
+        return true;
+      }
+    }
 
-    return firstCharactersAlign || lastCharactersAlign;
+    return false;
   }
+
 
   public void add(LocatedFragment fragment) {
     fragmentsByY.put(fragment.getBoundingBox().getCenterY(), fragment);
@@ -41,5 +44,10 @@ public class LocatedColumn extends LocatedText {
       boundingBox.add(fragment.getBoundingBox());
     } else
       boundingBox = new Rectangle(fragment.getBoundingBox());
+  }
+
+
+  private boolean contains(double x) {
+    return boundingBox.getMinX() < x && x < boundingBox.getMaxX();
   }
 }
