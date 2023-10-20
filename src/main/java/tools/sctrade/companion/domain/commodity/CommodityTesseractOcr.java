@@ -39,10 +39,11 @@ public class CommodityTesseractOcr extends TesseractOcr {
   }
 
   private List<Word> removeWordsRightOfTheListings(List<Word> words) {
-    OptionalDouble maxX =
-        words.parallelStream().filter(n -> n.getText().toLowerCase().strip().endsWith("/unit"))
-            .map(n -> (n.getBoundingBox().getMaxX() + (n.getBoundingBox().width / 2.0)))
-            .mapToDouble(n -> n).max();
+    OptionalDouble maxX = words.parallelStream().filter(n -> {
+      String string = n.getText().toLowerCase().strip();
+      return string.endsWith("/unit") || string.endsWith("scu");
+    }).map(n -> (n.getBoundingBox().getMaxX() + (n.getBoundingBox().getWidth() / 2.0)))
+        .mapToDouble(n -> n).max();
 
     if (maxX.isEmpty()) {
       return words;

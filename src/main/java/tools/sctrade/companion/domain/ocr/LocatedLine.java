@@ -18,7 +18,7 @@ class LocatedLine extends LocatedFragment {
     LocatedWord previousWord = null;
 
     for (var word : getWordsInReadingOrder()) {
-      if (fragments.isEmpty() || previousWord.isSeparatedFrom(word)) {
+      if (previousWord == null || previousWord.isSeparatedFrom(word)) {
         fragments.add(new LocatedFragment(word));
       } else {
         fragments.get(fragments.size() - 1).add(word);
