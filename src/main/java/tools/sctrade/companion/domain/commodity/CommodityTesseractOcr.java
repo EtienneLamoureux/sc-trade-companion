@@ -28,6 +28,7 @@ public class CommodityTesseractOcr extends TesseractOcr {
     var words = tesseract.getWords(image, 0);
     words = onlyKeepWordsInRightHalfOfImage(image, words);
     words = removeWordsRightOfTheListings(words);
+    words = removeSingleCharacterWords(words);
     logger.debug(
         words.stream().map(n -> n.getText()).collect(Collectors.joining(System.lineSeparator())));
 
@@ -51,6 +52,10 @@ public class CommodityTesseractOcr extends TesseractOcr {
     }
 
     return words.stream().filter(n -> n.getBoundingBox().getMaxX() <= maxX.getAsDouble()).toList();
+  }
+
+  private List<Word> removeSingleCharacterWords(List<Word> words) {
+    return words.stream().filter(n -> n.getText().strip().length() > 1).toList();
   }
 
   private boolean isInListings(Word word) {
