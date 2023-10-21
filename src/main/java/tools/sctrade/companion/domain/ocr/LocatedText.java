@@ -2,7 +2,6 @@ package tools.sctrade.companion.domain.ocr;
 
 import java.awt.Rectangle;
 
-
 public abstract class LocatedText {
   protected Rectangle boundingBox;
 
