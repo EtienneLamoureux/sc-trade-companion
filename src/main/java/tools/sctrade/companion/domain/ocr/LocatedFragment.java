@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+/**
+ * Group of words that for a line, or part of a line, i.e. one row of one column of text
+ */
 public class LocatedFragment extends LocatedText {
   protected Map<Double, LocatedWord> wordsByX;
 
