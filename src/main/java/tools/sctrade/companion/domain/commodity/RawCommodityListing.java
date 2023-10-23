@@ -6,7 +6,7 @@ import tools.sctrade.companion.domain.ocr.LocatedColumn;
 
 class RawCommodityListing {
   private static final Pattern RIGHT_PATTERN =
-      Pattern.compile(".*([0-9\\,]).+\\R\\D*((\\d+[\\.\\,])?\\d+[kK ]*)");
+      Pattern.compile(".*([0-9\\,]).+\\R\\D*((\\d+[\\.\\,])?\\d+[k ]*)", Pattern.CASE_INSENSITIVE);
   private LocatedColumn left;
   private LocatedColumn right;
 

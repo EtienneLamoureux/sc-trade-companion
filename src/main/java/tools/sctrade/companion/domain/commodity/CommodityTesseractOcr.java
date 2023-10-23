@@ -26,15 +26,15 @@ public class CommodityTesseractOcr extends TesseractOcr {
   @Override
   public OcrResult process(BufferedImage image) {
     var words = tesseract.getWords(image, 0);
+    words = removeSingleCharacterWords(words);
     words = onlyKeepWordsInRightHalfOfImage(image, words);
     words = removeWordsRightOfTheListings(words);
     words = removeWordsBelowTheListings(words);
-    words = removeSingleCharacterWords(words);
-    logger.debug(
+    logger.trace(
         words.stream().map(n -> n.getText()).collect(Collectors.joining(System.lineSeparator())));
 
-    return new OcrResult(
-        words.stream().map(n -> new LocatedWord(n.getText(), n.getBoundingBox())).toList());
+    return new OcrResult(words.stream()
+        .map(n -> new LocatedWord(n.getText().toLowerCase(), n.getBoundingBox())).toList());
   }
 
   private List<Word> onlyKeepWordsInRightHalfOfImage(BufferedImage image, List<Word> words) {
@@ -74,6 +74,8 @@ public class CommodityTesseractOcr extends TesseractOcr {
   private boolean isInListings(Word word) {
     String string = word.getText().toLowerCase().strip();
 
-    return string.endsWith("/unit") || string.endsWith("scu");
+    return string.endsWith("/unit") || string.endsWith("scu") || string.contains("stock")
+        || string.contains("out") || string.contains("sc") || string.contains("oc")
+        || string.contains("/");
   }
 }
