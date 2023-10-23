@@ -14,38 +14,46 @@ import tools.sctrade.companion.domain.ocr.LocatedColumn;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.user.UserService;
+import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
 
 public class CommodityService extends ImageProcessor {
   private final Logger logger = LoggerFactory.getLogger(CommodityService.class);
 
   private UserService userService;
-  private Ocr ocr;
+  private Ocr listingsOcr;
   private Collection<CommodityPublisher> outputAdapters;
 
   public CommodityService(UserService userService, Ocr ocr,
       Collection<CommodityPublisher> outputAdapters) {
     this.userService = userService;
-    this.ocr = ocr;
+    this.listingsOcr = ocr;
     this.outputAdapters = outputAdapters;
   }
 
   @Override
   public void process(BufferedImage screenCapture) {
-    OcrResult result = ocr.read(screenCapture);
+    OcrResult result = listingsOcr.read(screenCapture);
 
+    var rawListings = buildRawListings(result);
+
+    publish(Collections.emptyList()); // TODO
+  }
+
+  private List<RawCommodityListing> buildRawListings(OcrResult result) {
     var columns = result.getColumns();
 
     if (columns.size() < 2) {
-      logger.error("Could not make out 2 or more columns of text in the commodity listings");
-      return;
+      throw new NotEnoughColumnsException(2, result);
     }
 
+    // Find the 2 largest columns, by line count
     var columnsBySizeDesc = new TreeMap<Integer, LocatedColumn>(Collections.reverseOrder());
     columns.forEach(n -> columnsBySizeDesc.put(n.getText().length(), n));
     var columnIterator = columnsBySizeDesc.values().iterator();
     var column1 = columnIterator.next();
     var column2 = columnIterator.next();
 
+    // Assign left and right columns
     List<LocatedColumn> leftHalfListings;
     Vector<LocatedColumn> rightHalfListings;
 
@@ -57,6 +65,11 @@ public class CommodityService extends ImageProcessor {
       rightHalfListings = new Vector<>(column1.getParagraphs());
     }
 
+    return assembleRawListings(leftHalfListings, rightHalfListings);
+  }
+
+  private List<RawCommodityListing> assembleRawListings(List<LocatedColumn> leftHalfListings,
+      Vector<LocatedColumn> rightHalfListings) {
     List<RawCommodityListing> rawListings = new ArrayList<>();
 
     for (var leftHalfListing : leftHalfListings) {
@@ -69,7 +82,7 @@ public class CommodityService extends ImageProcessor {
       }
     }
 
-    publish(Collections.emptyList()); // TODO
+    return rawListings;
   }
 
   private void publish(Collection<CommodityListing> listings) {

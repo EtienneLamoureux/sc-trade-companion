@@ -74,8 +74,7 @@ public class CommodityTesseractOcr extends TesseractOcr {
   private boolean isInListings(Word word) {
     String string = word.getText().toLowerCase().strip();
 
-    return string.endsWith("/unit") || string.endsWith("scu") || string.contains("stock")
-        || string.contains("out") || string.contains("sc") || string.contains("oc")
-        || string.contains("/");
+    return string.endsWith("/unit") || string.endsWith("scu") || string.endsWith("stock")
+        || string.startsWith("out") || string.endsWith("demand");
   }
 }
