@@ -6,7 +6,7 @@ import tools.sctrade.companion.domain.ocr.LocatedColumn;
 
 class RawCommodityListing {
   private static final Pattern RIGHT_PATTERN =
-      Pattern.compile("(?>.+)?([0-9\\,]).+\\R(?>[^0-9]+)?(([0-9]+[\\.\\,])?[0-9]+([kK ]+)?)");
+      Pattern.compile(".*([0-9\\,]).+\\R\\D*((\\d+[\\.\\,])?\\d+[kK ]*)");
   private LocatedColumn left;
   private LocatedColumn right;
 
@@ -29,6 +29,7 @@ class RawCommodityListing {
 
   public double getPrice() {
     Matcher matcher = RIGHT_PATTERN.matcher(right.getText());
+    matcher.find();
     String match = matcher.group(2).toLowerCase();
     boolean isThousands = match.endsWith("k");
     match = match.replace("k", "");
