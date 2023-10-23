@@ -21,6 +21,7 @@ class RawCommodityListing {
 
   int getQuantity() {
     Matcher matcher = RIGHT_PATTERN.matcher(right.getText());
+    matcher.find();
     String match = matcher.group(1).toLowerCase();
     match = match.replace(",", "");
 

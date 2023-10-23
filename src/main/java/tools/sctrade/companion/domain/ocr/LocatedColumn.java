@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import tools.sctrade.companion.utils.MathUtil;
 
 public class LocatedColumn extends LocatedText {
   private Map<Double, LocatedFragment> fragmentsByY;
@@ -98,6 +99,7 @@ public class LocatedColumn extends LocatedText {
       previousFragment = fragment;
     }
 
+    yGaps.removeAll(MathUtil.calculateOuliers(yGaps));
     Collections.sort(yGaps);
     var gapsByScore = new TreeMap<Double, Double>(Collections.reverseOrder());
     double previousGap = 0.0;
