@@ -99,8 +99,8 @@ public class LocatedColumn extends LocatedText {
       previousFragment = fragment;
     }
 
-    yGaps.removeAll(MathUtil.calculateOuliers(yGaps));
     Collections.sort(yGaps);
+    yGaps.removeAll(MathUtil.calculateOuliers(yGaps));
     var gapsByScore = new TreeMap<Double, Double>(Collections.reverseOrder());
     double previousGap = 0.0;
 

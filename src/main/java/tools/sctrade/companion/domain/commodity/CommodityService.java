@@ -69,9 +69,6 @@ public class CommodityService extends ImageProcessor {
       }
     }
 
-    rawListings.get(0).getPrice();
-    rawListings.get(0).getQuantity();
-
     publish(Collections.emptyList()); // TODO
   }
 

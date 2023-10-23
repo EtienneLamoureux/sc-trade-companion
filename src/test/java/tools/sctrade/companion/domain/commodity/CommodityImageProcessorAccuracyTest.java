@@ -10,6 +10,7 @@ import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.ScaleAndOffsetColors;
+import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
 import tools.sctrade.companion.utils.ImageUtil;
 
 public class CommodityImageProcessorAccuracyTest {
@@ -23,7 +24,7 @@ public class CommodityImageProcessorAccuracyTest {
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
     preprocessingManipulations.add(new ScaleAndOffsetColors(10.0f, 0.0f));
-    // preprocessingManipulations.add(new WriteToDisk(PREPROCESSED_FOLDER_PATH));
+    preprocessingManipulations.add(new WriteToDisk(PREPROCESSED_FOLDER_PATH));
 
     service = new CommodityService(null, new CommodityTesseractOcr(preprocessingManipulations),
         Collections.emptyList());
@@ -32,6 +33,6 @@ public class CommodityImageProcessorAccuracyTest {
   @Test
   void givenCorrectSreenshotThenReadTextAccurately() throws IOException {
     service.process(ImageUtil
-        .getFromResourcePath("/images/kiosks/commodity/ScreenShot-2023-10-21_14-52-18-DC2.jpg"));
+        .getFromResourcePath("/images/kiosks/commodity/ScreenShot-2023-09-21_20-23-46-D56.jpg"));
   }
 }
