@@ -19,7 +19,6 @@ public class LocatedColumn extends LocatedText {
     add(fragment);
   }
 
-
   @Override
   public String getText() {
     return fragmentsByY.values().stream().map(n -> n.getText())
@@ -39,7 +38,6 @@ public class LocatedColumn extends LocatedText {
     return false;
   }
 
-
   public void add(LocatedFragment fragment) {
     fragmentsByY.put(fragment.getBoundingBox().getCenterY(), fragment);
 
@@ -47,6 +45,10 @@ public class LocatedColumn extends LocatedText {
       boundingBox.add(fragment.getBoundingBox());
     } else
       boundingBox = new Rectangle(fragment.getBoundingBox());
+  }
+
+  public List<LocatedFragment> getFragments() {
+    return fragmentsByY.values().stream().toList();
   }
 
   public List<LocatedColumn> getParagraphs() {
@@ -75,12 +77,10 @@ public class LocatedColumn extends LocatedText {
     return paragraphs;
   }
 
-
   public boolean hasYOverlapWith(LocatedColumn column) {
     return ((column.getBoundingBox().getMaxY() - getBoundingBox().getMinY()) > 0)
         && ((getBoundingBox().getMaxY() - column.getBoundingBox().getMinY()) > 0);
   }
-
 
   private double getParagraphGap() {
     LocatedFragment previousFragment = null;
