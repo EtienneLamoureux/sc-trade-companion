@@ -95,7 +95,7 @@ public class RawCommodityListing {
       if (price >= 1000.0) {
         /*
          * Prices never have more than 3 digits before the decimal character, as the 'k' notation is
-         * preferred. This indicates the '¤' character was read as a number.
+         * preferred. This indicates the '¤' character was read as a number: it must be stripped.
          */
         price %= 1000;
       }
