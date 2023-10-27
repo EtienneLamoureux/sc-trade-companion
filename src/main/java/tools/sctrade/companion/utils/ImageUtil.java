@@ -2,12 +2,14 @@ package tools.sctrade.companion.utils;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 import javax.imageio.ImageIO;
+import tools.sctrade.companion.exceptions.RectangleOutOfBoundsException;
 
 public class ImageUtil {
   private static final String JPG = "jpg";
@@ -40,9 +42,39 @@ public class ImageUtil {
     }
   }
 
-  public static void scaleAndOffsetColors(BufferedImage image, float scale, float offset) {
-    RescaleOp op = new RescaleOp(scale, offset, null);
+  public static void adjustBrightnessAndContrast(BufferedImage image, float contrastScale,
+      float brightnessOffset) {
+    RescaleOp op = new RescaleOp(contrastScale, brightnessOffset, null);
     op.filter(image, image);
+  }
+
+  public static Color calculateAverageColor(BufferedImage image, Rectangle rectangle) {
+    Rectangle imageRectangle =
+        new Rectangle(image.getMinX(), image.getMinY(), image.getWidth(), image.getHeight());
+
+    if (!imageRectangle.contains(rectangle)) {
+      throw new RectangleOutOfBoundsException(rectangle, imageRectangle);
+    }
+
+    int totalRed = 0;
+    int totalGreen = 0;
+    int totalBlue = 0;
+
+    for (int x = (int) rectangle.getMinX(); x < rectangle.getMaxX(); x++) {
+      for (int y = (int) rectangle.getMinY(); y < rectangle.getMaxY(); y++) {
+        Color pixel = new Color(image.getRGB(x, y));
+        totalRed += pixel.getRed();
+        totalGreen += pixel.getGreen();
+        totalBlue += pixel.getBlue();
+      }
+    }
+
+    int pixelCount = (int) (rectangle.getWidth() * rectangle.getHeight());
+    int averageRed = totalRed / pixelCount;
+    int averageGreen = totalGreen / pixelCount;
+    int averageBlue = totalBlue / pixelCount;
+
+    return new Color(averageRed, averageGreen, averageBlue);
   }
 
   public static BufferedImage makeCopy(BufferedImage image) {

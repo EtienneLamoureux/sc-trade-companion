@@ -1,5 +1,6 @@
 package tools.sctrade.companion.domain.commodity;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +16,7 @@ import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
+import tools.sctrade.companion.utils.ImageUtil;
 
 public class CommodityService extends ImageProcessor {
   private final Logger logger = LoggerFactory.getLogger(CommodityService.class);
@@ -33,10 +35,32 @@ public class CommodityService extends ImageProcessor {
   @Override
   public void process(BufferedImage screenCapture) {
     OcrResult result = listingsOcr.read(screenCapture);
-
+    String transactionType = extractTransactionType(screenCapture, result);
     var rawListings = buildRawListings(result);
 
     publish(Collections.emptyList()); // TODO
+  }
+
+  private String extractTransactionType(BufferedImage screenCapture, OcrResult result) {
+    screenCapture = ImageUtil.makeGreyscaleCopy(screenCapture);
+
+    Rectangle shopInv =
+        result.getColumns().parallelStream().flatMap(n -> n.getFragments().parallelStream())
+            .filter(n -> n.getText().equals("shop inventory")).findFirst().get().getBoundingBox();
+    int y = (int) shopInv.getMaxY();
+    int width = (int) shopInv.getWidth();
+    int height = (int) shopInv.getHeight() * 3;
+
+    var buyRectangle = new Rectangle((int) shopInv.getMinX(), y, width, height);
+    var buyRectangleColor = ImageUtil.calculateAverageColor(screenCapture, buyRectangle);
+    var buyRectangleLuminance = buyRectangleColor.getRed();
+
+    var sellRectangle =
+        new Rectangle((int) (shopInv.getMaxX() + (shopInv.getWidth() / 4)), y, width, height);
+    var sellRectangleColor = ImageUtil.calculateAverageColor(screenCapture, sellRectangle);
+    var sellRectangleLuminance = sellRectangleColor.getRed();
+
+    return (buyRectangleLuminance > sellRectangleLuminance) ? "sells" : "buys";
   }
 
   private List<RawCommodityListing> buildRawListings(OcrResult result) {
