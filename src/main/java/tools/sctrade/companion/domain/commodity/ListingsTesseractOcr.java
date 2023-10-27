@@ -14,10 +14,10 @@ import tools.sctrade.companion.domain.ocr.LocatedWord;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.TesseractOcr;
 
-public class CommodityTesseractOcr extends TesseractOcr {
-  private final Logger logger = LoggerFactory.getLogger(CommodityTesseractOcr.class);
+public class ListingsTesseractOcr extends TesseractOcr {
+  private final Logger logger = LoggerFactory.getLogger(ListingsTesseractOcr.class);
 
-  public CommodityTesseractOcr(List<ImageManipulation> preprocessingManipulations) {
+  public ListingsTesseractOcr(List<ImageManipulation> preprocessingManipulations) {
     super(preprocessingManipulations);
 
     tesseract.setConfigs(Arrays.asList("commodity"));

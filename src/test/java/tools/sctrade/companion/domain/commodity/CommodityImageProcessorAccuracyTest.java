@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
-import tools.sctrade.companion.domain.image.manipulations.ScaleAndOffsetColors;
+import tools.sctrade.companion.domain.image.manipulations.AdjustBrightnessAndContrast;
 import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
 import tools.sctrade.companion.utils.ImageUtil;
 
@@ -23,10 +23,10 @@ public class CommodityImageProcessorAccuracyTest {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
-    preprocessingManipulations.add(new ScaleAndOffsetColors(10.0f, 0.0f));
+    preprocessingManipulations.add(new AdjustBrightnessAndContrast(10.0f, 0.0f));
     preprocessingManipulations.add(new WriteToDisk(PREPROCESSED_FOLDER_PATH));
 
-    service = new CommodityService(null, new CommodityTesseractOcr(preprocessingManipulations),
+    service = new CommodityService(null, new ListingsTesseractOcr(preprocessingManipulations),
         Collections.emptyList());
   }
 

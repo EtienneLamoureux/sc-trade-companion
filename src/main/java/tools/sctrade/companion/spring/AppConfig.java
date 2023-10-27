@@ -8,12 +8,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.sctrade.companion.domain.commodity.CommodityPublisher;
 import tools.sctrade.companion.domain.commodity.CommodityService;
-import tools.sctrade.companion.domain.commodity.CommodityTesseractOcr;
+import tools.sctrade.companion.domain.commodity.ListingsTesseractOcr;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageProcessor;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
-import tools.sctrade.companion.domain.image.manipulations.ScaleAndOffsetColors;
+import tools.sctrade.companion.domain.image.manipulations.AdjustBrightnessAndContrast;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.input.KeyListener;
@@ -45,13 +45,13 @@ public class AppConfig {
   }
 
   @Bean("CommodityTesseractOcr")
-  public CommodityTesseractOcr buildCommodityTesseractOcr() {
+  public ListingsTesseractOcr buildCommodityTesseractOcr() {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
-    preprocessingManipulations.add(new ScaleAndOffsetColors(10.0f, 0.0f));
+    preprocessingManipulations.add(new AdjustBrightnessAndContrast(10.0f, 0.0f));
 
-    return new CommodityTesseractOcr(preprocessingManipulations);
+    return new ListingsTesseractOcr(preprocessingManipulations);
   }
 
   @Bean("CommodityService")
