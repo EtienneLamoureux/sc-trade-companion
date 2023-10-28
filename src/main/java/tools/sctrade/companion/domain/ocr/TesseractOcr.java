@@ -14,7 +14,7 @@ public abstract class TesseractOcr extends Ocr {
     tesseract.setDatapath("src/main/resources/tessdata");
     tesseract.setLanguage("eng");
     tesseract.setPageSegMode(11);
-    tesseract.setOcrEngineMode(1);
+    tesseract.setOcrEngineMode(3);
   }
 
 }
