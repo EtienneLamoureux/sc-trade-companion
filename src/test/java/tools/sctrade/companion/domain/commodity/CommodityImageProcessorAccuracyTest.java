@@ -7,9 +7,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.domain.image.ImageManipulation;
+import tools.sctrade.companion.domain.image.manipulations.AdjustBrightnessAndContrast;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
-import tools.sctrade.companion.domain.image.manipulations.AdjustBrightnessAndContrast;
 import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
 import tools.sctrade.companion.utils.ImageUtil;
 
@@ -33,6 +33,6 @@ public class CommodityImageProcessorAccuracyTest {
   @Test
   void givenCorrectSreenshotThenReadTextAccurately() throws IOException {
     service.process(ImageUtil
-        .getFromResourcePath("/images/kiosks/commodity/ScreenShot-2023-09-21_20-23-46-D56.jpg"));
+        .getFromResourcePath("/images/kiosks/commodity/ScreenShot-2023-09-26_19-21-06-5BE.jpg"));
   }
 }

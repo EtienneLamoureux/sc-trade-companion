@@ -2,7 +2,6 @@ package tools.sctrade.companion.domain.commodity;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.util.Arrays;
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
@@ -20,7 +19,7 @@ public class ListingsTesseractOcr extends TesseractOcr {
   public ListingsTesseractOcr(List<ImageManipulation> preprocessingManipulations) {
     super(preprocessingManipulations);
 
-    tesseract.setConfigs(Arrays.asList("commodity"));
+    // tesseract.setConfigs(Arrays.asList("commodity"));
   }
 
   @Override

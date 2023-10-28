@@ -6,17 +6,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentSkipListMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageProcessor;
 import tools.sctrade.companion.domain.ocr.LocatedColumn;
+import tools.sctrade.companion.domain.ocr.LocatedFragment;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
 import tools.sctrade.companion.utils.ImageUtil;
+import tools.sctrade.companion.utils.StringUtil;
 
 public class CommodityService extends ImageProcessor {
   private final Logger logger = LoggerFactory.getLogger(CommodityService.class);
@@ -44,9 +48,11 @@ public class CommodityService extends ImageProcessor {
   private String extractTransactionType(BufferedImage screenCapture, OcrResult result) {
     screenCapture = ImageUtil.makeGreyscaleCopy(screenCapture);
 
-    Rectangle shopInv =
-        result.getColumns().parallelStream().flatMap(n -> n.getFragments().parallelStream())
-            .filter(n -> n.getText().equals("shop inventory")).findFirst().get().getBoundingBox();
+    Map<Integer, LocatedFragment> fragmentsByDistanceToTarget = new ConcurrentSkipListMap<>();
+    result.getColumns().parallelStream().flatMap(n -> n.getFragments().parallelStream())
+        .forEach(n -> fragmentsByDistanceToTarget
+            .put(StringUtil.calculateLevenshteinDistance(n.getText(), "shop inventory"), n));
+    Rectangle shopInv = fragmentsByDistanceToTarget.values().iterator().next().getBoundingBox();
     int y = (int) shopInv.getMaxY();
     int width = (int) shopInv.getWidth();
     int height = (int) shopInv.getHeight() * 3;
