@@ -20,7 +20,7 @@ public class CommodityListingsTesseractOcr extends TesseractOcr {
   public CommodityListingsTesseractOcr(List<ImageManipulation> preprocessingManipulations) {
     super(preprocessingManipulations);
 
-    tesseract.setConfigs(Arrays.asList("commodity"));
+    tesseract.setConfigs(Arrays.asList("commodity-listings"));
   }
 
   @Override

@@ -16,4 +16,11 @@ public class MathUtil {
 
     return values.stream().filter(n -> n < lowerFence || n > upperFence).toList();
   }
+
+  public static double calculateMean(List<Double> distribution) {
+    DescriptiveStatistics statistics = new DescriptiveStatistics();
+    distribution.stream().forEach(n -> statistics.addValue(n));
+
+    return statistics.getMean();
+  }
 }
