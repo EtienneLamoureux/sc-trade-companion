@@ -2,6 +2,7 @@ package tools.sctrade.companion.domain.commodity;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
@@ -13,13 +14,13 @@ import tools.sctrade.companion.domain.ocr.LocatedWord;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.TesseractOcr;
 
-public class ListingsTesseractOcr extends TesseractOcr {
-  private final Logger logger = LoggerFactory.getLogger(ListingsTesseractOcr.class);
+public class CommodityListingsTesseractOcr extends TesseractOcr {
+  private final Logger logger = LoggerFactory.getLogger(CommodityListingsTesseractOcr.class);
 
-  public ListingsTesseractOcr(List<ImageManipulation> preprocessingManipulations) {
+  public CommodityListingsTesseractOcr(List<ImageManipulation> preprocessingManipulations) {
     super(preprocessingManipulations);
 
-    // tesseract.setConfigs(Arrays.asList("commodity"));
+    tesseract.setConfigs(Arrays.asList("commodity"));
   }
 
   @Override
