@@ -26,13 +26,13 @@ public class CommodityImageProcessorAccuracyTest {
     preprocessingManipulations.add(new AdjustBrightnessAndContrast(10.0f, 0.0f));
     preprocessingManipulations.add(new WriteToDisk(PREPROCESSED_FOLDER_PATH));
 
-    service = new CommodityService(null, new ListingsTesseractOcr(preprocessingManipulations),
-        Collections.emptyList());
+    service = new CommodityService(null,
+        new CommodityListingsTesseractOcr(preprocessingManipulations), Collections.emptyList());
   }
 
   @Test
   void givenCorrectSreenshotThenReadTextAccurately() throws IOException {
     service.process(ImageUtil
-        .getFromResourcePath("/images/kiosks/commodity/ScreenShot-2023-09-26_19-21-06-5BE.jpg"));
+        .getFromResourcePath("/images/kiosks/commodity/ScreenShot-2023-10-27_15-28-37-534-4k.jpg"));
   }
 }

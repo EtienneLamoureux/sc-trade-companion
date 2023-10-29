@@ -1,0 +1,6 @@
+\d\* SCU
+\d\*,\d\* SCU
+a\d\*/UNIT
+a\d.\d\*/UNIT
+a\d\*k/UNIT
+a\d.\d\*k/UNIT

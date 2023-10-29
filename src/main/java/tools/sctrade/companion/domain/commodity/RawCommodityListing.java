@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.ocr.LocatedColumn;
 
 public class RawCommodityListing {
-  private static final Pattern RIGHT_PATTERN =
-      Pattern.compile(".*([0-9\\,]).+\\R\\D*((\\d+[\\.\\,])?\\d+[k ]*)", Pattern.CASE_INSENSITIVE);
+  private static final Pattern RIGHT_PATTERN = Pattern
+      .compile("\\D*([0-9\\,]+).+\\R\\D*((\\d+[\\.\\,])?\\d+[k ]*)", Pattern.CASE_INSENSITIVE);
 
   private final Logger logger = LoggerFactory.getLogger(RawCommodityListing.class);
 
@@ -63,7 +63,7 @@ public class RawCommodityListing {
       commodity =
           Optional.of(fragments.stream().map(n -> n.getText()).collect(Collectors.joining(" ")));
     } catch (Exception e) {
-      logger.warn(String.format(Locale.ROOT, "Could not extract commodity from: %s", left), e);
+      logger.warn(String.format(Locale.ROOT, "Could not extract commodity from: %s", left));
       commodity = Optional.empty();
     }
   }
@@ -77,7 +77,7 @@ public class RawCommodityListing {
 
       quantity = Optional.of(Integer.valueOf(match));
     } catch (Exception e) {
-      logger.warn(String.format(Locale.ROOT, "Could not extract quantity from: %s", right), e);
+      logger.warn(String.format(Locale.ROOT, "Could not extract quantity from: %s", right));
       quantity = Optional.empty();
     }
   }
@@ -106,7 +106,7 @@ public class RawCommodityListing {
 
       this.price = Optional.of(price);
     } catch (Exception e) {
-      logger.warn(String.format(Locale.ROOT, "Could not extract price from: %s", right), e);
+      logger.warn(String.format(Locale.ROOT, "Could not extract price from: %s", right));
       this.price = Optional.empty();
     }
   }

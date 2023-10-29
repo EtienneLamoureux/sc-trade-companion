@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.sctrade.companion.domain.commodity.CommodityPublisher;
 import tools.sctrade.companion.domain.commodity.CommodityService;
-import tools.sctrade.companion.domain.commodity.ListingsTesseractOcr;
+import tools.sctrade.companion.domain.commodity.CommodityListingsTesseractOcr;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageProcessor;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
@@ -45,13 +45,13 @@ public class AppConfig {
   }
 
   @Bean("CommodityTesseractOcr")
-  public ListingsTesseractOcr buildCommodityTesseractOcr() {
+  public CommodityListingsTesseractOcr buildCommodityTesseractOcr() {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
     preprocessingManipulations.add(new AdjustBrightnessAndContrast(10.0f, 0.0f));
 
-    return new ListingsTesseractOcr(preprocessingManipulations);
+    return new CommodityListingsTesseractOcr(preprocessingManipulations);
   }
 
   @Bean("CommodityService")
