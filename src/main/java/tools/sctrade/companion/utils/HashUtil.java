@@ -9,7 +9,7 @@ public class HashUtil {
 
   private HashUtil() {}
 
-  public static String getSha256(String string) {
+  public static String hash(String string) {
     try {
       final MessageDigest digest = MessageDigest.getInstance(SHA3_256);
       final byte[] hashbytes = digest.digest(string.getBytes(StandardCharsets.UTF_8));
@@ -20,10 +20,10 @@ public class HashUtil {
     }
   }
 
-  private static String bytesToHex(byte[] hash) {
-    StringBuilder hexString = new StringBuilder(2 * hash.length);
+  private static String bytesToHex(byte[] bytes) {
+    StringBuilder hexString = new StringBuilder(2 * bytes.length);
 
-    for (byte element : hash) {
+    for (byte element : bytes) {
       String hex = Integer.toHexString(0xff & element);
 
       if (hex.length() == 1) {
