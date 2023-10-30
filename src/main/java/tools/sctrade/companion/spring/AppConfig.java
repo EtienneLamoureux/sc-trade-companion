@@ -15,6 +15,7 @@ import tools.sctrade.companion.domain.image.ImageProcessor;
 import tools.sctrade.companion.domain.image.manipulations.AdjustBrightnessAndContrast;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
+import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.input.KeyListener;
@@ -73,7 +74,10 @@ public class AppConfig {
   @Bean("ScreenPrinter")
   public ScreenPrinter buildScreenPrinter(
       @Qualifier("CommodityService") ImageProcessor commodityService) {
-    return new ScreenPrinter(Arrays.asList(commodityService));
+    List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
+    postprocessingManipulations.add(new UpscaleTo4k());
+
+    return new ScreenPrinter(Arrays.asList(commodityService), postprocessingManipulations);
   }
 
   @Bean("KeyListener")

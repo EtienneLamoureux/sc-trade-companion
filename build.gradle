@@ -28,6 +28,7 @@ dependencies {
 	// OCR
 	implementation 'net.sourceforge.tess4j:tess4j:5.8.0'
 	implementation 'org.apache.commons:commons-math3:3.6.1'
+	implementation 'org.imgscalr:imgscalr-lib:4.2'
 	
 	// Tests	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

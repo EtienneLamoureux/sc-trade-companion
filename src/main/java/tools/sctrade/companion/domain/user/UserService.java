@@ -27,7 +27,7 @@ public class UserService {
       id = uuid.toString();
     }
 
-    return HashUtil.getSha256(id);
+    return HashUtil.hash(id);
   }
 
   private String getMacAddress() throws UnknownHostException, SocketException {

@@ -9,6 +9,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Locale;
 import javax.imageio.ImageIO;
+import org.imgscalr.Scalr;
+import org.imgscalr.Scalr.Method;
+import org.imgscalr.Scalr.Mode;
 import tools.sctrade.companion.exceptions.RectangleOutOfBoundsException;
 
 public class ImageUtil {
@@ -75,6 +78,10 @@ public class ImageUtil {
     int averageBlue = totalBlue / pixelCount;
 
     return new Color(averageRed, averageGreen, averageBlue);
+  }
+
+  public static BufferedImage scaleToHeight(BufferedImage image, int height) {
+    return Scalr.resize(image, Method.ULTRA_QUALITY, Mode.FIT_TO_HEIGHT, height, height);
   }
 
   public static BufferedImage makeCopy(BufferedImage image) {
