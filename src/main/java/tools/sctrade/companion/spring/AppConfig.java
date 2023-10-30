@@ -6,14 +6,15 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tools.sctrade.companion.domain.commodity.CommodityListingsTesseractOcr;
 import tools.sctrade.companion.domain.commodity.CommodityPublisher;
 import tools.sctrade.companion.domain.commodity.CommodityService;
-import tools.sctrade.companion.domain.commodity.CommodityListingsTesseractOcr;
+import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageProcessor;
+import tools.sctrade.companion.domain.image.manipulations.AdjustBrightnessAndContrast;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
-import tools.sctrade.companion.domain.image.manipulations.AdjustBrightnessAndContrast;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.input.KeyListener;
@@ -54,12 +55,18 @@ public class AppConfig {
     return new CommodityListingsTesseractOcr(preprocessingManipulations);
   }
 
+  @Bean("CommoditySubmissionFactory")
+  public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
+      @Qualifier("CommodityTesseractOcr") Ocr ocr) {
+    return new CommoditySubmissionFactory(userService, ocr);
+  }
+
   @Bean("CommodityService")
-  public CommodityService buildCommodityService(UserService userService,
-      @Qualifier("CommodityTesseractOcr") Ocr ocr,
+  public CommodityService buildCommodityService(
+      CommoditySubmissionFactory commoditySubmissionFactory,
       @Qualifier("CommodityCsvWriter") CommodityPublisher commodityCsvLogger,
       @Qualifier("ScTradeToolsClient") CommodityPublisher scTradeToolsClient) {
-    return new CommodityService(userService, ocr,
+    return new CommodityService(commoditySubmissionFactory,
         Arrays.asList(commodityCsvLogger, scTradeToolsClient));
   }
 
