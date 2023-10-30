@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.ocr.LocatedColumn;
 
 public class RawCommodityListing {
-  private static final Pattern RIGHT_PATTERN = Pattern
-      .compile("\\D*([0-9\\,]+).+\\R\\D*((\\d+[\\.\\,])?\\d+[k ]*)", Pattern.CASE_INSENSITIVE);
+  private static final Pattern RIGHT_PATTERN =
+      Pattern.compile("\\D*([0-9\\,]+).+\\R.((\\d+[\\.\\,])?\\d+[k ]*)", Pattern.CASE_INSENSITIVE);
 
   private final Logger logger = LoggerFactory.getLogger(RawCommodityListing.class);
 

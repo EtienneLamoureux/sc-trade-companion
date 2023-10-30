@@ -1,4 +1,4 @@
 tessedit_char_whitelist 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ .,/¤▶▷>*°
 load_system_dawg F
 load_freq_dawg F
-user_patterns_file ./eng.commodity-listings.user-patterns
+user_patterns_file C:\Prog\java\sc-trade-companion\src\main\resources\tessdata\commodity-listings.user-patterns
