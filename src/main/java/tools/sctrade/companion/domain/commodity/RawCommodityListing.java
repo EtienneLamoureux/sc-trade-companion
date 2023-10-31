@@ -116,7 +116,8 @@ public class RawCommodityListing {
 
   private void extractPrice() {
     try {
-      String processedRight = right.getText().replace(" ", "").replace("l", "1").replace("s", "5");
+      String processedRight = right.getText().toLowerCase(Locale.ROOT).replace(" ", "")
+          .replace("l", "1").replace("s", "5");
       Matcher matcher = RIGHT_PATTERN.matcher(processedRight);
       matcher.find();
       String match = matcher.group(2).toLowerCase();
