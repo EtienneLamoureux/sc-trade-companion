@@ -52,6 +52,11 @@ public class RawCommodityListing {
     return price;
   }
 
+  boolean isComplete() {
+    return commodity.isPresent() && inventoryLevel.isPresent() && quantity.isPresent()
+        && price.isPresent();
+  }
+
   @Override
   public String toString() {
     String quantity =
@@ -60,12 +65,12 @@ public class RawCommodityListing {
     String commodity = this.commodity.orElse("?");
     String price = this.price.isPresent() ? String.format(Locale.ROOT, "¤%f/unit", this.price.get())
         : "¤?/unit";
-    String inventory = this.inventoryLevel.isPresent()
-        ? String.format(Locale.ROOT, "(%s)", this.inventoryLevel.get().getString())
+    String inventoryLevel = this.inventoryLevel.isPresent()
+        ? String.format(Locale.ROOT, "(%s)", this.inventoryLevel.get().getLabel())
         : "(?)";
 
     return String.format(Locale.ROOT, "%s of '%s' for %s %s", quantity, commodity, price,
-        inventory);
+        inventoryLevel);
   }
 
   private void extractCommodity() {
@@ -86,11 +91,9 @@ public class RawCommodityListing {
       var fragment = fragments.get(fragments.size() - 1);
 
       String rawInventoryLevel = fragment.getText();
-      rawInventoryLevel =
-          rawInventoryLevel.substring(0, rawInventoryLevel.lastIndexOf(" ")).strip();
 
       var inventoryLevelsByString = Arrays.asList(InventoryLevel.values()).stream()
-          .collect(Collectors.toMap(n -> n.getString(), n -> n));
+          .collect(Collectors.toMap(n -> n.getLabel(), n -> n));
       var closestInventoryLevel =
           StringUtil.spellCheck(rawInventoryLevel, inventoryLevelsByString.keySet());
       inventoryLevel = Optional.of(inventoryLevelsByString.get(closestInventoryLevel));
