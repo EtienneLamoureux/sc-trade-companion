@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.sctrade.companion.domain.commodity.CommodityListingsTesseractOcr;
+import tools.sctrade.companion.domain.commodity.CommodityLocationTesseractOcr;
 import tools.sctrade.companion.domain.commodity.CommodityPublisher;
 import tools.sctrade.companion.domain.commodity.CommodityService;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
@@ -46,7 +47,7 @@ public class AppConfig {
     return new ScTradeToolsClient();
   }
 
-  @Bean("CommodityTesseractOcr")
+  @Bean("CommodityListingsTesseractOcr")
   public CommodityListingsTesseractOcr buildCommodityTesseractOcr() {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
     preprocessingManipulations.add(new ConvertToGreyscale());
@@ -56,10 +57,21 @@ public class AppConfig {
     return new CommodityListingsTesseractOcr(preprocessingManipulations);
   }
 
+  @Bean("CommodityLocationTesseractOcr")
+  public CommodityLocationTesseractOcr buildCommodityLocationTesseractOcr() {
+    List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
+    preprocessingManipulations.add(new ConvertToGreyscale());
+    preprocessingManipulations.add(new InvertColors());
+    preprocessingManipulations.add(new AdjustBrightnessAndContrast(10.0f, 0.0f));
+
+    return new CommodityLocationTesseractOcr(preprocessingManipulations);
+  }
+
   @Bean("CommoditySubmissionFactory")
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
-      @Qualifier("CommodityTesseractOcr") Ocr ocr) {
-    return new CommoditySubmissionFactory(userService, ocr);
+      @Qualifier("CommodityListingsTesseractOcr") Ocr listingsOcr,
+      @Qualifier("CommodityLocationTesseractOcr") Ocr locationOcr) {
+    return new CommoditySubmissionFactory(userService, listingsOcr, locationOcr);
   }
 
   @Bean("CommodityService")
