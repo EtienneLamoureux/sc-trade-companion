@@ -23,7 +23,7 @@ public class RawCommodityListing {
 
   private Optional<String> commodity;
   private Optional<InventoryLevel> inventoryLevel;
-  private Optional<Integer> quantity;
+  private Optional<Integer> inventory;
   private Optional<Double> price;
 
   RawCommodityListing(LocatedColumn left, LocatedColumn right) {
@@ -32,7 +32,7 @@ public class RawCommodityListing {
 
     extractCommodity();
     extractInventoryLevel();
-    extractQuantity();
+    extractInventory();
     extractPrice();
   }
 
@@ -44,8 +44,8 @@ public class RawCommodityListing {
     return inventoryLevel;
   }
 
-  Optional<Integer> getQuantity() {
-    return quantity;
+  Optional<Integer> getInventory() {
+    return inventory;
   }
 
   Optional<Double> getPrice() {
@@ -53,14 +53,14 @@ public class RawCommodityListing {
   }
 
   boolean isComplete() {
-    return commodity.isPresent() && inventoryLevel.isPresent() && quantity.isPresent()
+    return commodity.isPresent() && inventoryLevel.isPresent() && inventory.isPresent()
         && price.isPresent();
   }
 
   @Override
   public String toString() {
-    String quantity =
-        this.quantity.isPresent() ? String.format(Locale.ROOT, "%s SCU", this.quantity.get())
+    String inventory =
+        this.inventory.isPresent() ? String.format(Locale.ROOT, "%s SCU", this.inventory.get())
             : "? SCU";
     String commodity = this.commodity.orElse("?");
     String price = this.price.isPresent() ? String.format(Locale.ROOT, "¤%f/unit", this.price.get())
@@ -69,7 +69,7 @@ public class RawCommodityListing {
         ? String.format(Locale.ROOT, "(%s)", this.inventoryLevel.get().getLabel())
         : "(?)";
 
-    return String.format(Locale.ROOT, "%s of '%s' for %s %s", quantity, commodity, price,
+    return String.format(Locale.ROOT, "%s of '%s' for %s %s", inventory, commodity, price,
         inventoryLevel);
   }
 
@@ -103,17 +103,17 @@ public class RawCommodityListing {
     }
   }
 
-  private void extractQuantity() {
+  private void extractInventory() {
     try {
       Matcher matcher = RIGHT_PATTERN.matcher(right.getText().replace(" ", ""));
       matcher.find();
       String match = matcher.group(1).toLowerCase();
       match = match.replace(",", "");
 
-      quantity = Optional.of(Integer.valueOf(match));
+      inventory = Optional.of(Integer.valueOf(match));
     } catch (Exception e) {
-      logger.debug(String.format(Locale.ROOT, "Could not extract quantity from: %s", right));
-      quantity = Optional.empty();
+      logger.debug(String.format(Locale.ROOT, "Could not extract inventory from: %s", right));
+      inventory = Optional.empty();
     }
   }
 
