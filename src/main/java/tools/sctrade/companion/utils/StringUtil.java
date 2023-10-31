@@ -1,5 +1,9 @@
 package tools.sctrade.companion.utils;
 
+import java.util.Collection;
+import java.util.concurrent.ConcurrentSkipListMap;
+import tools.sctrade.companion.exceptions.NoCloseStringException;
+
 public class StringUtil {
   private StringUtil() {}
 
@@ -20,5 +24,19 @@ public class StringUtil {
     }
 
     return dp[x.length()][y.length()];
+  }
+
+  public static String spellCheck(String string, Collection<String> possibilities) {
+    var possibilitiesByDistance = new ConcurrentSkipListMap<Integer, String>();
+    possibilities.parallelStream()
+        .forEach(n -> possibilitiesByDistance.put(calculateLevenshteinDistance(n, string), n));
+
+    var minDistance = possibilitiesByDistance.keySet().iterator().next();
+
+    if (minDistance > (string.length() / 2)) {
+      throw new NoCloseStringException(string);
+    }
+
+    return possibilitiesByDistance.get(minDistance);
   }
 }
