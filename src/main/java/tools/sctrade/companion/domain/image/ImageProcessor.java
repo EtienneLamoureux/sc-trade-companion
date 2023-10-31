@@ -17,5 +17,5 @@ public abstract class ImageProcessor {
     }
   }
 
-  protected abstract void process(BufferedImage image);
+  protected abstract void process(BufferedImage image) throws Exception;
 }

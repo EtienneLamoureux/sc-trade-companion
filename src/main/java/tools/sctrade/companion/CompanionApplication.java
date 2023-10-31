@@ -12,10 +12,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import tools.sctrade.companion.input.KeyListener;
 import tools.sctrade.companion.swing.CompanionGui;
 
 @SpringBootApplication
+@EnableScheduling
 @EnableAsync
 public class CompanionApplication {
   private static final Logger logger = LoggerFactory.getLogger(CompanionApplication.class);
