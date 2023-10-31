@@ -22,6 +22,6 @@ enum InventoryLevel {
       return quantity;
     }
 
-    return (quantity == 0) ? 999999 : (int) (quantity / this.fraction);
+    return (quantity == 0) ? 999999 : (int) (quantity / this.fraction) - quantity;
   }
 }
