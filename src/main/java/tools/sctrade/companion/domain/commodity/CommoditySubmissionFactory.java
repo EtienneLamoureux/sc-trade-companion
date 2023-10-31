@@ -21,8 +21,6 @@ import tools.sctrade.companion.utils.ImageUtil;
 import tools.sctrade.companion.utils.StringUtil;
 
 public class CommoditySubmissionFactory {
-  private static final String SELLS = "sells";
-  private static final String BUYS = "buys";
   private static final String SHOP_INVENTORY = "shop inventory";
 
   private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactory.class);
@@ -37,7 +35,7 @@ public class CommoditySubmissionFactory {
 
   CommoditySubmission build(BufferedImage screenCapture) {
     OcrResult result = listingsOcr.read(screenCapture);
-    String transactionType = extractTransactionType(screenCapture, result);
+    var transactionType = extractTransactionType(screenCapture, result);
     var rawListings = buildRawListings(result);
 
     return null;
@@ -89,7 +87,7 @@ public class CommoditySubmissionFactory {
     return rawListings;
   }
 
-  private String extractTransactionType(BufferedImage screenCapture, OcrResult result) {
+  private TransactionType extractTransactionType(BufferedImage screenCapture, OcrResult result) {
     screenCapture = ImageUtil.makeGreyscaleCopy(screenCapture);
     Rectangle shopInv = getShopInventoryRectangle(result);
 
@@ -106,7 +104,8 @@ public class CommoditySubmissionFactory {
     var sellRectangleColor = ImageUtil.calculateAverageColor(screenCapture, sellRectangle);
     var sellRectangleLuminance = sellRectangleColor.getRed();
 
-    return (buyRectangleLuminance > sellRectangleLuminance) ? SELLS : BUYS;
+    return (buyRectangleLuminance > sellRectangleLuminance) ? TransactionType.SELLS
+        : TransactionType.BUYS;
   }
 
   private Rectangle getShopInventoryRectangle(OcrResult result) {
