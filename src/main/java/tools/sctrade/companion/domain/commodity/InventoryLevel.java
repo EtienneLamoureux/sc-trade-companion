@@ -1,27 +1,24 @@
 package tools.sctrade.companion.domain.commodity;
 
 enum InventoryLevel {
-  NONE("no demand", 0), VERY_LOW("very low inventory", 1.0 / 6.0), LOW("low inventory",
+  SOLD_OUT("out of stock", 0.0), VERY_LOW("very low inventory", 1.0 / 6.0), LOW("low inventory",
       2.0 / 6.0), MEDIUM("medium inventory", 3.0 / 6.0), HIGH("high inventory",
-          4.0 / 6.0), VERY_HIGH("very high inventory", 5.0 / 6.0), MAX("out of stock", 1.0);
+          4.0 / 6.0), VERY_HIGH("very high inventory",
+              5.0 / 6.0), FULL("no demand", 1.0), MAX("max inventory", 1.0);
 
-  private final String string;
-  private final double fraction;
+  private final String label;
+  private final double saturation;
 
-  InventoryLevel(String string, double fraction) {
-    this.string = string;
-    this.fraction = fraction;
+  InventoryLevel(String label, double saturation) {
+    this.label = label;
+    this.saturation = saturation;
   }
 
-  String getString() {
-    return string;
+  String getLabel() {
+    return label;
   }
 
-  int getInventory(int quantity, TransactionType transactionType) {
-    if (TransactionType.SELLS.equals(transactionType)) {
-      return quantity;
-    }
-
-    return (quantity == 0) ? 999999 : (int) (quantity / this.fraction) - quantity;
+  double getSaturation() {
+    return saturation;
   }
 }
