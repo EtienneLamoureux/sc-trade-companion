@@ -8,7 +8,7 @@ public abstract class CommodityPublisher {
   private final Logger logger = LoggerFactory.getLogger(CommodityPublisher.class);
 
   @Async
-  public final void publishAsynchronously(CommoditySubmission submission) {
+  public void publishAsynchronously(CommoditySubmission submission) {
     try {
       publish(submission);
     } catch (Exception e) {
