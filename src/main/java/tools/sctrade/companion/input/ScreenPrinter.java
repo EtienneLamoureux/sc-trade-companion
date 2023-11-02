@@ -32,10 +32,14 @@ public class ScreenPrinter implements Runnable {
   @Override
   public void run() {
     try {
+      logger.debug("Printing screen...");
       var screenRectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
       var screenCapture = postProcess(new Robot().createScreenCapture(screenRectangle));
+      logger.debug("Printed screen");
 
+      logger.debug("Calling image processors...");
       imageProcessors.stream().forEach(n -> n.processAsynchronously(screenCapture));
+      logger.debug("Called image processors");
 
       ImageUtil.writeToDisk(screenCapture);
     } catch (Exception e) {

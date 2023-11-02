@@ -9,7 +9,7 @@ public abstract class ImageProcessor {
   private final Logger logger = LoggerFactory.getLogger(ImageProcessor.class);
 
   @Async
-  public final void processAsynchronously(BufferedImage image) {
+  public void processAsynchronously(BufferedImage image) {
     try {
       process(image);
     } catch (Exception e) {
