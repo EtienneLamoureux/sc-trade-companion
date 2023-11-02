@@ -1,6 +1,5 @@
 package tools.sctrade.companion.domain.commodity;
 
-import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.OptionalDouble;
@@ -22,9 +21,9 @@ public class CommodityListingsTesseractOcr extends TesseractOcr {
 
   @Override
   public OcrResult process(BufferedImage image) {
+    image = cropLeftHalf(image);
     var words = tesseract.getWords(image, 0);
     words = removeSingleCharacterWords(words);
-    words = onlyKeepWordsInRightHalfOfImage(image, words);
     words = removeWordsRightOfTheListings(words);
     words = removeWordsBelowTheListings(words);
     logger.trace(
@@ -34,10 +33,8 @@ public class CommodityListingsTesseractOcr extends TesseractOcr {
         .map(n -> new LocatedWord(n.getText().toLowerCase(), n.getBoundingBox())).toList());
   }
 
-  private List<Word> onlyKeepWordsInRightHalfOfImage(BufferedImage image, List<Word> words) {
-    Rectangle rightHalf =
-        new Rectangle((image.getWidth() / 2), 0, (image.getWidth() / 2), image.getHeight());
-    return words.stream().filter(n -> rightHalf.contains(n.getBoundingBox())).toList();
+  private BufferedImage cropLeftHalf(BufferedImage image) {
+    return image.getSubimage((image.getWidth() / 2), 0, (image.getWidth() / 2), image.getHeight());
   }
 
   private List<Word> removeWordsRightOfTheListings(List<Word> words) {

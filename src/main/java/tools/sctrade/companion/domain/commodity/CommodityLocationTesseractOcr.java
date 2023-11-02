@@ -21,13 +21,17 @@ public class CommodityLocationTesseractOcr extends TesseractOcr {
 
   @Override
   public OcrResult process(BufferedImage image) {
+    image = cropRightHalf(image);
     var words = tesseract.getWords(image, 0);
-    words = onlyKeepWordsInLeftHalfOfImage(image, words);
     logger.trace(
         words.stream().map(n -> n.getText()).collect(Collectors.joining(System.lineSeparator())));
 
     return new OcrResult(words.stream()
         .map(n -> new LocatedWord(n.getText().toLowerCase(), n.getBoundingBox())).toList());
+  }
+
+  private BufferedImage cropRightHalf(BufferedImage image) {
+    return image.getSubimage(0, 0, (image.getWidth() / 2), image.getHeight());
   }
 
   private List<Word> onlyKeepWordsInLeftHalfOfImage(BufferedImage image, List<Word> words) {
