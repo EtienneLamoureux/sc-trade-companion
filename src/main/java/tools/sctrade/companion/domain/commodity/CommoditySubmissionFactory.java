@@ -21,6 +21,7 @@ import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.exceptions.LocationNotFoundException;
 import tools.sctrade.companion.exceptions.NoCloseStringException;
 import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
+import tools.sctrade.companion.utils.HashUtil;
 import tools.sctrade.companion.utils.ImageUtil;
 import tools.sctrade.companion.utils.StringUtil;
 
@@ -47,6 +48,7 @@ public class CommoditySubmissionFactory {
 
     OcrResult locationResult = locationOcr.read(screenCapture);
     var location = extractLocation(locationResult);
+    String batchId = HashUtil.hash(screenCapture);
 
     return null;
   }

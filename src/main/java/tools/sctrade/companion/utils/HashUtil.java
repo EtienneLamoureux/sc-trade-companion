@@ -1,7 +1,11 @@
 package tools.sctrade.companion.utils;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import javax.imageio.ImageIO;
 import tools.sctrade.companion.exceptions.HashException;
 
 public class HashUtil {
@@ -10,9 +14,25 @@ public class HashUtil {
   private HashUtil() {}
 
   public static String hash(String string) {
+    return hash(string.getBytes(StandardCharsets.UTF_8));
+  }
+
+  public static String hash(BufferedImage image) {
+    try {
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      ImageIO.write(image, "jpg", outputStream);
+      byte[] bytes = outputStream.toByteArray();
+
+      return hash(bytes);
+    } catch (IOException e) {
+      throw new HashException(e);
+    }
+  }
+
+  public static String hash(byte[] bytes) {
     try {
       final MessageDigest digest = MessageDigest.getInstance(SHA3_256);
-      final byte[] hashbytes = digest.digest(string.getBytes(StandardCharsets.UTF_8));
+      final byte[] hashbytes = digest.digest(bytes);
 
       return bytesToHex(hashbytes);
     } catch (Exception e) {
