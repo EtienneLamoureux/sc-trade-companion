@@ -23,6 +23,7 @@ public class CommodityListingsTesseractOcr extends TesseractOcr {
   public OcrResult process(BufferedImage image) {
     image = cropLeftHalf(image);
     var words = tesseract.getWords(image, 0);
+    words = removeNonWords(words);
     words = removeSingleCharacterWords(words);
     words = removeWordsRightOfTheListings(words);
     words = removeWordsBelowTheListings(words);
@@ -59,10 +60,6 @@ public class CommodityListingsTesseractOcr extends TesseractOcr {
     }
 
     return words.stream().filter(n -> n.getBoundingBox().getMaxY() <= maxY.getAsDouble()).toList();
-  }
-
-  private List<Word> removeSingleCharacterWords(List<Word> words) {
-    return words.stream().filter(n -> n.getText().strip().length() > 1).toList();
   }
 
   private boolean isInListings(Word word) {
