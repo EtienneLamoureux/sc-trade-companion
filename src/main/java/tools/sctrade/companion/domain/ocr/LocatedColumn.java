@@ -82,6 +82,15 @@ public class LocatedColumn extends LocatedText {
         && ((getBoundingBox().getMaxY() - column.getBoundingBox().getMinY()) > 0);
   }
 
+  /**
+   * Calculates the gap, on the Y axis, above which the space between 2 lines means a new paragraph
+   * has started
+   *
+   * TODO Can be improve by assuming the `yGaps` is a binomial distribution and picking the first
+   * local minimum.
+   *
+   * @return Paragraph gap
+   */
   private double getParagraphGap() {
     LocatedFragment previousFragment = null;
     var yGaps = new ArrayList<Double>();
