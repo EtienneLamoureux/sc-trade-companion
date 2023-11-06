@@ -2,6 +2,7 @@ package tools.sctrade.companion.domain.commodity;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,6 +21,7 @@ import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.exceptions.LocationNotFoundException;
 import tools.sctrade.companion.exceptions.NoCloseStringException;
+import tools.sctrade.companion.exceptions.NoListingsException;
 import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
 import tools.sctrade.companion.utils.HashUtil;
 import tools.sctrade.companion.utils.ImageUtil;
@@ -50,7 +52,28 @@ public class CommoditySubmissionFactory {
     var location = extractLocation(locationResult);
     String batchId = HashUtil.hash(screenCapture);
 
-    return null;
+    Collection<CommodityListing> listings =
+        buildCommodityListings(location, transactionType, rawListings, batchId);
+
+    return new CommoditySubmission(userService.get(), listings);
+  }
+
+
+  private Collection<CommodityListing> buildCommodityListings(String location,
+      TransactionType transactionType, List<RawCommodityListing> rawListings, String batchId) {
+    rawListings = rawListings.parallelStream().filter(n -> n.isComplete()).toList();
+
+    if (rawListings.isEmpty()) {
+      throw new NoListingsException();
+    }
+
+    Instant now = Instant.now();
+
+    return rawListings.parallelStream()
+        .map(n -> new CommodityListing(location, transactionType.toString(), n.getCommodity().get(),
+            n.getPrice().get(), n.getInventory().get(), n.getInventoryLevel().get().getSaturation(),
+            batchId, now))
+        .toList();
   }
 
   private List<RawCommodityListing> buildRawListings(OcrResult result) {
