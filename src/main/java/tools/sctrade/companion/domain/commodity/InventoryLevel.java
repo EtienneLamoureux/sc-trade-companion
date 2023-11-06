@@ -1,6 +1,6 @@
 package tools.sctrade.companion.domain.commodity;
 
-enum InventoryLevel {
+public enum InventoryLevel {
   SOLD_OUT("out of stock", 0.0), VERY_LOW("very low inventory", 1.0 / 6.0), LOW("low inventory",
       2.0 / 6.0), MEDIUM("medium inventory", 3.0 / 6.0), HIGH("high inventory",
           4.0 / 6.0), VERY_HIGH("very high inventory",
@@ -14,11 +14,11 @@ enum InventoryLevel {
     this.saturation = saturation;
   }
 
-  String getLabel() {
+  public String getLabel() {
     return label;
   }
 
-  double getSaturation() {
+  public double getSaturation() {
     return saturation;
   }
 }

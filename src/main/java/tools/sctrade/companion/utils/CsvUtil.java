@@ -24,7 +24,7 @@ import tools.sctrade.companion.exceptions.CsvParsingException;
 public class CsvUtil {
   private CsvUtil() {}
 
-  public void write(Collection<List<String>> lines, Path path) {
+  public static void write(Path path, Collection<List<String>> lines) {
     try (CSVWriter writer = new CSVWriter(new FileWriter(path.toString(), true))) {
       for (List<String> line : lines) {
         writer.writeNext(line.toArray(new String[0]));

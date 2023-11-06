@@ -12,4 +12,8 @@ public class TimeUtil {
   public static String getNowAsString(TimeFormat timeFormat) {
     return timeFormat.format(getNow());
   }
+
+  public static String getAsString(TimeFormat timeFormat, Instant instant) {
+    return timeFormat.format(instant);
+  }
 }

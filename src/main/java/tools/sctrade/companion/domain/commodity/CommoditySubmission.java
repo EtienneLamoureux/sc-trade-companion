@@ -16,11 +16,11 @@ public class CommoditySubmission {
     this.listings = listings;
   }
 
-  User getUser() {
+  public User getUser() {
     return user;
   }
 
-  Collection<CommodityListing> getListings() {
+  public Collection<CommodityListing> getListings() {
     return listings;
   }
 
@@ -33,9 +33,9 @@ public class CommoditySubmission {
      * Kiosk location can only be correctly acquired from the "Sell" tab, since on the "Buy" tab,
      * the inventory listed would be the ship.
      */
-    if (newListing.transaction().equals(TransactionType.BUYS.toString())) {
+    if (newListing.transactionType().equals(TransactionType.BUYS)) {
       listings = listings.parallelStream().map(listing -> {
-        if (listing.transaction().equals(TransactionType.SELLS.toString())) {
+        if (listing.transactionType().equals(TransactionType.SELLS)) {
           return listing;
         }
 

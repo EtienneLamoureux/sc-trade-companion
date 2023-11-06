@@ -45,12 +45,16 @@ public class CommoditySubmissionFactory {
   }
 
   CommoditySubmission build(BufferedImage screenCapture) {
+    logger.debug("Reading listings...");
     OcrResult listingsResult = listingsOcr.read(screenCapture);
     var rawListings = buildRawListings(listingsResult);
+    logger.debug("Read {} listings", rawListings.size());
     var transactionType = extractTransactionType(screenCapture, listingsResult);
 
+    logger.debug("Reading location...");
     OcrResult locationResult = locationOcr.read(screenCapture);
     var location = extractLocation(locationResult);
+    logger.debug("Read location '{}'", location);
     String batchId = HashUtil.hash(screenCapture);
 
     Collection<CommodityListing> listings =
@@ -70,9 +74,8 @@ public class CommoditySubmissionFactory {
     Instant now = TimeUtil.getNow();
 
     return rawListings.parallelStream()
-        .map(n -> new CommodityListing(location, transactionType.toString(), n.getCommodity().get(),
-            n.getPrice().get(), n.getInventory().get(), n.getInventoryLevel().get().getSaturation(),
-            batchId, now))
+        .map(n -> new CommodityListing(location, transactionType, n.getCommodity().get(),
+            n.getPrice().get(), n.getInventory().get(), n.getInventoryLevel().get(), batchId, now))
         .toList();
   }
 
