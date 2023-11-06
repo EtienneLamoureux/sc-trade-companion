@@ -11,11 +11,10 @@ import tools.sctrade.companion.domain.image.manipulations.AdjustBrightnessAndCon
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
+import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.utils.ImageUtil;
 
 public class CommoditySubmissionFactoryAccuracyTest {
-  private static final String PREPROCESSED_FOLDER_PATH = "tests/preprocessed";
-
   private CommoditySubmissionFactory factory;
 
   @BeforeEach
@@ -24,9 +23,9 @@ public class CommoditySubmissionFactoryAccuracyTest {
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
     preprocessingManipulations.add(new AdjustBrightnessAndContrast(10.0f, 0.0f));
-    // preprocessingManipulations.add(new WriteToDisk(PREPROCESSED_FOLDER_PATH));
+    // preprocessingManipulations.add(new WriteToDisk("tests/preprocessed"));
 
-    factory = new CommoditySubmissionFactory(null,
+    factory = new CommoditySubmissionFactory(new UserService(),
         new CommodityListingsTesseractOcr(preprocessingManipulations),
         new CommodityLocationTesseractOcr(preprocessingManipulations));
   }
@@ -38,6 +37,7 @@ public class CommoditySubmissionFactoryAccuracyTest {
         .getFromResourcePath("/images/kiosks/commodity/ScreenShot-2023-10-27_15-28-07-12F.jpg");
     screenshot = manipulation.manipulate(screenshot);
 
-    factory.build(screenshot);
+    var submission = factory.build(screenshot);
+    System.out.println(submission.toString());
   }
 }
