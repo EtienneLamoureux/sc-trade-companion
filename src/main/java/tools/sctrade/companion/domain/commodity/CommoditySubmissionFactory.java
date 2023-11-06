@@ -26,6 +26,7 @@ import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
 import tools.sctrade.companion.utils.HashUtil;
 import tools.sctrade.companion.utils.ImageUtil;
 import tools.sctrade.companion.utils.StringUtil;
+import tools.sctrade.companion.utils.TimeUtil;
 
 public class CommoditySubmissionFactory {
   private static final String SHOP_INVENTORY = "shop inventory";
@@ -66,7 +67,7 @@ public class CommoditySubmissionFactory {
       throw new NoListingsException();
     }
 
-    Instant now = Instant.now();
+    Instant now = TimeUtil.getNow();
 
     return rawListings.parallelStream()
         .map(n -> new CommodityListing(location, transactionType.toString(), n.getCommodity().get(),

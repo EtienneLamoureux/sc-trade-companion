@@ -2,11 +2,14 @@ package tools.sctrade.companion.utils;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
+import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvException;
 import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -18,8 +21,20 @@ import tools.sctrade.companion.exceptions.CsvParsingException;
  *
  * @see <a href="https://www.baeldung.com/opencsv">Reference</a>
  */
-public class CsvParser {
-  public Collection<List<String>> parse(String path, boolean hasHeader) {
+public class CsvUtil {
+  private CsvUtil() {}
+
+  public void write(Collection<List<String>> lines, Path path) {
+    try (CSVWriter writer = new CSVWriter(new FileWriter(path.toString(), true))) {
+      for (List<String> line : lines) {
+        writer.writeNext(line.toArray(new String[0]));
+      }
+    } catch (IOException e) {
+      throw new CsvParsingException(e);
+    }
+  }
+
+  public Collection<List<String>> read(String path, boolean hasHeader) {
     try (Reader reader = initializeReader(path)) {
       try (CSVReader csvReader =
           new CSVReaderBuilder(reader).withSkipLines(hasHeader ? 1 : 0).build()) {
