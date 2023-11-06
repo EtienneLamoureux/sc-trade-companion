@@ -1,12 +1,12 @@
 package tools.sctrade.companion.output.commodity;
 
-import tools.sctrade.companion.domain.commodity.CommodityPublisher;
 import tools.sctrade.companion.domain.commodity.CommoditySubmission;
+import tools.sctrade.companion.utils.AsynchronousProcessor;
 
-public class CommodityCsvWriter extends CommodityPublisher {
+public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmission> {
 
   @Override
-  public void publish(CommoditySubmission submission) {
+  public void process(CommoditySubmission submission) {
     // TODO Auto-generated method stub
 
   }

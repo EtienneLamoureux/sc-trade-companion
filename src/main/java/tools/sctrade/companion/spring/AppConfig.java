@@ -8,11 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.sctrade.companion.domain.commodity.CommodityListingsTesseractOcr;
 import tools.sctrade.companion.domain.commodity.CommodityLocationTesseractOcr;
-import tools.sctrade.companion.domain.commodity.CommodityPublisher;
 import tools.sctrade.companion.domain.commodity.CommodityService;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
-import tools.sctrade.companion.domain.image.ImageProcessor;
 import tools.sctrade.companion.domain.image.manipulations.AdjustBrightnessAndContrast;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
@@ -77,15 +75,15 @@ public class AppConfig {
   @Bean("CommodityService")
   public CommodityService buildCommodityService(
       CommoditySubmissionFactory commoditySubmissionFactory,
-      @Qualifier("CommodityCsvWriter") CommodityPublisher commodityCsvLogger,
-      @Qualifier("ScTradeToolsClient") CommodityPublisher scTradeToolsClient) {
+      @Qualifier("CommodityCsvWriter") CommodityCsvWriter commodityCsvLogger,
+      @Qualifier("ScTradeToolsClient") ScTradeToolsClient scTradeToolsClient) {
     return new CommodityService(commoditySubmissionFactory,
         Arrays.asList(commodityCsvLogger, scTradeToolsClient));
   }
 
   @Bean("ScreenPrinter")
   public ScreenPrinter buildScreenPrinter(
-      @Qualifier("CommodityService") ImageProcessor commodityService) {
+      @Qualifier("CommodityService") CommodityService commodityService) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 

@@ -7,22 +7,22 @@ import java.util.concurrent.Semaphore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
-import tools.sctrade.companion.domain.image.ImageProcessor;
+import tools.sctrade.companion.utils.AsynchronousProcessor;
 
-public class CommodityService extends ImageProcessor {
+public class CommodityService extends AsynchronousProcessor<BufferedImage> {
   private final Logger logger = LoggerFactory.getLogger(CommodityService.class);
 
   private CommoditySubmissionFactory submissionFactory;
-  private Collection<CommodityPublisher> outputAdapters;
+  private Collection<AsynchronousProcessor<CommoditySubmission>> publishers;
 
   private Semaphore pendingSubmissionMutex = new Semaphore(1, true);
   private boolean publishNextTime;
   private Optional<CommoditySubmission> pendingSubmission;
 
   public CommodityService(CommoditySubmissionFactory submissionFactory,
-      Collection<CommodityPublisher> outputAdapters) {
+      Collection<AsynchronousProcessor<CommoditySubmission>> publishers) {
     this.submissionFactory = submissionFactory;
-    this.outputAdapters = outputAdapters;
+    this.publishers = publishers;
     this.publishNextTime = false;
     this.pendingSubmission = Optional.empty();
   }
@@ -59,7 +59,7 @@ public class CommodityService extends ImageProcessor {
       }
 
       CommoditySubmission submission = pendingSubmission.get();
-      outputAdapters.stream().forEach(n -> n.publishAsynchronously(submission));
+      publishers.stream().forEach(n -> n.processAsynchronously(submission));
       publishNextTime = false;
       pendingSubmission = Optional.empty();
     } finally {
