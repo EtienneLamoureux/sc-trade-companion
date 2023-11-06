@@ -10,20 +10,20 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
-import tools.sctrade.companion.domain.image.ImageProcessor;
+import tools.sctrade.companion.utils.AsynchronousProcessor;
 import tools.sctrade.companion.utils.ImageUtil;
 
 public class ScreenPrinter implements Runnable {
   private final Logger logger = LoggerFactory.getLogger(ScreenPrinter.class);
 
-  private Collection<ImageProcessor> imageProcessors;
+  private Collection<AsynchronousProcessor<BufferedImage>> imageProcessors;
   private List<ImageManipulation> postprocessingManipulations;
 
-  public ScreenPrinter(Collection<ImageProcessor> imageProcessors) {
+  public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors) {
     this(imageProcessors, Collections.emptyList());
   }
 
-  public ScreenPrinter(Collection<ImageProcessor> imageProcessors,
+  public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
       List<ImageManipulation> postprocessingManipulations) {
     this.imageProcessors = imageProcessors;
     this.postprocessingManipulations = postprocessingManipulations;

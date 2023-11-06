@@ -58,7 +58,6 @@ public class CommoditySubmissionFactory {
     return new CommoditySubmission(userService.get(), listings);
   }
 
-
   private Collection<CommodityListing> buildCommodityListings(String location,
       TransactionType transactionType, List<RawCommodityListing> rawListings, String batchId) {
     rawListings = rawListings.parallelStream().filter(n -> n.isComplete()).toList();
