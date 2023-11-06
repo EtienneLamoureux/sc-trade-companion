@@ -59,7 +59,7 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
 
       if (!publishNextTime) {
         publishNextTime = true;
-        logger.debug("Publish queued for next execution");
+        logger.info("Publish queued for next execution");
         return;
       }
 

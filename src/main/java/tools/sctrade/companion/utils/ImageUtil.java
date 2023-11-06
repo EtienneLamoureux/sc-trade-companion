@@ -99,7 +99,7 @@ public class ImageUtil {
   }
 
   public static void writeToDisk(BufferedImage screenCapture, String path) throws IOException {
-    String filename = TimeUtil.getNowAsString(TimeFormat.SCREENSHOT);
+    String filename = TimeUtil.getNowAsString(TimeFormat.SCREENSHOT_FILENAME);
     File imageFile = new File(String.format(Locale.ROOT, "%s/%s.%s", path, filename, JPG));
     ImageIO.write(screenCapture, JPG, imageFile);
   }

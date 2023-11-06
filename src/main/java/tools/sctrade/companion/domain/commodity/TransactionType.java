@@ -1,5 +1,5 @@
 package tools.sctrade.companion.domain.commodity;
 
-enum TransactionType {
+public enum TransactionType {
   SELLS, BUYS;
 }
