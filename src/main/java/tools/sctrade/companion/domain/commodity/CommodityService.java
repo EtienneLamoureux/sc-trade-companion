@@ -32,6 +32,7 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
     CommoditySubmission submission = submissionFactory.build(screenCapture);
 
     try {
+      logger.debug("Acquiring mutex...");
       pendingSubmissionMutex.acquire();
 
       if (pendingSubmission.isEmpty()) {
@@ -41,29 +42,36 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
       }
     } finally {
       pendingSubmissionMutex.release();
+      logger.debug("Released mutex");
     }
   }
 
   @Scheduled(fixedDelay = 60000)
   public void flush() throws InterruptedException {
     try {
+      logger.debug("Acquiring mutex...");
       pendingSubmissionMutex.acquire();
 
       if (pendingSubmission.isEmpty()) {
+        logger.debug("Nothing to publish");
         return;
       }
 
       if (!publishNextTime) {
         publishNextTime = true;
+        logger.debug("Publish queued for next execution");
         return;
       }
 
+      logger.debug("Calling publishers...");
       CommoditySubmission submission = pendingSubmission.get();
       publishers.stream().forEach(n -> n.processAsynchronously(submission));
       publishNextTime = false;
       pendingSubmission = Optional.empty();
+      logger.debug("Called publishers");
     } finally {
       pendingSubmissionMutex.release();
+      logger.debug("Released mutex");
     }
   }
 }

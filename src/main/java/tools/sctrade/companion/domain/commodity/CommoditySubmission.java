@@ -1,9 +1,13 @@
 package tools.sctrade.companion.domain.commodity;
 
 import java.util.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.user.User;
 
 public class CommoditySubmission {
+  private final Logger logger = LoggerFactory.getLogger(CommoditySubmission.class);
+
   private User user;
   private Collection<CommodityListing> listings;
 
@@ -21,6 +25,8 @@ public class CommoditySubmission {
   }
 
   synchronized void merge(CommoditySubmission submission) {
+    logger.debug("Merging {} new listings unto this submission's {} listings",
+        submission.getListings().size(), listings.size());
     CommodityListing newListing = submission.getListings().iterator().next();
 
     /*
