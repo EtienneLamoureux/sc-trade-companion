@@ -2,6 +2,7 @@ package tools.sctrade.companion.domain.commodity;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,7 @@ import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
 import tools.sctrade.companion.domain.user.UserService;
+import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.ImageUtil;
 
 public class CommoditySubmissionFactoryAccuracyTest {
@@ -27,7 +29,8 @@ public class CommoditySubmissionFactoryAccuracyTest {
 
     factory = new CommoditySubmissionFactory(new UserService(),
         new CommodityListingsTesseractOcr(preprocessingManipulations),
-        new CommodityLocationTesseractOcr(preprocessingManipulations));
+        new CommodityLocationTesseractOcr(preprocessingManipulations),
+        new DiskImageWriter(Paths.get(".", "debug"), true, true));
   }
 
   @Test

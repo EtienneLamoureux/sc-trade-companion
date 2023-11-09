@@ -5,7 +5,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public enum TimeFormat {
-  SCREENSHOT_FILENAME("yyyy-MM-dd_H-m-s-n"), CSV_FILENAME("yyyy-MM"), CSV_COLUMN(
+  IMAGE_FILENAME("yyyy-MM-dd_H-m-s-n"), CSV_FILENAME("yyyy-MM"), CSV_COLUMN(
       "yyyy-MM-dd H:m:s");
 
   public final String pattern;

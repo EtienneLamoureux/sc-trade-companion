@@ -2,7 +2,6 @@ package tools.sctrade.companion.domain.commodity;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +14,8 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.sctrade.companion.domain.image.ImageType;
+import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.ocr.LocatedColumn;
 import tools.sctrade.companion.domain.ocr.LocatedFragment;
 import tools.sctrade.companion.domain.ocr.Ocr;
@@ -27,7 +28,6 @@ import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
 import tools.sctrade.companion.utils.HashUtil;
 import tools.sctrade.companion.utils.ImageUtil;
 import tools.sctrade.companion.utils.StringUtil;
-import tools.sctrade.companion.utils.TimeFormat;
 import tools.sctrade.companion.utils.TimeUtil;
 
 public class CommoditySubmissionFactory {
@@ -39,18 +39,14 @@ public class CommoditySubmissionFactory {
   private UserService userService;
   private Ocr listingsOcr;
   private Ocr locationOcr;
-  private boolean debugIntermediaryImages;
-
-  public CommoditySubmissionFactory(UserService userService, Ocr listingsOcr, Ocr locationOcr) {
-    this(userService, listingsOcr, locationOcr, true);
-  }
+  private ImageWriter imageWriter;
 
   public CommoditySubmissionFactory(UserService userService, Ocr listingsOcr, Ocr locationOcr,
-      boolean debugIntermediaryImages) {
+      ImageWriter imageWriter) {
     this.userService = userService;
     this.listingsOcr = listingsOcr;
     this.locationOcr = locationOcr;
-    this.debugIntermediaryImages = debugIntermediaryImages;
+    this.imageWriter = imageWriter;
   }
 
   CommoditySubmission build(BufferedImage screenCapture) {
@@ -146,18 +142,14 @@ public class CommoditySubmissionFactory {
     var buyImage = ImageUtil.crop(screenCapture, buyRectangle);
     var buyRectangleColor = ImageUtil.calculateAverageColor(buyImage);
     var buyRectangleLuminance = buyRectangleColor.getRed();
+    imageWriter.write(buyImage, ImageType.BUY_BUTTON);
 
     var sellRectangle =
         new Rectangle((int) (shopInv.getMaxX() + (shopInv.getWidth() / 4)), y, width, height);
     var sellImage = ImageUtil.crop(screenCapture, sellRectangle);
     var sellRectangleColor = ImageUtil.calculateAverageColor(sellImage);
     var sellRectangleLuminance = sellRectangleColor.getRed();
-
-    if (debugIntermediaryImages) {
-      String now = TimeFormat.SCREENSHOT_FILENAME.format(Instant.now());
-      ImageUtil.writeToDiskNoFail(buyImage, Paths.get(".", "screenshots", now + "_buyImage.jpg"));
-      ImageUtil.writeToDiskNoFail(sellImage, Paths.get(".", "screenshots", now + "_sellImage.jpg"));
-    }
+    imageWriter.write(sellImage, ImageType.SELL_BUTTON);
 
     return (buyRectangleLuminance > sellRectangleLuminance) ? TransactionType.SELLS
         : TransactionType.BUYS;

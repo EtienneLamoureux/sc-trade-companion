@@ -1,30 +1,23 @@
 package tools.sctrade.companion.domain.image.manipulations;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
-import tools.sctrade.companion.utils.ImageUtil;
+import tools.sctrade.companion.domain.image.ImageType;
+import tools.sctrade.companion.domain.image.ImageWriter;
 
 public class WriteToDisk implements ImageManipulation {
   private final Logger logger = LoggerFactory.getLogger(WriteToDisk.class);
+  private ImageWriter imageWriter;
 
-  private String path;
-
-  public WriteToDisk(String path) {
-    this.path = path;
+  public WriteToDisk(ImageWriter imageWriter) {
+    this.imageWriter = imageWriter;
   }
 
   @Override
   public BufferedImage manipulate(BufferedImage image) {
-    try {
-      ImageUtil.writeToDisk(image, path);
-    } catch (IOException e) {
-      logger.error(
-          String.format(Locale.ROOT, "There was an error writing %s to disk", image.toString()), e);
-    }
+    imageWriter.write(image, ImageType.PREPROCESSED);
 
     return image;
   }

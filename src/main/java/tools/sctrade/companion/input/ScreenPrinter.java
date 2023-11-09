@@ -10,23 +10,27 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
+import tools.sctrade.companion.domain.image.ImageType;
+import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
-import tools.sctrade.companion.utils.ImageUtil;
 
 public class ScreenPrinter implements Runnable {
   private final Logger logger = LoggerFactory.getLogger(ScreenPrinter.class);
 
   private Collection<AsynchronousProcessor<BufferedImage>> imageProcessors;
   private List<ImageManipulation> postprocessingManipulations;
+  private ImageWriter imageWriter;
 
-  public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors) {
-    this(imageProcessors, Collections.emptyList());
+  public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
+      ImageWriter imageWriter) {
+    this(imageProcessors, Collections.emptyList(), imageWriter);
   }
 
   public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
-      List<ImageManipulation> postprocessingManipulations) {
+      List<ImageManipulation> postprocessingManipulations, ImageWriter imageWriter) {
     this.imageProcessors = imageProcessors;
     this.postprocessingManipulations = postprocessingManipulations;
+    this.imageWriter = imageWriter;
   }
 
   @Override
@@ -41,7 +45,7 @@ public class ScreenPrinter implements Runnable {
       imageProcessors.stream().forEach(n -> n.processAsynchronously(screenCapture));
       logger.debug("Called image processors");
 
-      ImageUtil.writeToDisk(screenCapture);
+      imageWriter.write(screenCapture, ImageType.SCREENSHOT);
     } catch (Exception e) {
       logger.error("Error while printing screen", e);
     }
