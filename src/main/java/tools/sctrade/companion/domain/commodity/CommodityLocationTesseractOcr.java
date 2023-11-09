@@ -1,5 +1,6 @@
 package tools.sctrade.companion.domain.commodity;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,6 +10,7 @@ import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.ocr.LocatedWord;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.TesseractOcr;
+import tools.sctrade.companion.utils.ImageUtil;
 
 public class CommodityLocationTesseractOcr extends TesseractOcr {
   private final Logger logger = LoggerFactory.getLogger(CommodityLocationTesseractOcr.class);
@@ -19,7 +21,7 @@ public class CommodityLocationTesseractOcr extends TesseractOcr {
 
   @Override
   public OcrResult process(BufferedImage image) {
-    image = cropRightHalf(image);
+    image = keepLeftHalf(image);
     var words = tesseract.getWords(image, 0);
     words = removeNonWords(words);
     words = removeSingleCharacterWords(words);
@@ -30,7 +32,7 @@ public class CommodityLocationTesseractOcr extends TesseractOcr {
         .map(n -> new LocatedWord(n.getText().toLowerCase(), n.getBoundingBox())).toList());
   }
 
-  private BufferedImage cropRightHalf(BufferedImage image) {
-    return image.getSubimage(0, 0, (image.getWidth() / 2), image.getHeight());
+  private BufferedImage keepLeftHalf(BufferedImage image) {
+    return ImageUtil.crop(image, new Rectangle(0, 0, (image.getWidth() / 2), image.getHeight()));
   }
 }

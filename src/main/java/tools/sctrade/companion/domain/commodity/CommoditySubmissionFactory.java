@@ -2,6 +2,7 @@ package tools.sctrade.companion.domain.commodity;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,6 +27,7 @@ import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
 import tools.sctrade.companion.utils.HashUtil;
 import tools.sctrade.companion.utils.ImageUtil;
 import tools.sctrade.companion.utils.StringUtil;
+import tools.sctrade.companion.utils.TimeFormat;
 import tools.sctrade.companion.utils.TimeUtil;
 
 public class CommoditySubmissionFactory {
@@ -37,11 +39,18 @@ public class CommoditySubmissionFactory {
   private UserService userService;
   private Ocr listingsOcr;
   private Ocr locationOcr;
+  private boolean debugIntermediaryImages;
 
   public CommoditySubmissionFactory(UserService userService, Ocr listingsOcr, Ocr locationOcr) {
+    this(userService, listingsOcr, locationOcr, true);
+  }
+
+  public CommoditySubmissionFactory(UserService userService, Ocr listingsOcr, Ocr locationOcr,
+      boolean debugIntermediaryImages) {
     this.userService = userService;
     this.listingsOcr = listingsOcr;
     this.locationOcr = locationOcr;
+    this.debugIntermediaryImages = debugIntermediaryImages;
   }
 
   CommoditySubmission build(BufferedImage screenCapture) {
@@ -124,21 +133,31 @@ public class CommoditySubmissionFactory {
   }
 
   private TransactionType extractTransactionType(BufferedImage screenCapture, OcrResult result) {
+    screenCapture = ImageUtil.crop(screenCapture, new Rectangle((screenCapture.getWidth() / 2), 0,
+        (screenCapture.getWidth() / 2), screenCapture.getHeight()));
     screenCapture = ImageUtil.makeGreyscaleCopy(screenCapture);
     Rectangle shopInv = getShopInventoryRectangle(result);
 
-    int y = (int) shopInv.getMaxY();
+    int y = (int) (shopInv.getMaxY() + shopInv.getHeight());
     int width = (int) shopInv.getWidth();
-    int height = (int) shopInv.getHeight() * 3;
+    int height = (int) shopInv.getHeight();
 
     var buyRectangle = new Rectangle((int) shopInv.getMinX(), y, width, height);
-    var buyRectangleColor = ImageUtil.calculateAverageColor(screenCapture, buyRectangle);
+    var buyImage = ImageUtil.crop(screenCapture, buyRectangle);
+    var buyRectangleColor = ImageUtil.calculateAverageColor(buyImage);
     var buyRectangleLuminance = buyRectangleColor.getRed();
 
     var sellRectangle =
         new Rectangle((int) (shopInv.getMaxX() + (shopInv.getWidth() / 4)), y, width, height);
-    var sellRectangleColor = ImageUtil.calculateAverageColor(screenCapture, sellRectangle);
+    var sellImage = ImageUtil.crop(screenCapture, sellRectangle);
+    var sellRectangleColor = ImageUtil.calculateAverageColor(sellImage);
     var sellRectangleLuminance = sellRectangleColor.getRed();
+
+    if (debugIntermediaryImages) {
+      String now = TimeFormat.SCREENSHOT_FILENAME.format(Instant.now());
+      ImageUtil.writeToDiskNoFail(buyImage, Paths.get(".", "screenshots", now + "_buyImage.jpg"));
+      ImageUtil.writeToDiskNoFail(sellImage, Paths.get(".", "screenshots", now + "_sellImage.jpg"));
+    }
 
     return (buyRectangleLuminance > sellRectangleLuminance) ? TransactionType.SELLS
         : TransactionType.BUYS;
