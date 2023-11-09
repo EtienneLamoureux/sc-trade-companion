@@ -1,5 +1,7 @@
-/tests/preprocessed/*.jpg
-/screenshots/*.jpg
+/my-data/**
+!/my-data/empty
+/debug/**
+!/debug/empty
 
 ### Gradle ###
 .gradle

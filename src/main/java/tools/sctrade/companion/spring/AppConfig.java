@@ -1,5 +1,6 @@
 package tools.sctrade.companion.spring;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +12,7 @@ import tools.sctrade.companion.domain.commodity.CommodityLocationTesseractOcr;
 import tools.sctrade.companion.domain.commodity.CommodityService;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
+import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.AdjustBrightnessAndContrast;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
@@ -19,6 +21,7 @@ import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.input.KeyListener;
 import tools.sctrade.companion.input.ScreenPrinter;
+import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
 import tools.sctrade.companion.swing.CompanionGui;
@@ -65,11 +68,16 @@ public class AppConfig {
     return new CommodityLocationTesseractOcr(preprocessingManipulations);
   }
 
+  @Bean("DiskImageWriter")
+  public DiskImageWriter buildDiskImageWriter() {
+    return new DiskImageWriter(Paths.get("..", "screenshots"), true, false); // TODO
+  }
+
   @Bean("CommoditySubmissionFactory")
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
       @Qualifier("CommodityListingsTesseractOcr") Ocr listingsOcr,
-      @Qualifier("CommodityLocationTesseractOcr") Ocr locationOcr) {
-    return new CommoditySubmissionFactory(userService, listingsOcr, locationOcr);
+      @Qualifier("CommodityLocationTesseractOcr") Ocr locationOcr, ImageWriter imageWriter) {
+    return new CommoditySubmissionFactory(userService, listingsOcr, locationOcr, imageWriter);
   }
 
   @Bean("CommodityService")
@@ -83,11 +91,12 @@ public class AppConfig {
 
   @Bean("ScreenPrinter")
   public ScreenPrinter buildScreenPrinter(
-      @Qualifier("CommodityService") CommodityService commodityService) {
+      @Qualifier("CommodityService") CommodityService commodityService, ImageWriter imageWriter) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
-    return new ScreenPrinter(Arrays.asList(commodityService), postprocessingManipulations);
+    return new ScreenPrinter(Arrays.asList(commodityService), postprocessingManipulations,
+        imageWriter);
   }
 
   @Bean("KeyListener")

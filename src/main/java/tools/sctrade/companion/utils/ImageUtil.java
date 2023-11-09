@@ -8,7 +8,6 @@ import java.awt.image.RescaleOp;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Locale;
 import javax.imageio.ImageIO;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
@@ -19,9 +18,6 @@ import tools.sctrade.companion.exceptions.RectangleOutOfBoundsException;
 
 public class ImageUtil {
   private static final Logger logger = LoggerFactory.getLogger(ImageUtil.class);
-
-  private static final String JPG = "jpg";
-  private static final String DEFAULT_PATH = "screenshots";
 
   private ImageUtil() {}
 
@@ -110,16 +106,6 @@ public class ImageUtil {
     return makeCopy(croppedImage);
   }
 
-  public static void writeToDisk(BufferedImage image) throws IOException {
-    writeToDisk(image, DEFAULT_PATH);
-  }
-
-  public static void writeToDisk(BufferedImage image, String path) throws IOException {
-    String filename = TimeUtil.getNowAsString(TimeFormat.SCREENSHOT_FILENAME);
-    File imageFile = new File(String.format(Locale.ROOT, "%s/%s.%s", path, filename, JPG));
-    ImageIO.write(image, JPG, imageFile);
-  }
-
   public static void writeToDiskNoFail(BufferedImage image, Path path) {
     try {
       writeToDisk(image, path.toAbsolutePath());
@@ -130,6 +116,7 @@ public class ImageUtil {
 
   static void writeToDisk(BufferedImage image, Path path) throws IOException {
     File imageFile = new File(path.toString());
-    ImageIO.write(image, JPG, imageFile);
+    String format = path.toString().substring(path.toString().lastIndexOf(".") + 1);
+    ImageIO.write(image, format, imageFile);
   }
 }
