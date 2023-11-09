@@ -7,14 +7,19 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Locale;
 import javax.imageio.ImageIO;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Mode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.exceptions.RectangleOutOfBoundsException;
 
 public class ImageUtil {
+  private static final Logger logger = LoggerFactory.getLogger(ImageUtil.class);
+
   private static final String JPG = "jpg";
   private static final String DEFAULT_PATH = "screenshots";
 
@@ -49,6 +54,10 @@ public class ImageUtil {
       float brightnessOffset) {
     RescaleOp op = new RescaleOp(contrastScale, brightnessOffset, null);
     op.filter(image, image);
+  }
+
+  public static Color calculateAverageColor(BufferedImage image) {
+    return calculateAverageColor(image, new Rectangle(0, 0, image.getWidth(), image.getHeight()));
   }
 
   public static Color calculateAverageColor(BufferedImage image, Rectangle rectangle) {
@@ -94,13 +103,33 @@ public class ImageUtil {
     return clonedImage;
   }
 
-  public static void writeToDisk(BufferedImage screenCapture) throws IOException {
-    writeToDisk(screenCapture, DEFAULT_PATH);
+  public static BufferedImage crop(BufferedImage image, Rectangle rectangle) {
+    BufferedImage croppedImage = image.getSubimage((int) rectangle.getMinX(),
+        (int) rectangle.getMinY(), (int) rectangle.getWidth(), (int) rectangle.getHeight());
+
+    return makeCopy(croppedImage);
   }
 
-  public static void writeToDisk(BufferedImage screenCapture, String path) throws IOException {
+  public static void writeToDisk(BufferedImage image) throws IOException {
+    writeToDisk(image, DEFAULT_PATH);
+  }
+
+  public static void writeToDisk(BufferedImage image, String path) throws IOException {
     String filename = TimeUtil.getNowAsString(TimeFormat.SCREENSHOT_FILENAME);
     File imageFile = new File(String.format(Locale.ROOT, "%s/%s.%s", path, filename, JPG));
-    ImageIO.write(screenCapture, JPG, imageFile);
+    ImageIO.write(image, JPG, imageFile);
+  }
+
+  public static void writeToDiskNoFail(BufferedImage image, Path path) {
+    try {
+      writeToDisk(image, path.toAbsolutePath());
+    } catch (Exception e) {
+      logger.error("There was an error writing to disk", e);
+    }
+  }
+
+  static void writeToDisk(BufferedImage image, Path path) throws IOException {
+    File imageFile = new File(path.toString());
+    ImageIO.write(image, JPG, imageFile);
   }
 }
