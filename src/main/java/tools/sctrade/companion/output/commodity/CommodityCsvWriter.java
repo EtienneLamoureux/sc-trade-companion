@@ -8,7 +8,10 @@ import java.util.Collection;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.sctrade.companion.domain.commodity.CommodityListing;
 import tools.sctrade.companion.domain.commodity.CommoditySubmission;
+import tools.sctrade.companion.domain.user.Setting;
+import tools.sctrade.companion.domain.user.SettingRepository;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
 import tools.sctrade.companion.utils.CsvUtil;
 import tools.sctrade.companion.utils.TimeFormat;
@@ -19,27 +22,36 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
 
   private Path folder;
 
-  public CommodityCsvWriter() {
-    folder = Paths.get(".", "my-data").normalize().toAbsolutePath();
+  public CommodityCsvWriter(SettingRepository settings) {
+    folder = settings.get(Setting.MY_DATA_PATH);
     logger.info("CSV output path: {}", folder);
   }
 
   @Override
   public void process(CommoditySubmission submission) {
-    String fileName = TimeUtil.getNowAsString(TimeFormat.CSV_FILENAME) + ".csv";
-    var filePath = Paths.get(folder.toString(), fileName).normalize().toAbsolutePath();
+    var filePath = buildFilePath();
     Collection<List<String>> lines = new ArrayList<>();
     logger.debug("Writing commodity listings to '{}'...", filePath);
 
     for (var listing : submission.getListings()) {
-      List<String> line = Arrays.asList(listing.location(), listing.transactionType().toString(),
-          listing.commodity(), String.valueOf(listing.price()), String.valueOf(listing.inventory()),
-          listing.inventoryLevel().getLabel(),
-          TimeUtil.getAsString(TimeFormat.CSV_COLUMN, listing.timestamp()));
+      List<String> line = buildLine(listing);
       lines.add(line);
     }
 
     CsvUtil.write(filePath, lines);
     logger.debug("Wrote commodity listings to '{}'", filePath);
+  }
+
+  private Path buildFilePath() {
+    String fileName = TimeUtil.getNowAsString(TimeFormat.CSV_FILENAME) + ".csv";
+
+    return Paths.get(folder.toString(), fileName);
+  }
+
+  private List<String> buildLine(CommodityListing listing) {
+    return Arrays.asList(listing.location(), listing.transactionType().toString(),
+        listing.commodity(), String.valueOf(listing.price()), String.valueOf(listing.inventory()),
+        listing.inventoryLevel().getLabel(),
+        TimeUtil.getAsString(TimeFormat.CSV_COLUMN, listing.timestamp()));
   }
 }

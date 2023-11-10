@@ -1,7 +1,7 @@
 package tools.sctrade.companion.domain.image;
 
-import java.time.Instant;
 import tools.sctrade.companion.utils.TimeFormat;
+import tools.sctrade.companion.utils.TimeUtil;
 
 public enum ImageType {
   SCREENSHOT(""), BUY_BUTTON("_buy-button"), SELL_BUTTON("_sell-button"), PREPROCESSED(
@@ -14,6 +14,6 @@ public enum ImageType {
   }
 
   public String generateFileName() {
-    return TimeFormat.IMAGE_FILENAME.format(Instant.now()) + suffix + ".jpg";
+    return TimeUtil.getNowAsString(TimeFormat.IMAGE_FILENAME) + suffix + ".jpg";
   }
 }
