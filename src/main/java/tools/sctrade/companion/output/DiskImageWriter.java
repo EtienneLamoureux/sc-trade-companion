@@ -7,39 +7,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.domain.image.ImageWriter;
+import tools.sctrade.companion.domain.user.Setting;
+import tools.sctrade.companion.domain.user.SettingRepository;
 import tools.sctrade.companion.utils.ImageUtil;
 
 public class DiskImageWriter implements ImageWriter {
   private final Logger logger = LoggerFactory.getLogger(ImageWriter.class);
 
-  private Path basePath;
-  private boolean debugScreenshots;
-  private boolean debugIntermediaryImages;
+  private SettingRepository settings;
 
-  public DiskImageWriter(Path basePath, boolean debugScreenshots, boolean debugIntermediaryImages) {
-    this.basePath = basePath.toAbsolutePath();
-    this.debugScreenshots = debugScreenshots;
-    this.debugIntermediaryImages = debugIntermediaryImages;
+  public DiskImageWriter(SettingRepository settings) {
+    this.settings = settings;
   }
 
   @Override
   public void write(BufferedImage image, ImageType type) {
     if (!shouldWrite(type)) {
-      logger.debug("Configured to not write images of type {}, skipping", type.toString());
+      logger.debug("Configured to not write images of type {}, skipping", type);
       return;
     }
 
-    Path path = Paths.get(basePath.toString(), type.generateFileName());
-    logger.info("Writing '{}' to disk...", path.toString());
+    Path path = Paths.get(settings.get(Setting.MY_IMAGES_PATH).toString(), type.generateFileName());
+    logger.info("Writing '{}' to disk...", path);
     ImageUtil.writeToDiskNoFail(image, path);
   }
 
   private boolean shouldWrite(ImageType type) {
     switch (type) {
       case SCREENSHOT:
-        return debugScreenshots;
+        return settings.get(Setting.OUTPUT_SCREENSHOTS);
       case BUY_BUTTON, SELL_BUTTON, PREPROCESSED:
-        return debugIntermediaryImages;
+        return settings.get(Setting.OUTPUT_TRANSIENT_IMAGES);
       default:
         return false;
     }
