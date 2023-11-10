@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import tools.sctrade.companion.domain.commodity.CommodityListingsTesseractOcr;
@@ -18,6 +19,8 @@ import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
 import tools.sctrade.companion.domain.ocr.Ocr;
+import tools.sctrade.companion.domain.user.Setting;
+import tools.sctrade.companion.domain.user.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.input.KeyListener;
 import tools.sctrade.companion.input.ScreenPrinter;
@@ -28,6 +31,21 @@ import tools.sctrade.companion.swing.CompanionGui;
 
 @Configuration
 public class AppConfig {
+  @Value("${output.screenshots:true}")
+  private String outputScreenshots;
+  @Value("${output.intermediary-images:false}")
+  private String outputIntermediaryImages;
+
+  @Bean("SettingRepository")
+  public SettingRepository buildSettingRepository() {
+    var settingRepository = new SettingRepository();
+    settingRepository.set(Setting.MY_IMAGES_PATH, Paths.get("..", "my-images").toAbsolutePath());
+    settingRepository.set(Setting.OUTPUT_SCREENSHOTS, outputScreenshots);
+    settingRepository.set(Setting.OUTPUT_TRANSIENT_IMAGES, outputIntermediaryImages);
+
+    return settingRepository;
+  }
+
   @Bean("CompanionGui")
   public CompanionGui buildCompanionGui() {
     return new CompanionGui();
@@ -69,8 +87,8 @@ public class AppConfig {
   }
 
   @Bean("DiskImageWriter")
-  public DiskImageWriter buildDiskImageWriter() {
-    return new DiskImageWriter(Paths.get("..", "screenshots"), true, false); // TODO
+  public DiskImageWriter buildDiskImageWriter(SettingRepository settingRepository) {
+    return new DiskImageWriter(settingRepository); // TODO
   }
 
   @Bean("CommoditySubmissionFactory")

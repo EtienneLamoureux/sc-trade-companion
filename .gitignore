@@ -1,7 +1,7 @@
 /my-data/**
 !/my-data/empty
-/debug/**
-!/debug/empty
+/my-images/**
+!/my-images/empty
 
 ### Gradle ###
 .gradle
