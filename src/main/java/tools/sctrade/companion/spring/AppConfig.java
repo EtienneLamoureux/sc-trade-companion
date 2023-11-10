@@ -39,7 +39,10 @@ public class AppConfig {
   @Bean("SettingRepository")
   public SettingRepository buildSettingRepository() {
     var settingRepository = new SettingRepository();
-    settingRepository.set(Setting.MY_IMAGES_PATH, Paths.get("..", "my-images").toAbsolutePath());
+    settingRepository.set(Setting.MY_IMAGES_PATH,
+        Paths.get("..", "my-images").normalize().toAbsolutePath());
+    settingRepository.set(Setting.MY_DATA_PATH,
+        Paths.get("..", "my-data").normalize().toAbsolutePath());
     settingRepository.set(Setting.OUTPUT_SCREENSHOTS, outputScreenshots);
     settingRepository.set(Setting.OUTPUT_TRANSIENT_IMAGES, outputIntermediaryImages);
 
@@ -57,8 +60,8 @@ public class AppConfig {
   }
 
   @Bean("CommodityCsvWriter")
-  public CommodityCsvWriter buildCommodityCsvLogger() {
-    return new CommodityCsvWriter();
+  public CommodityCsvWriter buildCommodityCsvLogger(SettingRepository settingRepository) {
+    return new CommodityCsvWriter(settingRepository);
   }
 
   @Bean("ScTradeToolsClient")
@@ -88,7 +91,7 @@ public class AppConfig {
 
   @Bean("DiskImageWriter")
   public DiskImageWriter buildDiskImageWriter(SettingRepository settingRepository) {
-    return new DiskImageWriter(settingRepository); // TODO
+    return new DiskImageWriter(settingRepository);
   }
 
   @Bean("CommoditySubmissionFactory")
