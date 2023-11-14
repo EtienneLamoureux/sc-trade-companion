@@ -1,6 +1,8 @@
 package tools.sctrade.companion.domain.commodity;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.user.User;
@@ -13,7 +15,7 @@ public class CommoditySubmission {
 
   CommoditySubmission(User user, Collection<CommodityListing> listings) {
     this.user = user;
-    this.listings = listings;
+    this.listings = new ArrayList<>(listings);
   }
 
   public User getUser() {
@@ -40,7 +42,7 @@ public class CommoditySubmission {
         }
 
         return listing.withLocation(newListing.location());
-      }).toList();
+      }).collect(Collectors.toList());
     }
 
     listings.addAll(submission.getListings());
