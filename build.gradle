@@ -18,6 +18,7 @@ repositories {
 dependencies {
 	// Spring boot
 	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	
 	// Keybinds
 	implementation 'com.github.kwhat:jnativehook:2.2.2'
@@ -28,9 +29,9 @@ dependencies {
 	
 	// OCR
 	implementation 'net.sourceforge.tess4j:tess4j:5.8.0'
-	implementation 'org.imgscalr:imgscalr-lib:4.2'
 	
 	// Utils
+	implementation 'org.imgscalr:imgscalr-lib:4.2'
 	implementation 'org.apache.commons:commons-math3:3.6.1'
 	implementation 'com.opencsv:opencsv:5.7.1'
 	
