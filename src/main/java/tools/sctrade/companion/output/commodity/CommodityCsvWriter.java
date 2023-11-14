@@ -31,7 +31,8 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
   public void process(CommoditySubmission submission) {
     var filePath = buildFilePath();
     Collection<List<String>> lines = new ArrayList<>();
-    logger.debug("Writing commodity listings to '{}'...", filePath);
+    logger.debug("Writing {} commodity listings to '{}'...", submission.getListings().size(),
+        filePath);
 
     for (var listing : submission.getListings()) {
       List<String> line = buildLine(listing);
@@ -39,7 +40,7 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
     }
 
     CsvUtil.write(filePath, lines);
-    logger.debug("Wrote commodity listings to '{}'", filePath);
+    logger.info("Wrote {} commodity listings to '{}'", submission.getListings().size(), filePath);
   }
 
   private Path buildFilePath() {

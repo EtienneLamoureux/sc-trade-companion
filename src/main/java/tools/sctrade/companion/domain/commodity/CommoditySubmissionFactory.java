@@ -14,8 +14,13 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.domain.image.ImageWriter;
+import tools.sctrade.companion.domain.image.manipulations.AdjustBrightnessAndContrast;
+import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
+import tools.sctrade.companion.domain.image.manipulations.InvertColors;
+import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
 import tools.sctrade.companion.domain.ocr.LocatedColumn;
 import tools.sctrade.companion.domain.ocr.LocatedFragment;
 import tools.sctrade.companion.domain.ocr.Ocr;
@@ -37,35 +42,39 @@ public class CommoditySubmissionFactory {
   private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactory.class);
 
   private UserService userService;
-  private Ocr listingsOcr;
-  private Ocr locationOcr;
   private ImageWriter imageWriter;
+  private ThreadLocal<Ocr> listingsOcr;
+  private ThreadLocal<Ocr> locationOcr;
 
-  public CommoditySubmissionFactory(UserService userService, Ocr listingsOcr, Ocr locationOcr,
-      ImageWriter imageWriter) {
+  public CommoditySubmissionFactory(UserService userService, ImageWriter imageWriter) {
     this.userService = userService;
-    this.listingsOcr = listingsOcr;
-    this.locationOcr = locationOcr;
     this.imageWriter = imageWriter;
+    this.listingsOcr = constructListingsOcr();
+    this.locationOcr = constructLocationOcr();
   }
 
   CommoditySubmission build(BufferedImage screenCapture) {
-    logger.debug("Reading listings...");
-    OcrResult listingsResult = listingsOcr.read(screenCapture);
-    var rawListings = buildRawListings(listingsResult);
-    logger.debug("Read {} listings", rawListings.size());
-    var transactionType = extractTransactionType(screenCapture, listingsResult);
+    try {
+      logger.debug("Reading listings...");
+      OcrResult listingsResult = listingsOcr.get().read(screenCapture);
+      var rawListings = buildRawListings(listingsResult);
+      logger.debug("Read {} listings", rawListings.size());
+      var transactionType = extractTransactionType(screenCapture, listingsResult);
 
-    logger.debug("Reading location...");
-    OcrResult locationResult = locationOcr.read(screenCapture);
-    var location = extractLocation(locationResult);
-    logger.debug("Read location '{}'", location);
-    String batchId = HashUtil.hash(screenCapture);
+      logger.debug("Reading location...");
+      OcrResult locationResult = locationOcr.get().read(screenCapture);
+      var location = extractLocation(locationResult);
+      logger.debug("Read location '{}'", location);
+      String batchId = HashUtil.hash(screenCapture);
 
-    Collection<CommodityListing> listings =
-        buildCommodityListings(location, transactionType, rawListings, batchId);
+      Collection<CommodityListing> listings =
+          buildCommodityListings(location, transactionType, rawListings, batchId);
 
-    return new CommoditySubmission(userService.get(), listings);
+      return new CommoditySubmission(userService.get(), listings);
+    } finally {
+      listingsOcr.remove();
+      locationOcr.remove();
+    }
   }
 
   private Collection<CommodityListing> buildCommodityListings(String location,
@@ -207,5 +216,27 @@ public class CommoditySubmissionFactory {
     columns.forEach(n -> columnsBySizeDesc.put(n.getText().length(), n));
 
     return columnsBySizeDesc.values().iterator();
+  }
+
+  private ThreadLocal<Ocr> constructListingsOcr() {
+    List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
+    preprocessingManipulations.add(new ConvertToGreyscale());
+    preprocessingManipulations.add(new InvertColors());
+    preprocessingManipulations.add(new AdjustBrightnessAndContrast(10.0f, 0.0f));
+    preprocessingManipulations.add(new WriteToDisk(imageWriter));
+
+    return ThreadLocal
+        .withInitial(() -> new CommodityListingsTesseractOcr(preprocessingManipulations));
+  }
+
+  private ThreadLocal<Ocr> constructLocationOcr() {
+    List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
+    preprocessingManipulations.add(new ConvertToGreyscale());
+    preprocessingManipulations.add(new InvertColors());
+    preprocessingManipulations.add(new AdjustBrightnessAndContrast(10.0f, 0.0f));
+    preprocessingManipulations.add(new WriteToDisk(imageWriter));
+
+    return ThreadLocal
+        .withInitial(() -> new CommodityLocationTesseractOcr(preprocessingManipulations));
   }
 }
