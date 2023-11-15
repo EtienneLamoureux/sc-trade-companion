@@ -134,6 +134,8 @@ public class CommoditySubmissionFactory {
       }
     }
 
+    logger.info("Read {} commodity listings", rawListings.size());
+
     return rawListings;
   }
 

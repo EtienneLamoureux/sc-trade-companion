@@ -35,9 +35,9 @@ public class AppConfig {
   public SettingRepository buildSettingRepository() {
     var settingRepository = new SettingRepository();
     settingRepository.set(Setting.MY_IMAGES_PATH,
-        Paths.get(".,", "my-images").normalize().toAbsolutePath());
+        Paths.get(".", "my-images").normalize().toAbsolutePath());
     settingRepository.set(Setting.MY_DATA_PATH,
-        Paths.get(".,", "my-data").normalize().toAbsolutePath());
+        Paths.get(".", "my-data").normalize().toAbsolutePath());
     settingRepository.set(Setting.OUTPUT_SCREENSHOTS, outputScreenshots);
     settingRepository.set(Setting.OUTPUT_TRANSIENT_IMAGES, outputIntermediaryImages);
     settingRepository.set(Setting.SC_TRADE_TOOLS_ROOT_URL, "https://sc-trade.tools");
