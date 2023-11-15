@@ -1,9 +1,9 @@
 package tools.sctrade.companion;
 
-import com.github.kwhat.jnativehook.GlobalScreen;
-import com.github.kwhat.jnativehook.NativeHookException;
 import java.awt.AWTException;
 import java.awt.EventQueue;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.NativeHookException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
