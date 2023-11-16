@@ -40,6 +40,9 @@ Desktop companion application for Star Citizen.
 13. Close the application (make sure you close it in the system tray)
 
 ## F.A.Q.
+### Why would I use this?
+It auto-scrapes commodity kiosk terminals at the press of a button, and gives you all that data in CSV format! It also helps the Star Citizen community at large by contributing to a shared pool of information.
+
 ### Where are my screenshot processed?
 Locally, on your computer. 
 
