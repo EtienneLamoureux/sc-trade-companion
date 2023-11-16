@@ -25,7 +25,7 @@ Desktop companion application for Star Citizen.
 2. Done!
 
 ## Usage
-1. Start the application
+1. Start the application by double-clicking the `SC Trade Companion/sc-trade-companion.bat` file
 2. Play Star Citizen
 3. When you get to a commodity kiosk, interact with it
 4. Align your character as close and as straight to the screen as possible
