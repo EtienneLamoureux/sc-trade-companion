@@ -30,7 +30,14 @@ Desktop companion application for Star Citizen.
 3. When you get to a commodity kiosk, interact with it
 4. Align your character as close and as straight to the screen as possible
 5. Turn off global chat (<kbd>F12</kdb> by default)
-6. Close the application (make sure you close it in the system tray)
+6. Go to the "Buy" tab
+7. In the left "Your inventories" dropdown, select your ship
+8. Press <kbd>F3</kbd>, while scrolling to capture all listings
+9. Go to the "Sell" tab
+10. In the left "Your inventories" dropdown, select the shop
+11. Press <kbd>F3</kbd>, while scrolling to capture all listings
+12. Repeat throughout your play session
+13. Close the application (make sure you close it in the system tray)
 
 ## F.A.Q.
 ### Where are my screenshot processed?
