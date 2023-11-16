@@ -12,11 +12,11 @@ Desktop companion application for Star Citizen.
 
 ## Installation
 1. Install Java 17+
-  1. To verify if you already have Java 17+, execute the following:
-  2. <kbd>Windows key</kbd>+<kbd>R</kbd>
-  3. Type `cmd`, then press <kbd>Enter</kbd>
-  4. Type in `java -version`, then press <kbd>Enter</kbd>
-  5. If an error occurs or the version listed is not 17+, please [install Java 17+](https://www.oracle.com/java/technologies/downloads/)
+   1. To verify if you already have Java 17+, execute the following:
+   2. <kbd>Windows key</kbd>+<kbd>R</kbd>
+   3. Type `cmd`, then press <kbd>Enter</kbd>
+   4. Type in `java -version`, then press <kbd>Enter</kbd>
+   5. If an error occurs or the version listed is not 17+, please [install Java 17+](https://www.oracle.com/java/technologies/downloads/)
 3. Download the [latest release](https://github.com/EtienneLamoureux/sc-trade-companion/releases) `.exe` file, under the "Assets" section
 4. Extract the application wherever
 
