@@ -13,8 +13,11 @@ import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
+import tools.sctrade.companion.utils.SoundUtil;
 
 public class ScreenPrinter implements Runnable {
+  private static final String CAMERA_SHUTTER = "/sounds/camera-shutter.wav";
+
   private final Logger logger = LoggerFactory.getLogger(ScreenPrinter.class);
 
   private Collection<AsynchronousProcessor<BufferedImage>> imageProcessors;
@@ -37,6 +40,7 @@ public class ScreenPrinter implements Runnable {
   public void run() {
     try {
       logger.debug("Printing screen...");
+      SoundUtil.play(CAMERA_SHUTTER);
       var screenRectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
       var screenCapture = postProcess(new Robot().createScreenCapture(screenRectangle));
       logger.debug("Printed screen");
