@@ -53,4 +53,4 @@ We take your privacy very seriously. The only data sent out are the final, parse
 See our [contribution guidelines](./CONTRIBUTING.md)
 
 ## Disclaimer
-<sup>SC Trade Companion is an unofficial Star Citizen application, not affiliated with the Cloud Imperium group of companies. All content on SC Trade Tools not authored by its host or users are property of their respective owners. Star Citizen®, Roberts Space Industries® and Cloud Imperium® are registered trademarks of Cloud Imperium Rights LLC</sup>
+<sup>SC Trade Companion is an unofficial Star Citizen application, not affiliated with the Cloud Imperium group of companies. All content on SC Trade Companion not authored by its host or users are property of their respective owners. Star Citizen®, Roberts Space Industries® and Cloud Imperium® are registered trademarks of Cloud Imperium Rights LLC</sup>
