@@ -44,3 +44,15 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+task copyDependencies(type: Copy) {
+	from configurations.runtimeClasspath
+	into "$buildDir/dependencies"
+}
+
+jar {
+	manifest {
+		attributes["Main-Class"] = "tools.sctrade.companion.CompanionApplication"
+		attributes["Class-Path"] = configurations.runtimeClasspath.collect { 'dependencies/' + it.getName() }.join(' ')
+	}
+}
