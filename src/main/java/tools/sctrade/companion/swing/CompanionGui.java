@@ -18,6 +18,8 @@ public class CompanionGui extends JFrame {
   private JLabel SCTradeToolsIcon;
   private JLabel UserNameHint;
   private JTextField UsernameBox;
+  private JCheckBox UsernameCheckBox;
+  private JTextField UsernameCheckBoxHint;
 
   public void initialize() throws AWTException {
     setLookAndFeel();
@@ -31,10 +33,8 @@ public class CompanionGui extends JFrame {
       // NOTE: Use getRootPanel() to ensure that, if we're nested as a result of some weird event, we can still rescale.
     this.getRootPane().addComponentListener(new ComponentAdapter() {
       public void componentResized(ComponentEvent e) {
-        // This is only called when the user releases the mouse button.
+        // This is called whenever the window is resized.
         BuildUI();
-
-        System.out.println("Username: " + GetUsername());
       }
     });
 
@@ -44,10 +44,11 @@ public class CompanionGui extends JFrame {
   // On first boot, initialize all elements on screen.
   private void InitializeUI() {
     // Set initial size and title.
-    setSize(450, 125);
+    setSize(450, 150);
     setTitle(LocalizationUtil.get("applicationTitle"));
 
     // Create components for BuildUI() to move.
+      // Below region is uncommented, since the code is very self-explanatory. Message me if you need help.
     UserNameHint = new JLabel(LocalizationUtil.get("usernameHint"));
     UserNameHint.setVisible(true);
     UserNameHint.setForeground(Color.black);
@@ -61,6 +62,19 @@ public class CompanionGui extends JFrame {
     UsernameBox.setVisible(true);
     add(UsernameBox);
 
+    UsernameCheckBox = new JCheckBox();
+    UsernameCheckBox.setVisible(true);
+    add(UsernameCheckBox);
+
+    UsernameCheckBoxHint = new JTextField(LocalizationUtil.get("usernameCheckBoxHint"));
+    UsernameCheckBoxHint.setVisible(true);
+
+      // There's probably a better way to do this, but this was just what came to mind first.
+    UsernameCheckBoxHint.setEditable(false);
+    UsernameCheckBoxHint.setOpaque(false);
+    UsernameCheckBoxHint.setBorder(null);
+    UsernameCheckBoxHint.setForeground(Color.black);
+    add(UsernameCheckBoxHint);
 
     // Move to center.
     setLocationRelativeTo(null);
@@ -98,10 +112,20 @@ public class CompanionGui extends JFrame {
             (int) (85.0 * WidthScalar),
             24
     );
+
+    // Place the checkbox 5% below all that above. (15% at this point.)
+    UsernameCheckBox.setBounds((int) (5.0 * WidthScalar), (int) (15.0 * HeightScalar) + 48, 24, 24);
+
+    // Also put its label next to it.
+    UsernameCheckBoxHint.setBounds((int) (5.0 * WidthScalar) + 30, (int) (15.0 * HeightScalar) + 48, (int) (85.0 * WidthScalar) - 30, 24);
   }
 
   public String GetUsername() {
     return UsernameBox.getText();
+  }
+
+  public boolean GetUsernameEnabled() {
+    return UsernameCheckBox.isSelected();
   }
 
   private void setLookAndFeel() {
