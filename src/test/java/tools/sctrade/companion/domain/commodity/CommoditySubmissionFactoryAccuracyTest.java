@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Paths;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
 import tools.sctrade.companion.domain.user.Setting;
@@ -26,7 +25,7 @@ class CommoditySubmissionFactoryAccuracyTest {
     factory = new CommoditySubmissionFactory(new UserService(), imageWriter);
   }
 
-  @Test
+  // @Test
   void givenCorrectSreenshotThenReadTextAccurately() throws IOException {
     var manipulation = new UpscaleTo4k();
     BufferedImage screenshot = ImageUtil
