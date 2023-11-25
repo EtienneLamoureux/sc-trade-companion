@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.imageio.ImageIO;
 import org.imgscalr.Scalr;
@@ -115,6 +116,7 @@ public class ImageUtil {
   }
 
   static void writeToDisk(BufferedImage image, Path path) throws IOException {
+    Files.createDirectories(path.getParent());
     File imageFile = new File(path.toString());
     String format = path.toString().substring(path.toString().lastIndexOf(".") + 1);
     ImageIO.write(image, format, imageFile);

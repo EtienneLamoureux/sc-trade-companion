@@ -12,7 +12,7 @@ import tools.sctrade.companion.domain.user.SettingRepository;
 import tools.sctrade.companion.utils.ImageUtil;
 
 public class DiskImageWriter implements ImageWriter {
-  private final Logger logger = LoggerFactory.getLogger(ImageWriter.class);
+  private final Logger logger = LoggerFactory.getLogger(DiskImageWriter.class);
 
   private SettingRepository settings;
 
