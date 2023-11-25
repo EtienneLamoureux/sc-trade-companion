@@ -41,6 +41,15 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+configurations.all {
+	exclude group: "commons-logging", module: "commons-logging"
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+task copyDependencies(type: Copy) {
+	from configurations.runtimeClasspath
+	into "$buildDir/dependencies"
 }
