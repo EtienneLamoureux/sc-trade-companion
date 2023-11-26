@@ -59,13 +59,6 @@ task copyDependencies(type: Copy, dependsOn: 'build') {
 	into dependenciesDir
 }
 
-task copyJar(type: Copy, dependsOn: 'build') {
-	from "$buildDir/libs"
-	into binariesDir
-	include "${rootProject.name}-${version}.jar"
-	rename "${rootProject.name}-${version}.jar", "${rootProject.name}.jar"
-}
-
 task jdeps(dependsOn: 'copyDependencies') {
     doLast {
 		exec {
@@ -87,5 +80,23 @@ task jlink(dependsOn: 'jdeps') {
 	}
 }
 
-task dist(dependsOn: ['copyJar', 'jlink']) {
+task copyJar(type: Copy, dependsOn: 'build') {
+	from "$buildDir/libs"
+	into binariesDir
+	include "${rootProject.name}-${version}.jar"
+	rename "${rootProject.name}-${version}.jar", "${rootProject.name}.jar"
+}
+
+task copyTessdata(type: Copy) {
+	from "./bin/tessdata"
+	into "$binariesDir/tessdata"
+}
+
+task copyStartScript(type: Copy) {
+	from "./scripts"
+	into distributionDir
+	include "${rootProject.name}.bat"
+}
+
+task dist(dependsOn: ['copyJar', 'copyTessdata', 'copyStartScript', 'jlink']) {
 }
