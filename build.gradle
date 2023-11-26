@@ -51,19 +51,41 @@ tasks.named('test') {
 
 // Distribution-specific tasks
 def dependenciesDir = "$buildDir/dependencies"
+def distributionDir = "$buildDir/dist"
+def binariesDir = "$distributionDir/bin"
 
-task copyDependencies(type: Copy) {
+task copyDependencies(type: Copy, dependsOn: 'build') {
 	from configurations.runtimeClasspath
 	into dependenciesDir
 }
 
-task jdeps {
-	def jdeps = new ByteArrayOutputStream()
-    exec {
-		workingDir "$projectDir"
-        commandLine 'jdeps', '--class-path', '"build/dependencies/*"', '--multi-release', 'base', '--ignore-missing-deps', '-recursive', '--print-module-deps', "$buildDir/libs/${rootProject.name}-${version}.jar"
-        standardOutput = jdeps
+task copyJar(type: Copy, dependsOn: 'build') {
+	from "$buildDir/libs"
+	into binariesDir
+	include "${rootProject.name}-${version}.jar"
+	rename "${rootProject.name}-${version}.jar", "${rootProject.name}.jar"
+}
+
+task jdeps(dependsOn: 'copyDependencies') {
+    doLast {
+		exec {
+			def jdeps = new ByteArrayOutputStream()
+	        commandLine 'jdeps', '--class-path', '"build/dependencies/*"', '--multi-release', 'base', '--ignore-missing-deps', '-recursive', '--print-module-deps', "$buildDir/libs/${rootProject.name}-${version}.jar"
+	        standardOutput = jdeps
+		    println jdeps
+		    ext.jdeps = jdeps
+	    }
     }
-    println jdeps
-    ext.jdeps = jdeps
+}
+
+task jlink(dependsOn: 'jdeps') {
+	doLast {
+		exec {
+			workingDir = projectDir
+	        commandLine 'jlink', '--output', "$binariesDir/jre", '--add-modules', 'java.base,java.compiler,java.desktop,java.instrument,java.management,java.naming,java.net.http,java.prefs,java.scripting,java.sql,jdk.jfr,jdk.unsupported' // TODO use "${tasks.jdeps.jdeps}"
+		}
+	}
+}
+
+task dist(dependsOn: ['copyJar', 'jlink']) {
 }
