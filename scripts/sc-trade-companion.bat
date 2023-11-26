@@ -1,0 +1,1 @@
+start bin\jre\bin\javaw.exe -jar bin\sc-trade-companion.jar

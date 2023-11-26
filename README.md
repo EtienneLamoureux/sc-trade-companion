@@ -11,21 +11,15 @@ Desktop companion application for Star Citizen.
 - [Known issues](https://github.com/EtienneLamoureux/sc-trade-companion/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
 
 ## Installation
-1. Install Java 17+
-    * To verify if you already have Java 17+, execute the following:
-       1. <kbd>Windows key</kbd>+<kbd>R</kbd>
-       2. Type `cmd`, then press <kbd>Enter</kbd>
-       3. Type in `java -version`, then press <kbd>Enter</kbd>
-       4. If an error occurs or the version listed is not 17+, please [install Java 17+](https://www.oracle.com/java/technologies/downloads/)
-3. Download the [latest release](https://github.com/EtienneLamoureux/sc-trade-companion/releases) `.exe` file, under the "Assets" section
-4. Extract the application wherever
+1. Download the [latest release](https://github.com/EtienneLamoureux/sc-trade-companion/releases) `.exe` file, under the "Assets" section
+2. Extract the application wherever
 
 ### Uninstalling
 1. Delete the `SC Trade Companion` folder wherever you installed it
 2. Done!
 
 ## Usage
-1. Start the application by double-clicking the `SC Trade Companion/sc-trade-companion.bat` file
+1. Start the application by double-clicking the `sc-trade-companion.bat` file
 2. Play Star Citizen
 3. When you get to a commodity kiosk, interact with it
 4. Align your character as close and as straight to the screen as possible

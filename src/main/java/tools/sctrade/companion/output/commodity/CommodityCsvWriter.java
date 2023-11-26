@@ -1,5 +1,6 @@
 package tools.sctrade.companion.output.commodity;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -30,23 +31,34 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
   @Override
   public void process(CommoditySubmission submission) {
     var filePath = buildFilePath();
-    Collection<List<String>> lines = new ArrayList<>();
-    logger.debug("Writing {} commodity listings to '{}'...", submission.getListings().size(),
-        filePath);
 
-    for (var listing : submission.getListings()) {
-      List<String> line = buildLine(listing);
-      lines.add(line);
+    try {
+      logger.debug("Writing {} commodity listings to '{}'...", submission.getListings().size(),
+          filePath);
+      Files.createDirectories(filePath);
+      Collection<List<String>> lines = buildLines(submission);
+      CsvUtil.write(filePath, lines);
+      logger.info("Wrote {} commodity listings to '{}'", submission.getListings().size(), filePath);
+    } catch (Exception e) {
+      logger.error("There was an error writing to '{}'", filePath, e);
     }
-
-    CsvUtil.write(filePath, lines);
-    logger.info("Wrote {} commodity listings to '{}'", submission.getListings().size(), filePath);
   }
 
   private Path buildFilePath() {
     String fileName = TimeUtil.getNowAsString(TimeFormat.CSV_FILENAME) + ".csv";
 
     return Paths.get(folder.toString(), fileName);
+  }
+
+  private Collection<List<String>> buildLines(CommoditySubmission submission) {
+    Collection<List<String>> lines = new ArrayList<>();
+
+    for (var listing : submission.getListings()) {
+      List<String> line = buildLine(listing);
+      lines.add(line);
+    }
+
+    return lines;
   }
 
   private List<String> buildLine(CommodityListing listing) {

@@ -3,6 +3,11 @@
 ### Features
 - #8 Add a sound when a screenshot is taken
 
+### Other
+- #9 Remove external Java dependency
+  - This app now ships as a stand-alone application, requiring no additional install
+  - If you had installed Java specifically for this app, you can uninstall it
+
 ## 0.1.0
 ### Features
 - Automatic commodity kiosk scraping by pressing the <kbd>F3</kbd> key
