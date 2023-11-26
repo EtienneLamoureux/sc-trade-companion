@@ -37,7 +37,7 @@ public abstract class TesseractOcr extends Ocr {
   }
 
   private String getDatapath() {
-    String datapath = Paths.get(".", "tessdata").normalize().toAbsolutePath().toString();
+    String datapath = Paths.get(".", "bin", "tessdata").normalize().toAbsolutePath().toString();
     logger.info("Loading Tesseract Datapath from '{}'", datapath);
 
     return datapath;
