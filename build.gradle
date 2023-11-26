@@ -49,17 +49,21 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+// Distribution-specific tasks
+def dependenciesDir = "$buildDir/dependencies"
+
 task copyDependencies(type: Copy) {
 	from configurations.runtimeClasspath
-	into "$buildDir/dependencies"
+	into dependenciesDir
 }
 
 task jdeps {
 	def jdeps = new ByteArrayOutputStream()
     exec {
 		workingDir "$projectDir"
-        commandLine 'jdeps', '--class-path', '"build/dependencies/*"', '--multi-release', 'base', '--ignore-missing-deps', '-recursive', '--print-module-deps', './build/libs/sc-trade-companion-0.2.0.jar'
+        commandLine 'jdeps', '--class-path', '"build/dependencies/*"', '--multi-release', 'base', '--ignore-missing-deps', '-recursive', '--print-module-deps', "$buildDir/libs/${rootProject.name}-${version}.jar"
         standardOutput = jdeps
     }
     println jdeps
+    ext.jdeps = jdeps
 }
