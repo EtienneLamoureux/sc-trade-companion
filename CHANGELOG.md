@@ -7,6 +7,7 @@
 - #9 Remove external Java dependency
   - This app now ships as a stand-alone application, requiring no additional install
   - If you had installed Java specifically for this app, you can uninstall it
+- #15 Add the current version to the application's title bar
 
 ## 0.1.0
 ### Features
