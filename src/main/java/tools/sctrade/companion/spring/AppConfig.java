@@ -25,6 +25,7 @@ import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
 import tools.sctrade.companion.swing.CompanionGui;
+import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
 public class AppConfig {
@@ -93,14 +94,20 @@ public class AppConfig {
         Arrays.asList(commodityCsvLogger, scTradeToolsClient));
   }
 
+  @Bean
+  public SoundUtil buildSoundUtil() {
+    return new SoundUtil();
+  }
+
   @Bean("ScreenPrinter")
   public ScreenPrinter buildScreenPrinter(
-      @Qualifier("CommodityService") CommodityService commodityService, ImageWriter imageWriter) {
+      @Qualifier("CommodityService") CommodityService commodityService, ImageWriter imageWriter,
+      SoundUtil soundPlayer) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
     return new ScreenPrinter(Arrays.asList(commodityService), postprocessingManipulations,
-        imageWriter);
+        imageWriter, soundPlayer);
   }
 
   @Bean("KeyListener")
