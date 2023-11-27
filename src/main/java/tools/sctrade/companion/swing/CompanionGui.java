@@ -21,10 +21,17 @@ public class CompanionGui extends JFrame {
   private JCheckBox UsernameCheckBox;
   private JTextField UsernameCheckBoxHint;
 
+  private final String version;
+
+  public CompanionGui(String version) {
+    this.version = version;
+  }
+
   public void initialize() throws AWTException {
     setLookAndFeel();
     setIconImages();
 
+<<<<<<< HEAD
     // Set UI Scale on boot.
     InitializeUI();
     BuildUI();
@@ -77,6 +84,11 @@ public class CompanionGui extends JFrame {
     add(UsernameCheckBoxHint);
 
     // Move to center.
+=======
+    setTitle(
+        String.format(Locale.ROOT, "%s %s", LocalizationUtil.get("applicationTitle"), version));
+    setSize(300, 200);
+>>>>>>> 42baa20... Add the current version to the application's title bar (#21)
     setLocationRelativeTo(null);
   }
 
