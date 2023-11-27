@@ -23,24 +23,27 @@ public class ScreenPrinter implements Runnable {
   private Collection<AsynchronousProcessor<BufferedImage>> imageProcessors;
   private List<ImageManipulation> postprocessingManipulations;
   private ImageWriter imageWriter;
+  private SoundUtil soundPlayer;
 
   public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
-      ImageWriter imageWriter) {
-    this(imageProcessors, Collections.emptyList(), imageWriter);
+      ImageWriter imageWriter, SoundUtil soundPlayer) {
+    this(imageProcessors, Collections.emptyList(), imageWriter, soundPlayer);
   }
 
   public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
-      List<ImageManipulation> postprocessingManipulations, ImageWriter imageWriter) {
+      List<ImageManipulation> postprocessingManipulations, ImageWriter imageWriter,
+      SoundUtil soundPlayer) {
     this.imageProcessors = imageProcessors;
     this.postprocessingManipulations = postprocessingManipulations;
     this.imageWriter = imageWriter;
+    this.soundPlayer = soundPlayer;
   }
 
   @Override
   public void run() {
     try {
       logger.debug("Printing screen...");
-      SoundUtil.play(CAMERA_SHUTTER);
+      soundPlayer.play(CAMERA_SHUTTER);
       var screenRectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
       var screenCapture = postProcess(new Robot().createScreenCapture(screenRectangle));
       logger.debug("Printed screen");
