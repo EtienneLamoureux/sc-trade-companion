@@ -17,11 +17,18 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 public class CompanionGui extends JFrame {
   private static final long serialVersionUID = -983766141308946535L;
 
+  private final String version;
+
+  public CompanionGui(String version) {
+    this.version = version;
+  }
+
   public void initialize() throws AWTException {
     setLookAndFeel();
     setIconImages();
 
-    setTitle(LocalizationUtil.get("applicationTitle"));
+    setTitle(
+        String.format(Locale.ROOT, "%s %s", LocalizationUtil.get("applicationTitle"), version));
     setSize(300, 200);
     setLocationRelativeTo(null);
 

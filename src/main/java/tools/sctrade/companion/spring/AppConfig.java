@@ -4,8 +4,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -26,6 +28,9 @@ import tools.sctrade.companion.swing.CompanionGui;
 
 @Configuration
 public class AppConfig {
+  @Autowired(required = false)
+  private BuildProperties buildProperties;
+
   @Value("${output.screenshots:true}")
   private String outputScreenshots;
   @Value("${output.intermediary-images:false}")
@@ -47,7 +52,9 @@ public class AppConfig {
 
   @Bean("CompanionGui")
   public CompanionGui buildCompanionGui() {
-    return new CompanionGui();
+    String version = buildProperties == null ? "TEST" : buildProperties.getVersion();
+
+    return new CompanionGui(version);
   }
 
   @Bean("UserService")
