@@ -49,6 +49,10 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+springBoot {
+    buildInfo()
+}
+
 // Distribution-specific tasks
 def dependenciesDir = "$buildDir/dependencies"
 def distributionDir = "$buildDir/dist"
@@ -65,7 +69,6 @@ task jdeps(dependsOn: 'copyDependencies') {
 			def jdeps = new ByteArrayOutputStream()
 	        commandLine 'jdeps', '--class-path', '"build/dependencies/*"', '--multi-release', 'base', '--ignore-missing-deps', '-recursive', '--print-module-deps', "$buildDir/libs/${rootProject.name}-${version}.jar"
 	        standardOutput = jdeps
-		    println jdeps
 		    ext.jdeps = jdeps
 	    }
     }
