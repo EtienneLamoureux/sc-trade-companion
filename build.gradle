@@ -55,7 +55,7 @@ springBoot {
 
 // Distribution-specific tasks
 def dependenciesDir = "$buildDir/dependencies"
-def distributionDir = "$buildDir/dist"
+def distributionDir = "$buildDir/SC Trade Companion"
 def binariesDir = "$distributionDir/bin"
 
 task copyDependencies(type: Copy, dependsOn: 'build') {
