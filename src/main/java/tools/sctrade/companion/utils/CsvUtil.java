@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,7 +25,9 @@ import tools.sctrade.companion.exceptions.CsvParsingException;
 public class CsvUtil {
   private CsvUtil() {}
 
-  public static void write(Path path, Collection<List<String>> lines) {
+  public static void write(Path path, Collection<List<String>> lines) throws IOException {
+    Files.createDirectories(path.getParent());
+
     try (CSVWriter writer = new CSVWriter(new FileWriter(path.toString(), true))) {
       for (List<String> line : lines) {
         writer.writeNext(line.toArray(new String[0]));

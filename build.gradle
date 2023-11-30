@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'tools.sctrade'
-version = '0.2.0'
+version = '0.2.1'
 
 java {
 	sourceCompatibility = '17'
@@ -67,7 +67,7 @@ task jdeps(dependsOn: 'copyDependencies') {
     doLast {
 		exec {
 			def jdeps = new ByteArrayOutputStream()
-	        commandLine 'jdeps', '--class-path', '"build/dependencies/*"', '--multi-release', 'base', '--ignore-missing-deps', '-recursive', '--print-module-deps', "$buildDir/libs/${rootProject.name}-${version}.jar"
+	        commandLine 'jdeps', '--class-path', '"build/dependencies/*"', '--multi-release', 'base', '--ignore-missing-deps', '-recursive', '--print-module-deps', "$buildDir/libs/${rootProject.name}-${version}.jar" // TODO append jdk.crypto.ec
 	        standardOutput = jdeps
 		    ext.jdeps = jdeps
 	    }
@@ -78,7 +78,7 @@ task jlink(dependsOn: 'jdeps') {
 	doLast {
 		exec {
 			workingDir = projectDir
-	        commandLine 'jlink', '--output', "$binariesDir/jre", '--add-modules', 'java.base,java.compiler,java.desktop,java.instrument,java.management,java.naming,java.net.http,java.prefs,java.scripting,java.sql,jdk.jfr,jdk.unsupported' // TODO use "${tasks.jdeps.jdeps}"
+	        commandLine 'jlink', '--output', "$binariesDir/jre", '--add-modules', 'java.base,java.compiler,java.desktop,java.instrument,java.management,java.naming,java.net.http,java.prefs,java.scripting,java.sql,jdk.jfr,jdk.unsupported,jdk.crypto.ec' // TODO use "${tasks.jdeps.jdeps}"
 		}
 	}
 }

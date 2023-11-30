@@ -1,6 +1,5 @@
 package tools.sctrade.companion.output.commodity;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -35,7 +34,6 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
     try {
       logger.debug("Writing {} commodity listings to '{}'...", submission.getListings().size(),
           filePath);
-      Files.createDirectories(filePath);
       Collection<List<String>> lines = buildLines(submission);
       CsvUtil.write(filePath, lines);
       logger.info("Wrote {} commodity listings to '{}'", submission.getListings().size(), filePath);
