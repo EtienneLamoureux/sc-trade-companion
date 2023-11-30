@@ -1,4 +1,9 @@
 # SC Trade Companion
+## 0.2.1
+### Bugs
+- Fix data not being exported to the /my-data folder
+- Fix data not being published to https://sc-trade.tools
+
 ## 0.2.0
 ### Features
 - #8 Add a sound when a screenshot is taken
