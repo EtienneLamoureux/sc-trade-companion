@@ -3,6 +3,7 @@ package tools.sctrade.companion.domain.commodity;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Locale;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import net.sourceforge.tess4j.Word;
@@ -33,7 +34,8 @@ public class CommodityListingsTesseractOcr extends TesseractOcr {
         words.stream().map(n -> n.getText()).collect(Collectors.joining(System.lineSeparator())));
 
     return new OcrResult(words.stream()
-        .map(n -> new LocatedWord(n.getText().toLowerCase(), n.getBoundingBox())).toList());
+        .map(n -> new LocatedWord(n.getText().toLowerCase(Locale.ROOT), n.getBoundingBox()))
+        .toList());
   }
 
   private BufferedImage keepRightHalf(BufferedImage image) {
@@ -66,7 +68,7 @@ public class CommodityListingsTesseractOcr extends TesseractOcr {
   }
 
   private boolean isInListings(Word word) {
-    String string = word.getText().toLowerCase().strip();
+    String string = word.getText().toLowerCase(Locale.ROOT).strip();
 
     return string.endsWith("/unit") || string.endsWith("scu") || string.endsWith("stock")
         || string.startsWith("out") || string.endsWith("demand");
