@@ -42,12 +42,15 @@ public class CommoditySubmissionFactory {
   private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactory.class);
 
   private UserService userService;
+  private CommodityRepository commodityRepository;
   private ImageWriter imageWriter;
   private ThreadLocal<Ocr> listingsOcr;
   private ThreadLocal<Ocr> locationOcr;
 
-  public CommoditySubmissionFactory(UserService userService, ImageWriter imageWriter) {
+  public CommoditySubmissionFactory(UserService userService,
+      CommodityRepository commodityRepository, ImageWriter imageWriter) {
     this.userService = userService;
+    this.commodityRepository = commodityRepository;
     this.imageWriter = imageWriter;
     this.listingsOcr = constructListingsOcr();
     this.locationOcr = constructLocationOcr();
@@ -88,7 +91,8 @@ public class CommoditySubmissionFactory {
     Instant now = TimeUtil.getNow();
 
     return rawListings.parallelStream()
-        .map(n -> new CommodityListing(location, transactionType, n.getCommodity().get(),
+        .map(n -> new CommodityListing(location, transactionType,
+            StringUtil.spellCheckNoFail(n.getCommodity().get(), commodityRepository.findAll()),
             n.getPrice().get(), n.getInventory().get(), n.getInventoryLevel().get(), batchId, now))
         .toList();
   }

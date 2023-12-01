@@ -1,19 +1,24 @@
 package tools.sctrade.companion.output.commodity;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommoditySubmission;
 import tools.sctrade.companion.domain.user.Setting;
 import tools.sctrade.companion.domain.user.SettingRepository;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
 
-public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmission> {
+public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmission>
+    implements CommodityRepository {
   private final Logger logger = LoggerFactory.getLogger(ScTradeToolsClient.class);
 
   private WebClient webClient;
@@ -21,6 +26,16 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
   public ScTradeToolsClient(WebClient.Builder webClientBuilder, SettingRepository settings) {
     this.webClient =
         webClientBuilder.baseUrl(settings.get(Setting.SC_TRADE_TOOLS_ROOT_URL)).build();
+  }
+
+  @Override
+  @Cacheable("ScTradeToolsClient.findAll")
+  public List<String> findAll() {
+    logger.debug("Fetching commodities from sc-trade.tools...");
+    return Arrays
+        .stream(
+            this.webClient.get().uri("/api/items").retrieve().bodyToMono(String[].class).block())
+        .map(n -> n.toLowerCase(Locale.ROOT)).toList();
   }
 
   @Override
