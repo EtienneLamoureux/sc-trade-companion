@@ -85,7 +85,8 @@ public class AppConfig {
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
       @Qualifier("ScTradeToolsClient") ScTradeToolsClient scTradeToolsClient,
       ImageWriter imageWriter) {
-    return new CommoditySubmissionFactory(userService, scTradeToolsClient, imageWriter);
+    return new CommoditySubmissionFactory(userService, scTradeToolsClient, scTradeToolsClient,
+        imageWriter);
   }
 
   @Bean("CommodityService")

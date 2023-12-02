@@ -6,7 +6,7 @@ import java.util.List;
 class TestCommodityRepository implements CommodityRepository {
 
   @Override
-  public List<String> findAll() {
+  public List<String> findAllCommodities() {
     return Arrays.asList("AcryliPlex Composite", "Agricium", "Agricium (Ore)",
         "Agricultural Supplies", "Altruciatoxin", "Aluminum", "Aluminum (Ore)", "Amioshi Plague",
         "Aphorite", "Astatine", "Atlasium", "Beryl", "Beryl (Raw)", "Bexalite", "Bexalite (Raw)",
