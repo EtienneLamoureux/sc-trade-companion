@@ -52,7 +52,6 @@ public class CompanionGui extends JFrame {
   // On first boot, initialize all elements on screen.
   private void InitializeUI() {
     // Set initial size and title.
-    setTitle(LocalizationUtil.get("applicationTitle"));
     setSize(StartWidth, StartHeight);
 
     // Create components for BuildUI() to move.
@@ -84,9 +83,8 @@ public class CompanionGui extends JFrame {
     UsernameCheckBoxHint.setForeground(Color.black);
     add(UsernameCheckBoxHint);
 
-    // Move to center.
-    setTitle(
-        String.format(Locale.ROOT, "%s %s", LocalizationUtil.get("applicationTitle"), version));
+    // Show version in Frame title.
+    setTitle(String.format(Locale.ROOT, "%s %s", LocalizationUtil.get("applicationTitle"), version));
     setLocationRelativeTo(null);
   }
 
@@ -97,12 +95,14 @@ public class CompanionGui extends JFrame {
     double WidthScalar = 0.01f * this.getRootPane().getWidth(), HeightScalar = 0.01f * this.getRootPane().getHeight();
     setLayout(null);
 
+    // First things first, if the window has been resized to below 300*200, hide the icon.
+    if (getWidth() < StartWidth || getHeight() < StartHeight) {
+      SCTradeToolsIcon.setVisible(false);
+    } else SCTradeToolsIcon.setVisible(true);
+
     // Add icon to top left corner.
     // System.out.println("WidthScalar: " + WidthScalar + "HeightScalar: " + HeightScalar);
     int IconSides = 64;
-    // TODO: Handle edge cases where the IconSides < icon64 sides.
-      // Something like this for dimensions: (int) Math.min(64.0 * WidthScalar, 64.0 * HeightScalar);
-      // Needs a method for rescaling the image, though. All this does is change the border box.
 
     // Place the icon in the top left corner, using a 5% gap on the sides.
     SCTradeToolsIcon.setBounds(
