@@ -91,7 +91,7 @@ public class CompanionGui extends JFrame {
     // System.out.println("WidthScalar: " + WidthScalar + "HeightScalar: " + HeightScalar);
     int IconSides = 64;
     // TODO: Handle edge cases where the IconSides < icon64 sides.
-      // Something like this for dimensions: (int) Math.min(64 * WidthScalar, 64 * HeightScalar);
+      // Something like this for dimensions: (int) Math.min(64.0 * WidthScalar, 64.0 * HeightScalar);
       // Needs a method for rescaling the image, though. All this does is change the border box.
 
     // Place the icon in the top left corner, using a 5% gap on the sides.
