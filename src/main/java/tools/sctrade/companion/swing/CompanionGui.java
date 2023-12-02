@@ -15,6 +15,8 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 
 public class CompanionGui extends JFrame {
   private static final long serialVersionUID = -983766141308946535L;
+  public static final int StartWidth = 450;
+  public static final int StartHeight = 150;
   private JLabel SCTradeToolsIcon;
   private JLabel UserNameHint;
   private JTextField UsernameBox;
@@ -50,8 +52,8 @@ public class CompanionGui extends JFrame {
   // On first boot, initialize all elements on screen.
   private void InitializeUI() {
     // Set initial size and title.
-    setSize(450, 150);
     setTitle(LocalizationUtil.get("applicationTitle"));
+    setSize(StartWidth, StartHeight);
 
     // Create components for BuildUI() to move.
       // Below region is uncommented, since the code is very self-explanatory. Message me if you need help.
@@ -85,7 +87,6 @@ public class CompanionGui extends JFrame {
     // Move to center.
     setTitle(
         String.format(Locale.ROOT, "%s %s", LocalizationUtil.get("applicationTitle"), version));
-    setSize(300, 200);
     setLocationRelativeTo(null);
   }
 
