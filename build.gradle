@@ -44,8 +44,6 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
-<<<<<<< HEAD
-=======
 
 springBoot {
     buildInfo()
@@ -101,4 +99,3 @@ task copyStartScript(type: Copy) {
 
 task dist(dependsOn: ['copyJar', 'copyTessdata', 'copyStartScript', 'jlink']) {
 }
->>>>>>> 42baa20... Add the current version to the application's title bar (#21)
