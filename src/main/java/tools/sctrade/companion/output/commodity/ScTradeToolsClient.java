@@ -1,19 +1,25 @@
 package tools.sctrade.companion.output.commodity;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import tools.sctrade.companion.domain.LocationRepository;
+import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommoditySubmission;
 import tools.sctrade.companion.domain.user.Setting;
 import tools.sctrade.companion.domain.user.SettingRepository;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
 
-public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmission> {
+public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmission>
+    implements CommodityRepository, LocationRepository {
   private final Logger logger = LoggerFactory.getLogger(ScTradeToolsClient.class);
 
   private WebClient webClient;
@@ -21,6 +27,28 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
   public ScTradeToolsClient(WebClient.Builder webClientBuilder, SettingRepository settings) {
     this.webClient =
         webClientBuilder.baseUrl(settings.get(Setting.SC_TRADE_TOOLS_ROOT_URL)).build();
+  }
+
+  @Override
+  @Cacheable("ScTradeToolsClient.findAllCommodities")
+  public List<String> findAllCommodities() {
+    logger.debug("Fetching commodities from sc-trade.tools...");
+    return Arrays
+        .stream(
+            this.webClient.get().uri("/api/items").retrieve().bodyToMono(String[].class).block())
+        .map(n -> n.toLowerCase(Locale.ROOT)).toList();
+  }
+
+  @Override
+  @Cacheable("ScTradeToolsClient.findAllLocations")
+  public List<String> findAllLocations() {
+    logger.debug("Fetching locations from sc-trade.tools...");
+    LocationDto[] locationDtos = this.webClient.get().uri("/api/locations").retrieve()
+        .bodyToMono(LocationDto[].class).block();
+    return Arrays.stream(locationDtos)
+        .map(
+            n -> n.name().substring(n.name().lastIndexOf(">") + 1).strip().toLowerCase(Locale.ROOT))
+        .toList();
   }
 
   @Override
@@ -53,5 +81,8 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
 
   private record CommodityListingDto(String location, String transaction, String commodity,
       double price, Integer quantity, double saturation, String batchId, Timestamp timestamp) {
+  }
+
+  private record LocationDto(String name, String type) {
   }
 }

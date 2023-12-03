@@ -3,6 +3,7 @@ package tools.sctrade.companion.domain.commodity;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,8 @@ public class CommodityLocationTesseractOcr extends TesseractOcr {
         words.stream().map(n -> n.getText()).collect(Collectors.joining(System.lineSeparator())));
 
     return new OcrResult(words.stream()
-        .map(n -> new LocatedWord(n.getText().toLowerCase(), n.getBoundingBox())).toList());
+        .map(n -> new LocatedWord(n.getText().toLowerCase(Locale.ROOT), n.getBoundingBox()))
+        .toList());
   }
 
   private BufferedImage keepLeftHalf(BufferedImage image) {
