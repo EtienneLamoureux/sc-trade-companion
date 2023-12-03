@@ -37,7 +37,7 @@
 	</root>
 
 	<!-- LOG "tools.sctrade.companion" at INFO level -->
-	<logger name="org.jnativehook" level="info" additivity="false">
+	<logger name="tools.sctrade.companion" level="info" additivity="false">
 		<appender-ref ref="FILE-ROLLING" />
 		<appender-ref ref="STDOUT" />
 	</logger>
