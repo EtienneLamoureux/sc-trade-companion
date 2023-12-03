@@ -109,7 +109,7 @@ public class RawCommodityListing {
     try {
       Matcher matcher = RIGHT_PATTERN.matcher(right.getText().replace(" ", ""));
       matcher.find();
-      String match = matcher.group(1).toLowerCase();
+      String match = matcher.group(1).toLowerCase(Locale.ROOT);
       match = match.replace(",", "");
 
       inventory = Optional.of(Integer.valueOf(match));
@@ -121,11 +121,11 @@ public class RawCommodityListing {
 
   private void extractPrice() {
     try {
-      String processedRight = right.getText().toLowerCase(Locale.ROOT).replace(" ", "")
+      String processedRight = right.getText().strip().toLowerCase(Locale.ROOT).replace(" ", "")
           .replace("l", "1").replace("s", "5");
       Matcher matcher = RIGHT_PATTERN.matcher(processedRight);
       matcher.find();
-      String match = matcher.group(2).toLowerCase();
+      String match = matcher.group(2).toLowerCase(Locale.ROOT);
       boolean isThousands = match.endsWith("k");
       match = match.replace("k", "");
 

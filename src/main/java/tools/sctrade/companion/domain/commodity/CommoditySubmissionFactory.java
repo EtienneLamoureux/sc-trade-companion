@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.domain.image.ImageWriter;
@@ -42,12 +43,18 @@ public class CommoditySubmissionFactory {
   private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactory.class);
 
   private UserService userService;
+  private CommodityRepository commodityRepository;
+  private LocationRepository locationRepository;
   private ImageWriter imageWriter;
   private ThreadLocal<Ocr> listingsOcr;
   private ThreadLocal<Ocr> locationOcr;
 
-  public CommoditySubmissionFactory(UserService userService, ImageWriter imageWriter) {
+  public CommoditySubmissionFactory(UserService userService,
+      CommodityRepository commodityRepository, LocationRepository locationRepository,
+      ImageWriter imageWriter) {
     this.userService = userService;
+    this.commodityRepository = commodityRepository;
+    this.locationRepository = locationRepository;
     this.imageWriter = imageWriter;
     this.listingsOcr = constructListingsOcr();
     this.locationOcr = constructLocationOcr();
@@ -88,7 +95,9 @@ public class CommoditySubmissionFactory {
     Instant now = TimeUtil.getNow();
 
     return rawListings.parallelStream()
-        .map(n -> new CommodityListing(location, transactionType, n.getCommodity().get(),
+        .map(n -> new CommodityListing(location, transactionType,
+            StringUtil.spellCheckNoFail(n.getCommodity().get(),
+                commodityRepository.findAllCommodities()),
             n.getPrice().get(), n.getInventory().get(), n.getInventoryLevel().get(), batchId, now))
         .toList();
   }
@@ -190,7 +199,9 @@ public class CommoditySubmissionFactory {
 
       if (next.equals(yourInventoriesFragment)) {
         try {
-          return it.next().getText();
+          return StringUtil.spellCheck(it.next().getText(), locationRepository.findAllLocations());
+        } catch (NoCloseStringException e) {
+          return null;
         } catch (NoSuchElementException e) {
           throw new LocationNotFoundException(longestColumn);
         }

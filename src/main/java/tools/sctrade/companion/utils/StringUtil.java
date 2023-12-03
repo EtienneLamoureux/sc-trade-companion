@@ -26,6 +26,14 @@ public class StringUtil {
     return dp[x.length()][y.length()];
   }
 
+  public static String spellCheckNoFail(String string, Collection<String> possibilities) {
+    try {
+      return spellCheck(string, possibilities);
+    } catch (NoCloseStringException e) {
+      return string;
+    }
+  }
+
   public static String spellCheck(String string, Collection<String> possibilities) {
     var possibilitiesByDistance = new ConcurrentSkipListMap<Integer, String>();
     possibilities.parallelStream()

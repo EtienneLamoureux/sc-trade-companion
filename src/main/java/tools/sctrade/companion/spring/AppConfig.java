@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -28,6 +29,7 @@ import tools.sctrade.companion.swing.CompanionGui;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
+@EnableCaching
 public class AppConfig {
   @Autowired(required = false)
   private BuildProperties buildProperties;
@@ -81,8 +83,10 @@ public class AppConfig {
 
   @Bean("CommoditySubmissionFactory")
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
+      @Qualifier("ScTradeToolsClient") ScTradeToolsClient scTradeToolsClient,
       ImageWriter imageWriter) {
-    return new CommoditySubmissionFactory(userService, imageWriter);
+    return new CommoditySubmissionFactory(userService, scTradeToolsClient, scTradeToolsClient,
+        imageWriter);
   }
 
   @Bean("CommodityService")
