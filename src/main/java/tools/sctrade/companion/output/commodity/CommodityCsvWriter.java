@@ -43,7 +43,7 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
   }
 
   private Path buildFilePath() {
-    String fileName = TimeUtil.getNowAsString(TimeFormat.CSV_FILENAME) + ".csv";
+    String fileName = TimeUtil.getNowAsString(TimeFormat.CSV_FILENAME) + "_commodity-listings.csv";
 
     return Paths.get(folder.toString(), fileName);
   }
