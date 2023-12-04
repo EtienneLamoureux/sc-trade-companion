@@ -1,5 +1,6 @@
 package tools.sctrade.companion.swing;
 
+import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.intellijthemes.FlatArcDarkOrangeIJTheme;
 import java.awt.AWTException;
 import java.awt.Image;
@@ -37,6 +38,7 @@ public class CompanionGui extends JFrame {
 
   private void setLookAndFeel() {
     FlatArcDarkOrangeIJTheme.setup();
+    FlatLaf.updateUI();
   }
 
   private void setIconImages() {
