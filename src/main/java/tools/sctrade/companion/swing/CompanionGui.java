@@ -13,12 +13,20 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Locale;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 public class CompanionGui extends JFrame {
   private static final long serialVersionUID = -983766141308946535L;
 
   private final String version;
+
+  private JMenuBar menuBar;
+  private JTabbedPane tabbedPane;
 
   public CompanionGui(String version) {
     this.version = version;
@@ -30,8 +38,41 @@ public class CompanionGui extends JFrame {
 
     setTitle(
         String.format(Locale.ROOT, "%s %s", LocalizationUtil.get("applicationTitle"), version));
+
     setSize(300, 200);
     setLocationRelativeTo(null);
+
+    var fileMenu = new JMenu();
+    fileMenu.setText(LocalizationUtil.get("menuBarFile"));
+
+    JMenuItem closeMenuItem = new JMenuItem();
+    closeMenuItem.setText(LocalizationUtil.get("menuItemSendToTray"));
+    closeMenuItem.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        setVisible(false);
+      }
+    });
+    fileMenu.add(closeMenuItem);
+
+    JMenuItem exitMenuItem = new JMenuItem();
+    exitMenuItem.setText(LocalizationUtil.get("menuItemExit"));
+    exitMenuItem.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        System.exit(0);
+      }
+    });
+    fileMenu.add(exitMenuItem);
+
+    menuBar = new JMenuBar();
+    menuBar.add(fileMenu);
+    setJMenuBar(menuBar);
+
+    tabbedPane = new JTabbedPane();
+    tabbedPane.addTab(LocalizationUtil.get("tabTitleSettings"), new JPanel());
+    tabbedPane.addTab(LocalizationUtil.get("tabTitleLogs"), new JPanel());
+    add(tabbedPane);
 
     setupTray();
   }
@@ -69,7 +110,7 @@ public class CompanionGui extends JFrame {
   }
 
   private MenuItem buildOpenMenuItem() {
-    MenuItem openMenuItem = new MenuItem(LocalizationUtil.get("trayMenuItemOpen"));
+    MenuItem openMenuItem = new MenuItem(LocalizationUtil.get("menuItemOpen"));
     openMenuItem.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -81,7 +122,7 @@ public class CompanionGui extends JFrame {
   }
 
   private MenuItem buildExitMenuItem() {
-    MenuItem exitMenuItem = new MenuItem(LocalizationUtil.get("trayMenuItemExit"));
+    MenuItem exitMenuItem = new MenuItem(LocalizationUtil.get("menuItemExit"));
     exitMenuItem.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
