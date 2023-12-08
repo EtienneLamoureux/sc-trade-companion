@@ -3,6 +3,7 @@ package tools.sctrade.companion.swing;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.intellijthemes.FlatArcDarkOrangeIJTheme;
 import java.awt.AWTException;
+import java.awt.Component;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
@@ -13,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Locale;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -39,11 +41,11 @@ public class CompanionGui extends JFrame {
     setTitle(
         String.format(Locale.ROOT, "%s %s", LocalizationUtil.get("applicationTitle"), version));
 
-    setSize(300, 200);
+    setSize(600, 575);
     setLocationRelativeTo(null);
 
     var fileMenu = new JMenu();
-    fileMenu.setText(LocalizationUtil.get("menuBarFile"));
+    fileMenu.setText(LocalizationUtil.get("menuFile"));
 
     JMenuItem closeMenuItem = new JMenuItem();
     closeMenuItem.setText(LocalizationUtil.get("menuItemSendToTray"));
@@ -70,11 +72,21 @@ public class CompanionGui extends JFrame {
     setJMenuBar(menuBar);
 
     tabbedPane = new JTabbedPane();
-    tabbedPane.addTab(LocalizationUtil.get("tabTitleSettings"), new JPanel());
-    tabbedPane.addTab(LocalizationUtil.get("tabTitleLogs"), new JPanel());
+    tabbedPane.addTab(LocalizationUtil.get("tabUsage"), buildUsageTab());
+    tabbedPane.addTab(LocalizationUtil.get("tabSettings"), new SettingsTab());
+    tabbedPane.addTab(LocalizationUtil.get("tabLogs"), new JPanel());
     add(tabbedPane);
 
     setupTray();
+  }
+
+  private Component buildUsageTab() {
+    JPanel usageTab = new JPanel();
+
+    JLabel instructions = new JLabel(LocalizationUtil.get("instructions"));
+    usageTab.add(instructions);
+
+    return usageTab;
   }
 
   private void setLookAndFeel() {
