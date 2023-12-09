@@ -13,24 +13,8 @@ public class LogsTab extends JPanel {
   public LogsTab() {
     super(new GridLayout());
 
-    var model = new DefaultTableModel() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public boolean isCellEditable(int row, int column) {
-        return false;
-      }
-    };
-    model.addColumn(LocalizationUtil.get("tableColumnTime"));
-    model.addColumn(LocalizationUtil.get("tableColumnType"));
-    model.addColumn(LocalizationUtil.get("tableColumnMessage"));
-
-
-    var table = new JTable(model);
-    table.setAutoCreateRowSorter(true);
-    table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-    table.getColumnModel().getColumn(0).setMaxWidth(150);
-    table.getColumnModel().getColumn(1).setMaxWidth(50);
+    var model = buildModel();
+    var table = buildTable(model);
 
     add(new JScrollPane(table));
 
@@ -60,5 +44,31 @@ public class LogsTab extends JPanel {
     model.addRow(new Object[] {"2023-12-06", "INFO", "Screenshot processed"});
     model.addRow(new Object[] {"2023-12-05", "INFO", "Screenshot processed"});
     model.addRow(new Object[] {"2023-12-04", "INFO", "Screenshot processed"});
+  }
+
+  private DefaultTableModel buildModel() {
+    var model = new DefaultTableModel() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public boolean isCellEditable(int row, int column) {
+        return false;
+      }
+    };
+    model.addColumn(LocalizationUtil.get("tableColumnTime"));
+    model.addColumn(LocalizationUtil.get("tableColumnType"));
+    model.addColumn(LocalizationUtil.get("tableColumnMessage"));
+
+    return model;
+  }
+
+  private JTable buildTable(DefaultTableModel model) {
+    var table = new JTable(model);
+    table.setAutoCreateRowSorter(true);
+    table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
+    table.getColumnModel().getColumn(0).setMaxWidth(150);
+    table.getColumnModel().getColumn(1).setMaxWidth(50);
+
+    return table;
   }
 }
