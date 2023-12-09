@@ -3,18 +3,14 @@ package tools.sctrade.companion.swing;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.intellijthemes.FlatArcDarkOrangeIJTheme;
 import java.awt.AWTException;
-import java.awt.Component;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Locale;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -44,49 +40,10 @@ public class CompanionGui extends JFrame {
     setSize(600, 575);
     setLocationRelativeTo(null);
 
-    var fileMenu = new JMenu();
-    fileMenu.setText(LocalizationUtil.get("menuFile"));
-
-    JMenuItem closeMenuItem = new JMenuItem();
-    closeMenuItem.setText(LocalizationUtil.get("menuItemSendToTray"));
-    closeMenuItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        setVisible(false);
-      }
-    });
-    fileMenu.add(closeMenuItem);
-
-    JMenuItem exitMenuItem = new JMenuItem();
-    exitMenuItem.setText(LocalizationUtil.get("menuItemExit"));
-    exitMenuItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        System.exit(0);
-      }
-    });
-    fileMenu.add(exitMenuItem);
-
-    menuBar = new JMenuBar();
-    menuBar.add(fileMenu);
-    setJMenuBar(menuBar);
-
-    tabbedPane = new JTabbedPane();
-    tabbedPane.addTab(LocalizationUtil.get("tabUsage"), buildUsageTab());
-    tabbedPane.addTab(LocalizationUtil.get("tabSettings"), new SettingsTab());
-    tabbedPane.addTab(LocalizationUtil.get("tabLogs"), new JPanel());
-    add(tabbedPane);
+    buildMenuBar();
+    buildTabs();
 
     setupTray();
-  }
-
-  private Component buildUsageTab() {
-    JPanel usageTab = new JPanel();
-
-    JLabel instructions = new JLabel(LocalizationUtil.get("instructions"));
-    usageTab.add(instructions);
-
-    return usageTab;
   }
 
   private void setLookAndFeel() {
@@ -99,6 +56,38 @@ public class CompanionGui extends JFrame {
     var iconImages = iconPaths.parallelStream().map(this::getIcon).toList();
 
     setIconImages(iconImages);
+  }
+
+  private void buildMenuBar() {
+    menuBar = new JMenuBar();
+    menuBar.add(buildFileMenu());
+
+    setJMenuBar(menuBar);
+  }
+
+  private JMenu buildFileMenu() {
+    var fileMenu = new JMenu();
+    fileMenu.setText(LocalizationUtil.get("menuFile"));
+
+    JMenuItem closeMenuItem = new JMenuItem();
+    closeMenuItem.setText(LocalizationUtil.get("menuItemSendToTray"));
+    closeMenuItem.addActionListener(e -> setVisible(false));
+    fileMenu.add(closeMenuItem);
+
+    JMenuItem exitMenuItem = new JMenuItem();
+    exitMenuItem.setText(LocalizationUtil.get("menuItemExit"));
+    exitMenuItem.addActionListener(e -> System.exit(0));
+    fileMenu.add(exitMenuItem);
+    return fileMenu;
+  }
+
+  private void buildTabs() {
+    tabbedPane = new JTabbedPane();
+    tabbedPane.addTab(LocalizationUtil.get("tabUsage"), new UsageTab());
+    tabbedPane.addTab(LocalizationUtil.get("tabSettings"), new SettingsTab());
+    tabbedPane.addTab(LocalizationUtil.get("tabLogs"), new JPanel());
+
+    add(tabbedPane);
   }
 
   private void setupTray() throws AWTException {
@@ -123,24 +112,14 @@ public class CompanionGui extends JFrame {
 
   private MenuItem buildOpenMenuItem() {
     MenuItem openMenuItem = new MenuItem(LocalizationUtil.get("menuItemOpen"));
-    openMenuItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        setVisible(true);
-      }
-    });
+    openMenuItem.addActionListener(e -> setVisible(true));
 
     return openMenuItem;
   }
 
   private MenuItem buildExitMenuItem() {
     MenuItem exitMenuItem = new MenuItem(LocalizationUtil.get("menuItemExit"));
-    exitMenuItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        System.exit(0);
-      }
-    });
+    exitMenuItem.addActionListener(e -> System.exit(0));
 
     return exitMenuItem;
   }
