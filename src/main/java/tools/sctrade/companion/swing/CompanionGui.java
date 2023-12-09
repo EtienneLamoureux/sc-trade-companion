@@ -1,5 +1,6 @@
 package tools.sctrade.companion.swing;
 
+import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.intellijthemes.FlatArcDarkOrangeIJTheme;
 import java.awt.AWTException;
 import java.awt.Image;
@@ -7,17 +8,23 @@ import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Locale;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 public class CompanionGui extends JFrame {
   private static final long serialVersionUID = -983766141308946535L;
 
   private final String version;
+
+  private JMenuBar menuBar;
+  private JTabbedPane tabbedPane;
 
   public CompanionGui(String version) {
     this.version = version;
@@ -29,14 +36,19 @@ public class CompanionGui extends JFrame {
 
     setTitle(
         String.format(Locale.ROOT, "%s %s", LocalizationUtil.get("applicationTitle"), version));
-    setSize(300, 200);
+
+    setSize(600, 575);
     setLocationRelativeTo(null);
+
+    buildMenuBar();
+    buildTabs();
 
     setupTray();
   }
 
   private void setLookAndFeel() {
     FlatArcDarkOrangeIJTheme.setup();
+    FlatLaf.updateUI();
   }
 
   private void setIconImages() {
@@ -44,6 +56,38 @@ public class CompanionGui extends JFrame {
     var iconImages = iconPaths.parallelStream().map(this::getIcon).toList();
 
     setIconImages(iconImages);
+  }
+
+  private void buildMenuBar() {
+    menuBar = new JMenuBar();
+    menuBar.add(buildFileMenu());
+
+    setJMenuBar(menuBar);
+  }
+
+  private JMenu buildFileMenu() {
+    var fileMenu = new JMenu();
+    fileMenu.setText(LocalizationUtil.get("menuFile"));
+
+    JMenuItem closeMenuItem = new JMenuItem();
+    closeMenuItem.setText(LocalizationUtil.get("menuItemSendToTray"));
+    closeMenuItem.addActionListener(e -> setVisible(false));
+    fileMenu.add(closeMenuItem);
+
+    JMenuItem exitMenuItem = new JMenuItem();
+    exitMenuItem.setText(LocalizationUtil.get("menuItemExit"));
+    exitMenuItem.addActionListener(e -> System.exit(0));
+    fileMenu.add(exitMenuItem);
+    return fileMenu;
+  }
+
+  private void buildTabs() {
+    tabbedPane = new JTabbedPane();
+    tabbedPane.addTab(LocalizationUtil.get("tabUsage"), new UsageTab());
+    tabbedPane.addTab(LocalizationUtil.get("tabSettings"), new SettingsTab());
+    tabbedPane.addTab(LocalizationUtil.get("tabLogs"), new JPanel());
+
+    add(tabbedPane);
   }
 
   private void setupTray() throws AWTException {
@@ -67,25 +111,15 @@ public class CompanionGui extends JFrame {
   }
 
   private MenuItem buildOpenMenuItem() {
-    MenuItem openMenuItem = new MenuItem(LocalizationUtil.get("trayMenuItemOpen"));
-    openMenuItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        setVisible(true);
-      }
-    });
+    MenuItem openMenuItem = new MenuItem(LocalizationUtil.get("menuItemOpen"));
+    openMenuItem.addActionListener(e -> setVisible(true));
 
     return openMenuItem;
   }
 
   private MenuItem buildExitMenuItem() {
-    MenuItem exitMenuItem = new MenuItem(LocalizationUtil.get("trayMenuItemExit"));
-    exitMenuItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        System.exit(0);
-      }
-    });
+    MenuItem exitMenuItem = new MenuItem(LocalizationUtil.get("menuItemExit"));
+    exitMenuItem.addActionListener(e -> System.exit(0));
 
     return exitMenuItem;
   }
