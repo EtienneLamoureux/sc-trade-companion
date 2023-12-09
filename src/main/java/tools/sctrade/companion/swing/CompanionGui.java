@@ -14,7 +14,6 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
@@ -85,7 +84,7 @@ public class CompanionGui extends JFrame {
     tabbedPane = new JTabbedPane();
     tabbedPane.addTab(LocalizationUtil.get("tabUsage"), new UsageTab());
     tabbedPane.addTab(LocalizationUtil.get("tabSettings"), new SettingsTab());
-    tabbedPane.addTab(LocalizationUtil.get("tabLogs"), new JPanel());
+    tabbedPane.addTab(LocalizationUtil.get("tabLogs"), new LogsTab());
 
     add(tabbedPane);
   }
