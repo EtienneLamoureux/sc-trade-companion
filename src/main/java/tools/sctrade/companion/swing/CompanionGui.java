@@ -105,9 +105,9 @@ public class CompanionGui extends JFrame {
 
       SystemTray systemTray = SystemTray.getSystemTray();
       systemTray.add(trayIcon);
-    } else {
-      setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
+
+    setDefaultCloseOperation(EXIT_ON_CLOSE);
   }
 
   private MenuItem buildOpenMenuItem() {
