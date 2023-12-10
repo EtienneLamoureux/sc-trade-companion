@@ -63,9 +63,7 @@ public class AppConfig {
 
   @Bean("CompanionGui")
   public CompanionGui buildCompanionGui() {
-    String version = buildProperties == null ? "TEST" : buildProperties.getVersion();
-
-    return new CompanionGui(version);
+    return new CompanionGui(getVersion());
   }
 
   @Bean("NotificationService")
@@ -87,7 +85,7 @@ public class AppConfig {
   @Bean("ScTradeToolsClient")
   public ScTradeToolsClient buildScTradeToolsClient(WebClient.Builder webClientBuilder,
       SettingRepository settings, NotificationService notificationService) {
-    return new ScTradeToolsClient(webClientBuilder, settings, notificationService);
+    return new ScTradeToolsClient(webClientBuilder, settings, notificationService, getVersion());
   }
 
   @Bean("DiskImageWriter")
@@ -134,4 +132,7 @@ public class AppConfig {
     return new KeyListener(Arrays.asList(screenPrinter));
   }
 
+  private String getVersion() {
+    return buildProperties == null ? "TEST" : buildProperties.getVersion();
+  }
 }
