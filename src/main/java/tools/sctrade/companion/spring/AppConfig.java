@@ -61,19 +61,19 @@ public class AppConfig {
     return new LogsTab();
   }
 
+  @Bean("UserService")
+  public UserService buildUserService(SettingRepository settings) {
+    return new UserService(settings);
+  }
+
   @Bean("CompanionGui")
-  public CompanionGui buildCompanionGui() {
-    return new CompanionGui(getVersion());
+  public CompanionGui buildCompanionGui(UserService userService, SettingRepository settings) {
+    return new CompanionGui(userService, settings, getVersion());
   }
 
   @Bean("NotificationService")
   public NotificationService buildNotificationService(NotificationRepository repository) {
     return new NotificationService(repository);
-  }
-
-  @Bean("UserService")
-  public UserService buildUserService() {
-    return new UserService();
   }
 
   @Bean("CommodityCsvWriter")

@@ -12,8 +12,23 @@ import tools.sctrade.companion.utils.HashUtil;
 public class UserService {
   private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
+  private SettingRepository settings;
+  private User user;
+
+  public UserService(SettingRepository settings) {
+    this.settings = settings;
+  }
+
   public User get() {
-    return new User(getId(), null);
+    if (user == null) {
+      user = new User(getId(), settings.get(Setting.USERNAME));
+    }
+
+    return user;
+  }
+
+  public void updateUsername(String username) {
+    user = get().withLabel(username);
   }
 
   private String getId() {

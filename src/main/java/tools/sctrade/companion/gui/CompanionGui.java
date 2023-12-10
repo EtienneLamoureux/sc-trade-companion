@@ -17,6 +17,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
 import tools.sctrade.companion.domain.notification.NotificationLevel;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
+import tools.sctrade.companion.domain.user.SettingRepository;
+import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.TimeFormat;
 import tools.sctrade.companion.utils.TimeUtil;
@@ -24,11 +26,14 @@ import tools.sctrade.companion.utils.TimeUtil;
 public class CompanionGui extends JFrame implements NotificationRepository {
   private static final long serialVersionUID = -983766141308946535L;
 
+  private transient UserService userService;
+  private transient SettingRepository settings;
   private final String version;
   private LogsTab logsTab;
 
-
-  public CompanionGui(String version) {
+  public CompanionGui(UserService userService, SettingRepository settings, String version) {
+    this.userService = userService;
+    this.settings = settings;
     this.version = version;
   }
 
@@ -95,7 +100,7 @@ public class CompanionGui extends JFrame implements NotificationRepository {
 
     var tabbedPane = new JTabbedPane();
     tabbedPane.addTab(LocalizationUtil.get("tabUsage"), new UsageTab());
-    tabbedPane.addTab(LocalizationUtil.get("tabSettings"), new SettingsTab());
+    tabbedPane.addTab(LocalizationUtil.get("tabSettings"), new SettingsTab(userService, settings));
     tabbedPane.addTab(LocalizationUtil.get("tabLogs"), logsTab);
 
     add(tabbedPane);

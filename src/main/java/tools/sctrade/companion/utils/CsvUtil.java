@@ -26,9 +26,14 @@ public class CsvUtil {
   private CsvUtil() {}
 
   public static void write(Path path, Collection<List<String>> lines) throws IOException {
+    write(path, lines, true);
+  }
+
+  public static void write(Path path, Collection<List<String>> lines, boolean apprendLines)
+      throws IOException {
     Files.createDirectories(path.getParent());
 
-    try (CSVWriter writer = new CSVWriter(new FileWriter(path.toString(), true))) {
+    try (CSVWriter writer = new CSVWriter(new FileWriter(path.toString(), apprendLines))) {
       for (List<String> line : lines) {
         writer.writeNext(line.toArray(new String[0]));
       }
