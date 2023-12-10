@@ -17,6 +17,8 @@ import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
+import tools.sctrade.companion.domain.notification.NotificationRepository;
+import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.user.Setting;
 import tools.sctrade.companion.domain.user.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
@@ -26,6 +28,7 @@ import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
 import tools.sctrade.companion.swing.CompanionGui;
+import tools.sctrade.companion.swing.LogsTab;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
@@ -53,11 +56,19 @@ public class AppConfig {
     return settingRepository;
   }
 
+  @Bean("LogsTab")
+  public LogsTab buildLogsTab() {
+    return new LogsTab();
+  }
+
   @Bean("CompanionGui")
   public CompanionGui buildCompanionGui() {
-    String version = buildProperties == null ? "TEST" : buildProperties.getVersion();
+    return new CompanionGui(getVersion());
+  }
 
-    return new CompanionGui(version);
+  @Bean("NotificationService")
+  public NotificationService buildNotificationService(NotificationRepository repository) {
+    return new NotificationService(repository);
   }
 
   @Bean("UserService")
@@ -66,14 +77,15 @@ public class AppConfig {
   }
 
   @Bean("CommodityCsvWriter")
-  public CommodityCsvWriter buildCommodityCsvLogger(SettingRepository settingRepository) {
-    return new CommodityCsvWriter(settingRepository);
+  public CommodityCsvWriter buildCommodityCsvLogger(SettingRepository settingRepository,
+      NotificationService notificationService) {
+    return new CommodityCsvWriter(settingRepository, notificationService);
   }
 
   @Bean("ScTradeToolsClient")
   public ScTradeToolsClient buildScTradeToolsClient(WebClient.Builder webClientBuilder,
-      SettingRepository settings) {
-    return new ScTradeToolsClient(webClientBuilder, settings);
+      SettingRepository settings, NotificationService notificationService) {
+    return new ScTradeToolsClient(webClientBuilder, settings, notificationService, getVersion());
   }
 
   @Bean("DiskImageWriter")
@@ -93,9 +105,10 @@ public class AppConfig {
   public CommodityService buildCommodityService(
       CommoditySubmissionFactory commoditySubmissionFactory,
       @Qualifier("CommodityCsvWriter") CommodityCsvWriter commodityCsvLogger,
-      @Qualifier("ScTradeToolsClient") ScTradeToolsClient scTradeToolsClient) {
+      @Qualifier("ScTradeToolsClient") ScTradeToolsClient scTradeToolsClient,
+      NotificationService notificationService) {
     return new CommodityService(commoditySubmissionFactory,
-        Arrays.asList(commodityCsvLogger, scTradeToolsClient));
+        Arrays.asList(commodityCsvLogger, scTradeToolsClient), notificationService);
   }
 
   @Bean
@@ -106,12 +119,12 @@ public class AppConfig {
   @Bean("ScreenPrinter")
   public ScreenPrinter buildScreenPrinter(
       @Qualifier("CommodityService") CommodityService commodityService, ImageWriter imageWriter,
-      SoundUtil soundPlayer) {
+      SoundUtil soundPlayer, NotificationService notificationService) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
     return new ScreenPrinter(Arrays.asList(commodityService), postprocessingManipulations,
-        imageWriter, soundPlayer);
+        imageWriter, soundPlayer, notificationService);
   }
 
   @Bean("KeyListener")
@@ -119,4 +132,7 @@ public class AppConfig {
     return new KeyListener(Arrays.asList(screenPrinter));
   }
 
+  private String getVersion() {
+    return buildProperties == null ? "TEST" : buildProperties.getVersion();
+  }
 }

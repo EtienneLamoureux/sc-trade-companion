@@ -7,6 +7,7 @@ import java.util.concurrent.Semaphore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
+import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
 
 public class CommodityService extends AsynchronousProcessor<BufferedImage> {
@@ -20,7 +21,10 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
   private Optional<CommoditySubmission> pendingSubmission;
 
   public CommodityService(CommoditySubmissionFactory submissionFactory,
-      Collection<AsynchronousProcessor<CommoditySubmission>> publishers) {
+      Collection<AsynchronousProcessor<CommoditySubmission>> publishers,
+      NotificationService notificationService) {
+    super(notificationService);
+
     this.submissionFactory = submissionFactory;
     this.publishers = publishers;
     this.publishNextTime = false;

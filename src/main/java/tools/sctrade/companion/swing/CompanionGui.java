@@ -14,17 +14,19 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import tools.sctrade.companion.domain.notification.NotificationLevel;
+import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.utils.LocalizationUtil;
+import tools.sctrade.companion.utils.TimeFormat;
+import tools.sctrade.companion.utils.TimeUtil;
 
-public class CompanionGui extends JFrame {
+public class CompanionGui extends JFrame implements NotificationRepository {
   private static final long serialVersionUID = -983766141308946535L;
 
   private final String version;
+  private LogsTab logsTab;
 
-  private JMenuBar menuBar;
-  private JTabbedPane tabbedPane;
 
   public CompanionGui(String version) {
     this.version = version;
@@ -42,8 +44,15 @@ public class CompanionGui extends JFrame {
 
     buildMenuBar();
     buildTabs();
-
     setupTray();
+  }
+
+  @Override
+  public void add(NotificationLevel level, String message) {
+    if (logsTab != null) {
+      logsTab.addLog(
+          new Object[] {TimeUtil.getNowAsString(TimeFormat.CSV_COLUMN), level.toString(), message});
+    }
   }
 
   private void setLookAndFeel() {
@@ -59,7 +68,7 @@ public class CompanionGui extends JFrame {
   }
 
   private void buildMenuBar() {
-    menuBar = new JMenuBar();
+    var menuBar = new JMenuBar();
     menuBar.add(buildFileMenu());
 
     setJMenuBar(menuBar);
@@ -82,10 +91,12 @@ public class CompanionGui extends JFrame {
   }
 
   private void buildTabs() {
-    tabbedPane = new JTabbedPane();
+    logsTab = new LogsTab();
+
+    var tabbedPane = new JTabbedPane();
     tabbedPane.addTab(LocalizationUtil.get("tabUsage"), new UsageTab());
     tabbedPane.addTab(LocalizationUtil.get("tabSettings"), new SettingsTab());
-    tabbedPane.addTab(LocalizationUtil.get("tabLogs"), new JPanel());
+    tabbedPane.addTab(LocalizationUtil.get("tabLogs"), logsTab);
 
     add(tabbedPane);
   }
