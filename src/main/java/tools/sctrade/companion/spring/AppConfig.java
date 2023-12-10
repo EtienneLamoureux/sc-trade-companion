@@ -22,13 +22,13 @@ import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.user.Setting;
 import tools.sctrade.companion.domain.user.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
+import tools.sctrade.companion.gui.CompanionGui;
+import tools.sctrade.companion.gui.LogsTab;
 import tools.sctrade.companion.input.KeyListener;
 import tools.sctrade.companion.input.ScreenPrinter;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
-import tools.sctrade.companion.swing.CompanionGui;
-import tools.sctrade.companion.swing.LogsTab;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration

@@ -1,4 +1,4 @@
-package tools.sctrade.companion.swing;
+package tools.sctrade.companion.gui;
 
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.intellijthemes.FlatArcDarkOrangeIJTheme;
