@@ -17,6 +17,8 @@ import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
+import tools.sctrade.companion.domain.notification.NotificationRepository;
+import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.user.Setting;
 import tools.sctrade.companion.domain.user.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
@@ -26,6 +28,7 @@ import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
 import tools.sctrade.companion.swing.CompanionGui;
+import tools.sctrade.companion.swing.LogsTab;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
@@ -53,11 +56,21 @@ public class AppConfig {
     return settingRepository;
   }
 
+  @Bean("LogsTab")
+  public LogsTab buildLogsTab() {
+    return new LogsTab();
+  }
+
   @Bean("CompanionGui")
   public CompanionGui buildCompanionGui() {
     String version = buildProperties == null ? "TEST" : buildProperties.getVersion();
 
     return new CompanionGui(version);
+  }
+
+  @Bean("NotificationService")
+  public NotificationService buildNotificationService(NotificationRepository repository) {
+    return new NotificationService(repository);
   }
 
   @Bean("UserService")

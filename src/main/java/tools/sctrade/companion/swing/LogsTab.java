@@ -10,44 +10,22 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 public class LogsTab extends JPanel {
   private static final long serialVersionUID = 5664549029232335333L;
 
+  private DefaultTableModel model;
+
   public LogsTab() {
     super(new GridLayout());
 
-    var model = buildModel();
-    var table = buildTable(model);
-
+    buildModel();
+    var table = buildTable();
     add(new JScrollPane(table));
+  }
 
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "Error", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-02", "Error", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-03", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-01", "INFO", "Bonjour"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "Error", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-09", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-10", "Error", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-08", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-07", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-06", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-05", "INFO", "Screenshot processed"});
-    model.addRow(new Object[] {"2023-12-04", "INFO", "Screenshot processed"});
+  public void addLog(Object[] row) {
+    model.addRow(row);
   }
 
   private DefaultTableModel buildModel() {
-    var model = new DefaultTableModel() {
+    model = new DefaultTableModel() {
       private static final long serialVersionUID = 1L;
 
       @Override
@@ -62,7 +40,7 @@ public class LogsTab extends JPanel {
     return model;
   }
 
-  private JTable buildTable(DefaultTableModel model) {
+  private JTable buildTable() {
     var table = new JTable(model);
     table.setAutoCreateRowSorter(true);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
