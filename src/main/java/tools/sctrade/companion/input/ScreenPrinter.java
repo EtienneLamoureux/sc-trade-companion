@@ -55,7 +55,7 @@ public class ScreenPrinter implements Runnable {
       logger.debug("Calling image processors...");
       imageProcessors.stream().forEach(n -> n.processAsynchronously(screenCapture));
       logger.debug("Called image processors");
-      notificationService.notify(LocalizationUtil.get("notificationProcessingScreenshot"));
+      notificationService.notify(LocalizationUtil.get("infoProcessingScreenshot"));
 
       imageWriter.write(screenCapture, ImageType.SCREENSHOT);
     } catch (Exception e) {
