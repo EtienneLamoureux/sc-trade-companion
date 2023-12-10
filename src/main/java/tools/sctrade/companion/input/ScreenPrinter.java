@@ -12,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.domain.image.ImageWriter;
+import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
+import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.SoundUtil;
 
 public class ScreenPrinter implements Runnable {
@@ -24,19 +26,21 @@ public class ScreenPrinter implements Runnable {
   private List<ImageManipulation> postprocessingManipulations;
   private ImageWriter imageWriter;
   private SoundUtil soundPlayer;
+  private NotificationService notificationService;
 
   public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
-      ImageWriter imageWriter, SoundUtil soundPlayer) {
-    this(imageProcessors, Collections.emptyList(), imageWriter, soundPlayer);
+      ImageWriter imageWriter, SoundUtil soundPlayer, NotificationService notificationService) {
+    this(imageProcessors, Collections.emptyList(), imageWriter, soundPlayer, notificationService);
   }
 
   public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
       List<ImageManipulation> postprocessingManipulations, ImageWriter imageWriter,
-      SoundUtil soundPlayer) {
+      SoundUtil soundPlayer, NotificationService notificationService) {
     this.imageProcessors = imageProcessors;
     this.postprocessingManipulations = postprocessingManipulations;
     this.imageWriter = imageWriter;
     this.soundPlayer = soundPlayer;
+    this.notificationService = notificationService;
   }
 
   @Override
@@ -51,6 +55,7 @@ public class ScreenPrinter implements Runnable {
       logger.debug("Calling image processors...");
       imageProcessors.stream().forEach(n -> n.processAsynchronously(screenCapture));
       logger.debug("Called image processors");
+      notificationService.notify(LocalizationUtil.get("infoProcessingScreenshot"));
 
       imageWriter.write(screenCapture, ImageType.SCREENSHOT);
     } catch (Exception e) {
