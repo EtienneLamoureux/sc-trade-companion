@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.commodity.CommodityListing;
 import tools.sctrade.companion.domain.commodity.CommoditySubmission;
+import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.user.Setting;
 import tools.sctrade.companion.domain.user.SettingRepository;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
@@ -22,7 +23,9 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
 
   private Path folder;
 
-  public CommodityCsvWriter(SettingRepository settings) {
+  public CommodityCsvWriter(SettingRepository settings, NotificationService notificationService) {
+    super(notificationService);
+
     folder = settings.get(Setting.MY_DATA_PATH);
     logger.info("CSV output path: {}", folder);
   }

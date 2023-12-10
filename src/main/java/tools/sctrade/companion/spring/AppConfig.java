@@ -79,14 +79,15 @@ public class AppConfig {
   }
 
   @Bean("CommodityCsvWriter")
-  public CommodityCsvWriter buildCommodityCsvLogger(SettingRepository settingRepository) {
-    return new CommodityCsvWriter(settingRepository);
+  public CommodityCsvWriter buildCommodityCsvLogger(SettingRepository settingRepository,
+      NotificationService notificationService) {
+    return new CommodityCsvWriter(settingRepository, notificationService);
   }
 
   @Bean("ScTradeToolsClient")
   public ScTradeToolsClient buildScTradeToolsClient(WebClient.Builder webClientBuilder,
-      SettingRepository settings) {
-    return new ScTradeToolsClient(webClientBuilder, settings);
+      SettingRepository settings, NotificationService notificationService) {
+    return new ScTradeToolsClient(webClientBuilder, settings, notificationService);
   }
 
   @Bean("DiskImageWriter")
@@ -106,9 +107,10 @@ public class AppConfig {
   public CommodityService buildCommodityService(
       CommoditySubmissionFactory commoditySubmissionFactory,
       @Qualifier("CommodityCsvWriter") CommodityCsvWriter commodityCsvLogger,
-      @Qualifier("ScTradeToolsClient") ScTradeToolsClient scTradeToolsClient) {
+      @Qualifier("ScTradeToolsClient") ScTradeToolsClient scTradeToolsClient,
+      NotificationService notificationService) {
     return new CommodityService(commoditySubmissionFactory,
-        Arrays.asList(commodityCsvLogger, scTradeToolsClient));
+        Arrays.asList(commodityCsvLogger, scTradeToolsClient), notificationService);
   }
 
   @Bean

@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommoditySubmission;
+import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.user.Setting;
 import tools.sctrade.companion.domain.user.SettingRepository;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
@@ -24,7 +25,10 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
 
   private WebClient webClient;
 
-  public ScTradeToolsClient(WebClient.Builder webClientBuilder, SettingRepository settings) {
+  public ScTradeToolsClient(WebClient.Builder webClientBuilder, SettingRepository settings,
+      NotificationService notificationService) {
+    super(notificationService);
+
     this.webClient =
         webClientBuilder.baseUrl(settings.get(Setting.SC_TRADE_TOOLS_ROOT_URL)).build();
   }
