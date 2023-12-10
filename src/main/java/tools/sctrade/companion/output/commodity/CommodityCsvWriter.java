@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.commodity.CommodityListing;
@@ -40,6 +41,8 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
       Collection<List<String>> lines = buildLines(submission);
       CsvUtil.write(filePath, lines);
       logger.info("Wrote {} commodity listings to '{}'", submission.getListings().size(), filePath);
+      notificationService.notify(String.format(Locale.ROOT, "Wrote %d commodity listings to '%s'",
+          submission.getListings().size(), filePath));
     } catch (Exception e) {
       logger.error("There was an error writing to '{}'", filePath, e);
     }
