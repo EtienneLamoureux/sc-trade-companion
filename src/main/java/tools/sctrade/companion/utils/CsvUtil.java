@@ -4,10 +4,9 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvException;
-import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,8 +41,8 @@ public class CsvUtil {
     }
   }
 
-  public Collection<List<String>> read(String path, boolean hasHeader) {
-    try (Reader reader = initializeReader(path)) {
+  public static Collection<List<String>> read(Path path, boolean hasHeader) {
+    try (Reader reader = new FileReader(path.toString())) {
       try (CSVReader csvReader =
           new CSVReaderBuilder(reader).withSkipLines(hasHeader ? 1 : 0).build()) {
         List<String[]> lines = csvReader.readAll();
@@ -54,14 +53,6 @@ public class CsvUtil {
         return formattedLines;
       }
     } catch (IOException | CsvException e) {
-      throw new CsvParsingException(e);
-    }
-  }
-
-  private Reader initializeReader(String path) {
-    try {
-      return new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(path)));
-    } catch (Exception e) {
       throw new CsvParsingException(e);
     }
   }

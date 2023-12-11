@@ -28,6 +28,13 @@ public class UserService {
   }
 
   public void updateUsername(String username) {
+    if (username == null || username.strip().isEmpty()) {
+      logger.warn("Username is empty");
+      return;
+    }
+
+    username = username.strip();
+    settings.set(Setting.USERNAME, username);
     user = get().withLabel(username);
   }
 
