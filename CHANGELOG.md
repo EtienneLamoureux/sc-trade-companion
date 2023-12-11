@@ -1,4 +1,20 @@
 # SC Trade Companion
+## 1.0.0
+### Features
+- Spellcheck and auto-correct location and commodity names
+- Add a setting to allow users to send a username when submitting data
+- Notify users of important errors through the UI
+
+### Bugs
+- Fix ships listed as locations
+- Completely close app when pressing "X"
+- Fix companion app opening as white screen
+
+### Other
+- Add German localization
+- Limit RAM usage
+- Apply dark theme to the UI
+
 ## 0.2.1
 ### Bugs
 - Fix data not being exported to the /my-data folder
@@ -6,13 +22,13 @@
 
 ## 0.2.0
 ### Features
-- #8 Add a sound when a screenshot is taken
+- Add a sound when a screenshot is taken
 
 ### Other
-- #9 Remove external Java dependency
+- Remove external Java dependency
   - This app now ships as a stand-alone application, requiring no additional install
   - If you had installed Java specifically for this app, you can uninstall it
-- #15 Add the current version to the application's title bar
+- Add the current version to the application's title bar
 
 ## 0.1.0
 ### Features
