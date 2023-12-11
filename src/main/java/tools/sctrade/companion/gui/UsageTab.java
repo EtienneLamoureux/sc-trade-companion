@@ -1,4 +1,4 @@
-package tools.sctrade.companion.swing;
+package tools.sctrade.companion.gui;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;

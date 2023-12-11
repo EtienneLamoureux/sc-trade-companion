@@ -22,8 +22,8 @@ class CommoditySubmissionFactoryAccuracyTest {
     initializeSettings();
     imageWriter = new DiskImageWriter(settings);
 
-    factory = new CommoditySubmissionFactory(new UserService(), new TestCommodityRepository(),
-        new TestLocationRepository(), imageWriter);
+    factory = new CommoditySubmissionFactory(new UserService(settings),
+        new TestCommodityRepository(), new TestLocationRepository(), imageWriter);
   }
 
   // @Test
