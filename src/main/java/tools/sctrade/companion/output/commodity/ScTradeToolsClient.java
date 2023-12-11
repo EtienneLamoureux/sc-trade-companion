@@ -31,8 +31,7 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
     super(notificationService);
 
     this.webClient = webClientBuilder.baseUrl(settings.get(Setting.SC_TRADE_TOOLS_ROOT_URL))
-        .defaultHeader("User-Agent", String.format(Locale.ROOT, "ScTradeCompanion/%s", version))
-        .build();
+        .defaultHeader("x-companion-version", version).build();
   }
 
   @Override

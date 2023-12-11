@@ -20,7 +20,7 @@ Desktop companion application for Star Citizen.
 
 ## Usage
 1. Start the application by double-clicking the `sc-trade-companion.bat` file
-2. Play Star Citizen
+2. Play Star Citizen, on LIVE, in English
 3. When you get to a commodity kiosk, interact with it
     1. To ensure good results, check-out the [best practices](https://github.com/EtienneLamoureux/sc-trade-companion#best-practices)
 4. For the `Buy` tab:
