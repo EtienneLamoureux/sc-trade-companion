@@ -8,6 +8,7 @@ Desktop companion application for Star Citizen.
 - Available in: 
   - 🇬🇧 English
   - 🇫🇷 French
+  - 🇩🇪 German
 - [Known issues](https://github.com/EtienneLamoureux/sc-trade-companion/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
 
 ## Installation
