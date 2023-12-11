@@ -22,13 +22,13 @@ import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.user.Setting;
 import tools.sctrade.companion.domain.user.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
+import tools.sctrade.companion.gui.CompanionGui;
+import tools.sctrade.companion.gui.LogsTab;
 import tools.sctrade.companion.input.KeyListener;
 import tools.sctrade.companion.input.ScreenPrinter;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
-import tools.sctrade.companion.swing.CompanionGui;
-import tools.sctrade.companion.swing.LogsTab;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
@@ -61,19 +61,19 @@ public class AppConfig {
     return new LogsTab();
   }
 
+  @Bean("UserService")
+  public UserService buildUserService(SettingRepository settings) {
+    return new UserService(settings);
+  }
+
   @Bean("CompanionGui")
-  public CompanionGui buildCompanionGui() {
-    return new CompanionGui(getVersion());
+  public CompanionGui buildCompanionGui(UserService userService, SettingRepository settings) {
+    return new CompanionGui(userService, settings, getVersion());
   }
 
   @Bean("NotificationService")
   public NotificationService buildNotificationService(NotificationRepository repository) {
     return new NotificationService(repository);
-  }
-
-  @Bean("UserService")
-  public UserService buildUserService() {
-    return new UserService();
   }
 
   @Bean("CommodityCsvWriter")

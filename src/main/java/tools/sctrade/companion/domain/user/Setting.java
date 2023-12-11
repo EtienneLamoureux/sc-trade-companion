@@ -3,7 +3,7 @@ package tools.sctrade.companion.domain.user;
 import java.nio.file.Paths;
 
 public enum Setting {
-  OUTPUT_SCREENSHOTS, OUTPUT_TRANSIENT_IMAGES, MY_IMAGES_PATH, MY_DATA_PATH, SC_TRADE_TOOLS_ROOT_URL;
+  OUTPUT_SCREENSHOTS, OUTPUT_TRANSIENT_IMAGES, MY_IMAGES_PATH, MY_DATA_PATH, SC_TRADE_TOOLS_ROOT_URL, USERNAME;
 
   @SuppressWarnings("unchecked")
   public <T> T cast(String value) {

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
+import tools.sctrade.companion.utils.LocalizationUtil;
 
 public class CommodityService extends AsynchronousProcessor<BufferedImage> {
   private final Logger logger = LoggerFactory.getLogger(CommodityService.class);
@@ -34,6 +35,7 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
   @Override
   public void process(BufferedImage screenCapture) throws InterruptedException {
     CommoditySubmission submission = submissionFactory.build(screenCapture);
+    notificationService.notify(LocalizationUtil.get("infoCommodityListingsRead"));
 
     try {
       logger.debug("Acquiring mutex...");

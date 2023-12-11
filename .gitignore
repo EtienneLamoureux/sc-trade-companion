@@ -1,6 +1,7 @@
 /my-data/**
 /my-images/**
 /logs/**
+settings
 
 ### Gradle ###
 .gradle
