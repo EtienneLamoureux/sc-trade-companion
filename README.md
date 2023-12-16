@@ -24,16 +24,13 @@ Desktop companion application for Star Citizen.
 2. Play Star Citizen, on LIVE, in English
 3. When you get to a commodity kiosk, interact with it
     1. To ensure good results, check-out the [best practices](https://github.com/EtienneLamoureux/sc-trade-companion#best-practices)
-4. For the `Buy` tab:
-    1. Make the listings "not red" by selecting your ship in the "Your inventories" dropdown
+4. In the left "Your inventories" dropdown, select the shop
+5. For the `Buy` tab:
     2. Press <kbd>F3</kbd>
     3. Scroll and repeat in order to capture all listings
-5. For the `Sell` tab
-    1. In the left “Your inventories” dropdown, select the shop
-    2. Press <kbd>F3</kbd>
-    3. Scroll and repeat in order to capture all listings
-6. Repeat throughout your play session
-7. Close the application (make sure you close it in the system tray)
+6. Repeat for the `Sell` tab
+7. Repeat throughout your play session
+8. Close the application (make sure you close it in the system tray)
 
 ### Best practices
 1. Align your character **as close and as straight** to the screen as possible
