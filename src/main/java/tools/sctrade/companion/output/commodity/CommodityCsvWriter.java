@@ -43,7 +43,7 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
       CsvUtil.write(filePath, lines);
       logger.info("Wrote {} commodity listings to '{}'", submission.getListings().size(), filePath);
       notificationService
-          .notify(String.format(Locale.ROOT, LocalizationUtil.get("infoCommodityListingsCsvOutput"),
+          .info(String.format(Locale.ROOT, LocalizationUtil.get("infoCommodityListingsCsvOutput"),
               submission.getListings().size(), filePath));
     } catch (Exception e) {
       logger.error("There was an error writing to '{}'", filePath, e);

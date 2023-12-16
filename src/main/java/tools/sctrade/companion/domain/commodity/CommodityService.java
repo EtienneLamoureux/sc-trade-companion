@@ -17,7 +17,7 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
   private CommoditySubmissionFactory submissionFactory;
   private Collection<AsynchronousProcessor<CommoditySubmission>> publishers;
 
-  private Semaphore pendingSubmissionMutex = new Semaphore(1, true);
+  private Semaphore mutex = new Semaphore(1, true);
   private boolean publishNextTime;
   private Optional<CommoditySubmission> pendingSubmission;
 
@@ -35,11 +35,11 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
   @Override
   public void process(BufferedImage screenCapture) throws InterruptedException {
     CommoditySubmission submission = submissionFactory.build(screenCapture);
-    notificationService.notify(LocalizationUtil.get("infoCommodityListingsRead"));
+    notificationService.info(LocalizationUtil.get("infoCommodityListingsRead"));
 
     try {
       logger.debug("Acquiring mutex...");
-      pendingSubmissionMutex.acquire();
+      mutex.acquire();
 
       if (pendingSubmission.isEmpty()) {
         pendingSubmission = Optional.of(submission);
@@ -47,7 +47,7 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
         pendingSubmission.get().merge(submission);
       }
     } finally {
-      pendingSubmissionMutex.release();
+      mutex.release();
       logger.debug("Released mutex");
     }
   }
@@ -56,7 +56,7 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
   public void flush() throws InterruptedException {
     try {
       logger.debug("Acquiring mutex...");
-      pendingSubmissionMutex.acquire();
+      mutex.acquire();
 
       if (pendingSubmission.isEmpty()) {
         logger.debug("Nothing to publish");
@@ -69,14 +69,21 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
         return;
       }
 
-      logger.debug("Calling publishers...");
       CommoditySubmission submission = pendingSubmission.get();
-      publishers.stream().forEach(n -> n.processAsynchronously(submission));
+
+      if (submission.isLocated()) {
+        logger.debug("Calling publishers...");
+        publishers.stream().forEach(n -> n.processAsynchronously(submission));
+        logger.debug("Called publishers");
+      } else {
+        logger.error("No commodity listings had a valid location");
+        notificationService.error(LocalizationUtil.get("errorNoLocation"));
+      }
+
       publishNextTime = false;
       pendingSubmission = Optional.empty();
-      logger.debug("Called publishers");
     } finally {
-      pendingSubmissionMutex.release();
+      mutex.release();
       logger.debug("Released mutex");
     }
   }

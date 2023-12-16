@@ -42,4 +42,8 @@ public class CommoditySubmission {
       listings = locatedListings;
     }
   }
+
+  boolean isLocated() {
+    return listings.parallelStream().anyMatch(n -> n.location() != null);
+  }
 }

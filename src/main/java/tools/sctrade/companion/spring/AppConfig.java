@@ -95,10 +95,11 @@ public class AppConfig {
 
   @Bean("CommoditySubmissionFactory")
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
+      NotificationService notificationService,
       @Qualifier("ScTradeToolsClient") ScTradeToolsClient scTradeToolsClient,
       ImageWriter imageWriter) {
-    return new CommoditySubmissionFactory(userService, scTradeToolsClient, scTradeToolsClient,
-        imageWriter);
+    return new CommoditySubmissionFactory(userService, notificationService, scTradeToolsClient,
+        scTradeToolsClient, imageWriter);
   }
 
   @Bean("CommodityService")

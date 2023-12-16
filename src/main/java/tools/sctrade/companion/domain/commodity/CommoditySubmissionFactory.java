@@ -22,6 +22,7 @@ import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
+import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.LocatedColumn;
 import tools.sctrade.companion.domain.ocr.LocatedFragment;
 import tools.sctrade.companion.domain.ocr.Ocr;
@@ -33,6 +34,7 @@ import tools.sctrade.companion.exceptions.NoListingsException;
 import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
 import tools.sctrade.companion.utils.HashUtil;
 import tools.sctrade.companion.utils.ImageUtil;
+import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.StringUtil;
 import tools.sctrade.companion.utils.TimeUtil;
 
@@ -43,6 +45,7 @@ public class CommoditySubmissionFactory {
   private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactory.class);
 
   private UserService userService;
+  private NotificationService notificationService;
   private CommodityRepository commodityRepository;
   private LocationRepository locationRepository;
   private ImageWriter imageWriter;
@@ -50,9 +53,10 @@ public class CommoditySubmissionFactory {
   private ThreadLocal<Ocr> locationOcr;
 
   public CommoditySubmissionFactory(UserService userService,
-      CommodityRepository commodityRepository, LocationRepository locationRepository,
-      ImageWriter imageWriter) {
+      NotificationService notificationService, CommodityRepository commodityRepository,
+      LocationRepository locationRepository, ImageWriter imageWriter) {
     this.userService = userService;
+    this.notificationService = notificationService;
     this.commodityRepository = commodityRepository;
     this.locationRepository = locationRepository;
     this.imageWriter = imageWriter;
@@ -201,9 +205,13 @@ public class CommoditySubmissionFactory {
       var next = it.next();
 
       if (next.equals(yourInventoriesFragment)) {
+        String rawLocation = it.next().getText();
+
         try {
-          return StringUtil.spellCheck(it.next().getText(), locationRepository.findAllLocations());
+          return StringUtil.spellCheck(rawLocation, locationRepository.findAllLocations());
         } catch (NoCloseStringException e) {
+          logger.warn("Did not recognize the location '{}'", rawLocation);
+          notificationService.warn(LocalizationUtil.get("warnNoLocation"));
           return null;
         } catch (NoSuchElementException e) {
           throw new LocationNotFoundException(longestColumn);

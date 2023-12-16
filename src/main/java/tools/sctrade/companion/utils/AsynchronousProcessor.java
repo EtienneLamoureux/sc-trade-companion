@@ -20,7 +20,7 @@ public abstract class AsynchronousProcessor<T> {
       process(unitOfWork);
     } catch (Exception e) {
       logger.error("Error while processing", e);
-      notificationService.notify(e);
+      notificationService.error(e);
     }
   }
 

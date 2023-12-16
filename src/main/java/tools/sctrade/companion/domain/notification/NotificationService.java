@@ -7,11 +7,19 @@ public class NotificationService {
     this.repository = repository;
   }
 
-  public void notify(Exception e) {
-    repository.add(NotificationLevel.ERROR, e.getMessage());
+  public void info(String string) {
+    repository.add(NotificationLevel.INFO, string);
   }
 
-  public void notify(String string) {
-    repository.add(NotificationLevel.INFO, string);
+  public void warn(String string) {
+    repository.add(NotificationLevel.WARN, string);
+  }
+
+  public void error(String string) {
+    repository.add(NotificationLevel.ERROR, string);
+  }
+
+  public void error(Exception e) {
+    repository.add(NotificationLevel.ERROR, e.getMessage());
   }
 }
