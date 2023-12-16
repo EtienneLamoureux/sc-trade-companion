@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import org.slf4j.Logger;
@@ -18,7 +19,6 @@ import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.domain.image.ImageWriter;
-import tools.sctrade.companion.domain.image.manipulations.AdjustBrightnessAndContrast;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
@@ -94,12 +94,15 @@ public class CommoditySubmissionFactory {
 
     Instant now = TimeUtil.getNow();
 
-    return rawListings.parallelStream()
-        .map(n -> new CommodityListing(location, transactionType,
-            StringUtil.spellCheckNoFail(n.getCommodity().get(),
-                commodityRepository.findAllCommodities()),
-            n.getPrice().get(), n.getInventory().get(), n.getInventoryLevel().get(), batchId, now))
-        .toList();
+    return rawListings.parallelStream().map(n -> {
+      try {
+        return Optional.of(new CommodityListing(location, transactionType,
+            StringUtil.spellCheck(n.getCommodity().get(), commodityRepository.findAllCommodities()),
+            n.getPrice().get(), n.getInventory().get(), n.getInventoryLevel().get(), batchId, now));
+      } catch (NoCloseStringException e) {
+        return Optional.empty();
+      }
+    }).filter(n -> n.isPresent()).map(n -> (CommodityListing) n.get()).toList();
   }
 
   private List<RawCommodityListing> buildRawListings(OcrResult result) {
@@ -235,7 +238,6 @@ public class CommoditySubmissionFactory {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
-    preprocessingManipulations.add(new AdjustBrightnessAndContrast(10.0f, 0.0f));
     preprocessingManipulations.add(new WriteToDisk(imageWriter));
 
     return ThreadLocal
@@ -246,7 +248,6 @@ public class CommoditySubmissionFactory {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
-    preprocessingManipulations.add(new AdjustBrightnessAndContrast(10.0f, 0.0f));
     preprocessingManipulations.add(new WriteToDisk(imageWriter));
 
     return ThreadLocal
