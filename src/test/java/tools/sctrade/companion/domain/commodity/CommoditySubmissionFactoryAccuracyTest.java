@@ -38,7 +38,7 @@ class CommoditySubmissionFactoryAccuracyTest {
   void givenCorrectSreenshotThenReadTextAccurately() throws IOException {
     var manipulation = new UpscaleTo4k();
     BufferedImage screenshot =
-        ImageUtil.getFromResourcePath("/images/kiosks/commodity/2023-12-15_21-18-49-582985900.jpg");
+        ImageUtil.getFromResourcePath("/images/kiosks/commodity/2023-12-15_21-5-11-930335300.jpg");
     screenshot = manipulation.manipulate(screenshot);
 
     var submission = factory.build(screenshot);
@@ -48,6 +48,6 @@ class CommoditySubmissionFactoryAccuracyTest {
   private void initializeSettings() {
     settings = new SettingRepository();
     settings.set(Setting.MY_IMAGES_PATH, Paths.get(".", "my-images").toAbsolutePath());
-    settings.set(Setting.OUTPUT_TRANSIENT_IMAGES, false);
+    settings.set(Setting.OUTPUT_TRANSIENT_IMAGES, true);
   }
 }
