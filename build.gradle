@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'tools.sctrade'
-version = '1.0.0-beta.2'
+version = '1.0.0-beta.3'
 
 java {
 	sourceCompatibility = '17'
@@ -29,6 +29,7 @@ dependencies {
 	
 	// OCR
 	implementation 'net.sourceforge.tess4j:tess4j:5.8.0'
+	implementation 'org.openpnp:opencv:4.8.1-0'
 	
 	// Utils
 	implementation 'org.imgscalr:imgscalr-lib:4.2'

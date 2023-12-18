@@ -21,6 +21,7 @@ import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
+import tools.sctrade.companion.domain.image.manipulations.Threshold;
 import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.LocatedColumn;
@@ -247,6 +248,8 @@ public class CommoditySubmissionFactory {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
+    preprocessingManipulations.add(new WriteToDisk(imageWriter));
+    preprocessingManipulations.add(new Threshold());
     preprocessingManipulations.add(new WriteToDisk(imageWriter));
 
     return ThreadLocal

@@ -14,7 +14,7 @@ import tools.sctrade.companion.utils.StringUtil;
 
 public class RawCommodityListing {
   private static final Pattern RIGHT_PATTERN = Pattern
-      .compile("\\D*([0-9\\.\\,]+).+\\R\\D?((\\d+[\\.\\,])?\\d+[k ]*)", Pattern.CASE_INSENSITIVE);
+      .compile("\\D*([0-9\\.\\,]+).+\\R.((\\d+[\\.\\,])?\\d+[k ]*)", Pattern.CASE_INSENSITIVE);
 
   private final Logger logger = LoggerFactory.getLogger(RawCommodityListing.class);
 
@@ -126,11 +126,12 @@ public class RawCommodityListing {
       Matcher matcher = RIGHT_PATTERN.matcher(rightText);
       matcher.find();
       String match = matcher.group(2).toLowerCase(Locale.ROOT);
-      boolean isThousands = match.endsWith("k");
       boolean isMillions = match.endsWith("m");
-      match = match.replace("k", "");
+      boolean isThousands = match.endsWith("k");
+      match = match.replace("m", "").replace("k", "");
 
       double price = Double.parseDouble(match);
+      isThousands = isThousands || (price % 1) > 1; // Decimals = metric notation, which is 99% kilo
 
       if (price >= 1000.0) {
         /*
@@ -140,10 +141,10 @@ public class RawCommodityListing {
         price %= 1000;
       }
 
-      if (isThousands) {
-        price *= 1000;
-      } else if (isMillions) {
+      if (isMillions) {
         price *= 1000000;
+      } else if (isThousands) {
+        price *= 1000;
       }
 
       this.price = Optional.of(price);
@@ -155,7 +156,8 @@ public class RawCommodityListing {
 
   private String getRightText() {
     return right.getText().strip().toLowerCase(Locale.ROOT).replace(" ", "").replace(",", ".")
-        .replace("i", "1").replace("l", "1").replace("s", "5").replace("g", "6").replace("b", "8")
-        .replace("o", "0").replace("5cu", "scu");
+        .replace("i", "1").replace("l", "1").replace("s", "5").replace("$", "5").replace("e", "5")
+        .replace("g", "6").replace("b", "8").replace("o", "0").replace("5cu", "scu")
+        .replace("5cy", "scu");
   }
 }
