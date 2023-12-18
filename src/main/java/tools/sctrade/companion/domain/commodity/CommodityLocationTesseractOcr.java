@@ -22,7 +22,7 @@ public class CommodityLocationTesseractOcr extends TesseractOcr {
 
   @Override
   public OcrResult process(BufferedImage image) {
-    image = keepLeftHalf(image);
+    image = keepTopLeftCorner(image);
     var words = tesseract.getWords(image, 0);
     words = removeNonWords(words);
     words = removeSingleCharacterWords(words);
@@ -34,7 +34,8 @@ public class CommodityLocationTesseractOcr extends TesseractOcr {
         .toList());
   }
 
-  private BufferedImage keepLeftHalf(BufferedImage image) {
-    return ImageUtil.crop(image, new Rectangle(0, 0, (image.getWidth() / 2), image.getHeight()));
+  private BufferedImage keepTopLeftCorner(BufferedImage image) {
+    return ImageUtil.crop(image,
+        new Rectangle(0, 0, (image.getWidth() / 2), (image.getHeight() / 3)));
   }
 }
