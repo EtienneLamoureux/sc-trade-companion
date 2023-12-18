@@ -206,11 +206,12 @@ public class CommoditySubmissionFactory {
 
       if (next.equals(yourInventoriesFragment)) {
         String rawLocation = it.next().getText();
+        logger.debug("Read location '{}'", rawLocation);
 
         try {
           return StringUtil.spellCheck(rawLocation, locationRepository.findAllLocations());
         } catch (NoCloseStringException e) {
-          logger.warn("Did not recognize the location '{}'", rawLocation);
+          logger.warn("Could not spell-check location '{}'", rawLocation);
           notificationService.warn(LocalizationUtil.get("warnNoLocation"));
           return null;
         } catch (NoSuchElementException e) {
