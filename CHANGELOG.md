@@ -4,14 +4,16 @@
 - Spellcheck and auto-correct location and commodity names
 - Add a setting to allow users to send a username when submitting data
 - Notify users of important errors through the UI
+- Improve shop location detection
+- Improve price accuracy detection
 
 ### Bugs
 - Fix ships listed as locations
-- Completely close app when pressing "X"
 - Fix companion app opening as white screen
-- Ignore batches of commodity listings that cannot be attributed to a location
 - Correctly parse listings from low-contrast screens
 - Ignore commodity listings that cannot be spellchecked
+- Ignore batches of commodity listings that cannot be attributed to a location
+- Completely close app when pressing "X"
 
 ### Other
 - Add German localization
