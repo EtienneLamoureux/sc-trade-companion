@@ -11,15 +11,14 @@
 - Fix ships listed as locations
 - Fix companion app opening as white screen
 - Correctly parse listings from low-contrast screens
-- Ignore commodity listings that cannot be spellchecked
-- Ignore batches of commodity listings that cannot be attributed to a location
+- Correctly ignore commodity listings that cannot be spellchecked
+- Correctly ignore batches of commodity listings that cannot be attributed to a location
 - Completely close app when pressing "X"
 
 ### Other
 - Add German localization
 - Limit RAM usage
 - Apply dark theme to the UI
-- Clarify when screenshot parsing error is caused by glare
 
 ## 0.2.1
 ### Bugs
