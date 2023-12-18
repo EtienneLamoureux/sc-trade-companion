@@ -5,16 +5,24 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.RescaleOp;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.imageio.ImageIO;
+import nu.pattern.OpenCV;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Mode;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.sctrade.companion.exceptions.ImageProcessingException;
 import tools.sctrade.companion.exceptions.RectangleOutOfBoundsException;
 
 public class ImageUtil {
@@ -105,6 +113,41 @@ public class ImageUtil {
         (int) rectangle.getMinY(), (int) rectangle.getWidth(), (int) rectangle.getHeight());
 
     return makeCopy(croppedImage);
+  }
+
+  public static BufferedImage applyAdaptiveGaussianThreshold(BufferedImage image) {
+    OpenCV.loadShared();
+
+    try {
+      Mat original = toMat(image);
+      Mat processed = new Mat(original.rows(), original.cols(), original.type());
+
+      Imgproc.adaptiveThreshold(original, processed, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C,
+          Imgproc.THRESH_BINARY, 41, 14);
+
+      return toBufferedImage(processed);
+    } catch (IOException e) {
+      throw new ImageProcessingException(e);
+    }
+  }
+
+  /**
+   * @see https://answers.opencv.org/question/28348/converting-bufferedimage-to-mat-in-java/
+   */
+  public static Mat toMat(BufferedImage image) throws IOException {
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    ImageIO.write(image, "jpg", byteArrayOutputStream);
+    byteArrayOutputStream.flush();
+
+    return Imgcodecs.imdecode(new MatOfByte(byteArrayOutputStream.toByteArray()),
+        Imgcodecs.IMREAD_ANYCOLOR);
+  }
+
+  public static BufferedImage toBufferedImage(Mat mat) throws IOException {
+    MatOfByte mob = new MatOfByte();
+    Imgcodecs.imencode(".jpg", mat, mob);
+
+    return ImageIO.read(new ByteArrayInputStream(mob.toArray()));
   }
 
   public static void writeToDiskNoFail(BufferedImage image, Path path) {
