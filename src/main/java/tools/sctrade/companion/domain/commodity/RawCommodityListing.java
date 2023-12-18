@@ -13,8 +13,8 @@ import tools.sctrade.companion.domain.ocr.LocatedColumn;
 import tools.sctrade.companion.utils.StringUtil;
 
 public class RawCommodityListing {
-  private static final Pattern RIGHT_PATTERN =
-      Pattern.compile("\\D*([0-9\\,]+).+\\R.((\\d+[\\.\\,])?\\d+[k ]*)", Pattern.CASE_INSENSITIVE);
+  private static final Pattern RIGHT_PATTERN = Pattern
+      .compile("\\D*([0-9\\.\\,]+).+\\R\\D?((\\d+[\\.\\,])?\\d+[k ]*)", Pattern.CASE_INSENSITIVE);
 
   private final Logger logger = LoggerFactory.getLogger(RawCommodityListing.class);
 
@@ -100,47 +100,50 @@ public class RawCommodityListing {
           StringUtil.spellCheck(rawInventoryLevel, inventoryLevelsByString.keySet());
       inventoryLevel = Optional.of(inventoryLevelsByString.get(closestInventoryLevel));
     } catch (Exception e) {
-      logger.debug(String.format(Locale.ROOT, "Could not extract inventory level from: %s", left));
+      logger.debug("Could not extract inventory level from: {}", left);
       inventoryLevel = Optional.empty();
     }
   }
 
   private void extractInventory() {
     try {
-      Matcher matcher = RIGHT_PATTERN.matcher(right.getText().replace(" ", ""));
+      String rightText = getRightText().replace(".", ",");
+      Matcher matcher = RIGHT_PATTERN.matcher(rightText);
       matcher.find();
       String match = matcher.group(1).toLowerCase(Locale.ROOT);
       match = match.replace(",", "");
 
       inventory = Optional.of(Integer.valueOf(match));
     } catch (Exception e) {
-      logger.debug(String.format(Locale.ROOT, "Could not extract inventory from: %s", right));
+      logger.debug("Could not extract inventory from: {}", right);
       inventory = Optional.empty();
     }
   }
 
   private void extractPrice() {
     try {
-      String processedRight = right.getText().strip().toLowerCase(Locale.ROOT).replace(" ", "")
-          .replace("l", "1").replace("s", "5");
-      Matcher matcher = RIGHT_PATTERN.matcher(processedRight);
+      String rightText = getRightText();
+      Matcher matcher = RIGHT_PATTERN.matcher(rightText);
       matcher.find();
       String match = matcher.group(2).toLowerCase(Locale.ROOT);
       boolean isThousands = match.endsWith("k");
+      boolean isMillions = match.endsWith("m");
       match = match.replace("k", "");
 
       double price = Double.parseDouble(match);
 
       if (price >= 1000.0) {
         /*
-         * Prices never have more than 3 digits before the decimal character, as the 'k' notation is
-         * preferred. This indicates the '¤' character was read as a number: it must be stripped.
+         * Prices never have more than 3 digits before the decimal character, as the metric notation
+         * is preferred. This indicates the '¤' character was read as a number: it must be stripped.
          */
         price %= 1000;
       }
 
       if (isThousands) {
         price *= 1000;
+      } else if (isMillions) {
+        price *= 1000000;
       }
 
       this.price = Optional.of(price);
@@ -148,5 +151,11 @@ public class RawCommodityListing {
       logger.debug(String.format(Locale.ROOT, "Could not extract price from: %s", right));
       this.price = Optional.empty();
     }
+  }
+
+  private String getRightText() {
+    return right.getText().strip().toLowerCase(Locale.ROOT).replace(" ", "").replace(",", ".")
+        .replace("i", "1").replace("l", "1").replace("s", "5").replace("g", "6").replace("b", "8")
+        .replace("o", "0").replace("5cu", "scu");
   }
 }
