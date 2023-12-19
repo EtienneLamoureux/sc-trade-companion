@@ -192,15 +192,12 @@ public class CommoditySubmissionFactory {
   }
 
   private String extractLocation(OcrResult result) {
-    List<LocatedColumn> columns = result.getColumns();
-    var columnIterator = getColumnIteratorOrderedByLineCount(columns);
-    var longestColumn = columnIterator.next();
-
-    var yourInventoriesFragment =
-        findFragmentClosestTo(longestColumn.getFragments(), YOUR_INVENTORIES);
+    List<LocatedFragment> fragments =
+        result.getColumns().stream().flatMap(n -> n.getFragments().stream()).toList();
+    var yourInventoriesFragment = findFragmentClosestTo(fragments, YOUR_INVENTORIES);
 
     // Return the fragment that follows "your inventories"
-    var it = longestColumn.getFragments().iterator();
+    var it = fragments.iterator();
 
     while (it.hasNext()) {
       var next = it.next();
@@ -216,12 +213,12 @@ public class CommoditySubmissionFactory {
           notificationService.warn(LocalizationUtil.get("warnNoLocation"));
           return null;
         } catch (NoSuchElementException e) {
-          throw new LocationNotFoundException(longestColumn);
+          throw new LocationNotFoundException(fragments);
         }
       }
     }
 
-    throw new LocationNotFoundException(longestColumn);
+    throw new LocationNotFoundException(fragments);
   }
 
   private LocatedFragment findFragmentClosestTo(Collection<LocatedFragment> fragments,
