@@ -51,18 +51,23 @@ public class SettingsTab extends JPanel {
         userService.updateUsername(usernameField.getText());
       }
     });
+
+    var tooltip = buildLabel(1, LocalizationUtil.get("tooltipUsername"));
+    tooltip.putClientProperty("FlatLaf.styleClass", "small");
+    tooltip.setEnabled(false);
+    buildLabel(2, " ");
   }
 
   private void buildDataPathField(String dataPath) {
-    var dataPathLabel = buildLabel(1, LocalizationUtil.get("labelMyData"));
-    var dataPathField = buildTextField(1, dataPath);
+    var dataPathLabel = buildLabel(3, LocalizationUtil.get("labelMyData"));
+    var dataPathField = buildTextField(3, dataPath);
     dataPathField.setEditable(false);
     dataPathLabel.setLabelFor(dataPathField);
   }
 
   private void buildImagesPathField(String imagesPath) {
-    var imagesPathLabel = buildLabel(2, LocalizationUtil.get("labelMyImages"));
-    var imagesPathField = buildTextField(2, imagesPath);
+    var imagesPathLabel = buildLabel(4, LocalizationUtil.get("labelMyImages"));
+    var imagesPathField = buildTextField(4, imagesPath);
     imagesPathField.setEditable(false);
     imagesPathLabel.setLabelFor(imagesPathField);
   }
