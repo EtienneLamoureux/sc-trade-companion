@@ -131,7 +131,7 @@ public class RawCommodityListing {
       match = match.replace("m", "").replace("k", "");
 
       double price = Double.parseDouble(match);
-      isThousands = isThousands || (price % 1) > 1; // Decimals = metric notation, which is 99% kilo
+      isThousands = isThousands || (price % 1) > 0; // Decimals = metric notation, which is 99% kilo
 
       if (price >= 1000.0) {
         /*
