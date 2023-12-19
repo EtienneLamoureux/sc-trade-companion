@@ -50,10 +50,9 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
     logger.debug("Fetching locations from sc-trade.tools...");
     LocationDto[] locationDtos = this.webClient.get().uri("/api/locations").retrieve()
         .bodyToMono(LocationDto[].class).block();
-    return Arrays.stream(locationDtos)
-        .map(
-            n -> n.name().substring(n.name().lastIndexOf(">") + 1).strip().toLowerCase(Locale.ROOT))
-        .toList();
+    return Arrays.stream(locationDtos).map(n -> n.name())
+        .filter(n -> Arrays.stream(locationDtos).map(m -> m.name()).noneMatch(m -> m.contains(n)))
+        .map(n -> n.substring(n.lastIndexOf(">") + 1).strip().toLowerCase(Locale.ROOT)).toList();
   }
 
   @Override
