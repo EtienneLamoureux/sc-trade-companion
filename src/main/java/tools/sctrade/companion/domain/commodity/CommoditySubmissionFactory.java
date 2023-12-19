@@ -248,7 +248,6 @@ public class CommoditySubmissionFactory {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
-    preprocessingManipulations.add(new WriteToDisk(imageWriter));
     preprocessingManipulations.add(new Threshold());
     preprocessingManipulations.add(new WriteToDisk(imageWriter));
 
@@ -260,6 +259,7 @@ public class CommoditySubmissionFactory {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
+    preprocessingManipulations.add(new Threshold());
     preprocessingManipulations.add(new WriteToDisk(imageWriter));
 
     return ThreadLocal
