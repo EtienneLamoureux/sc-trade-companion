@@ -1,7 +1,7 @@
 package tools.sctrade.companion.domain;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface LocationRepository {
-  List<String> findAllLocations();
+  Collection<String> findAllLocations();
 }
