@@ -52,7 +52,7 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
     }
   }
 
-  @Scheduled(fixedDelay = 60000)
+  @Scheduled(fixedDelay = 600)
   public void flush() throws InterruptedException {
     try {
       logger.debug("Acquiring mutex...");
