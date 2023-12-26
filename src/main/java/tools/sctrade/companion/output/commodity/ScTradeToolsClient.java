@@ -12,12 +12,14 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommoditySubmission;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.user.Setting;
 import tools.sctrade.companion.domain.user.SettingRepository;
+import tools.sctrade.companion.exceptions.PublicationException;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
 
 public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmission>
@@ -76,11 +78,17 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
   public void process(CommoditySubmission submission) {
     logger.debug("Sending {} commodity listings to SC Trade Tools...",
         submission.getListings().size());
-    var response = webClient.post().uri("/api/crowdsource/commodity-listings")
-        .contentType(MediaType.APPLICATION_JSON).body(BodyInserters.fromValue(buildDto(submission)))
-        .header("signature", "").retrieve().toBodilessEntity();
-    response.block();
-    logger.info("Sent {} commodity listings to SC Trade Tools", submission.getListings().size());
+
+    try {
+      var response = webClient.post().uri("/api/crowdsource/commodity-listings")
+          .contentType(MediaType.APPLICATION_JSON)
+          .body(BodyInserters.fromValue(buildDto(submission))).header("signature", "").retrieve()
+          .toBodilessEntity();
+      response.block();
+      logger.info("Sent {} commodity listings to SC Trade Tools", submission.getListings().size());
+    } catch (WebClientResponseException e) {
+      throw new PublicationException(e.getResponseBodyAsString());
+    }
   }
 
   private CommoditySubmissionDto buildDto(CommoditySubmission submission) {
