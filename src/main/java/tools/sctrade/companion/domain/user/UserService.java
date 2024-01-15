@@ -1,9 +1,7 @@
 package tools.sctrade.companion.domain.user;
 
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +40,9 @@ public class UserService {
     String id;
 
     try {
-      id = getMacAddress();
+      id = getSystemUuid();
     } catch (Exception e) {
-      logger.warn("Could not retreive MAC address", e);
+      logger.warn("Could not retrieve computer identifier", e);
       UUID uuid = UUID.randomUUID();
       id = uuid.toString();
     }
@@ -52,16 +50,25 @@ public class UserService {
     return HashUtil.hash(id);
   }
 
-  private String getMacAddress() throws UnknownHostException, SocketException {
-    InetAddress localHost = InetAddress.getLocalHost();
-    NetworkInterface ni = NetworkInterface.getByInetAddress(localHost);
-    byte[] hardwareAddress = ni.getHardwareAddress();
-    String[] hexadecimal = new String[hardwareAddress.length];
+  private String getSystemUuid() throws Exception {
+    String system = System.getProperty("os.name").toLowerCase();
 
-    for (int i = 0; i < hardwareAddress.length; i++) {
-      hexadecimal[i] = String.format("%02X", hardwareAddress[i]);
+    if (system.indexOf("win") >= 0) {
+      String[] cmd = {"wmic", "csproduct", "get", "UUID"};
+      Process process = Runtime.getRuntime().exec(cmd);
+      process.waitFor();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+      String line = "";
+      StringBuilder output = new StringBuilder();
+
+      while ((line = reader.readLine()) != null) {
+        output.append(line);
+      }
+
+      return output.toString().replaceAll("\\s+", " ").strip();
+    } else {
+      throw new RuntimeException("System is not Windows");
     }
-
-    return String.join("-", hexadecimal);
   }
 }
