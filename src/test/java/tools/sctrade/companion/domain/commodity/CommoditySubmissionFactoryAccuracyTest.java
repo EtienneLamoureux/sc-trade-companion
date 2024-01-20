@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Paths;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -34,11 +35,11 @@ class CommoditySubmissionFactoryAccuracyTest {
         new TestCommodityRepository(), new TestLocationRepository(), imageWriter);
   }
 
-  // @Test
+  @Test
   void givenCorrectSreenshotThenReadTextAccurately() throws IOException {
     var manipulation = new UpscaleTo4k();
     BufferedImage screenshot =
-        ImageUtil.getFromResourcePath("/images/kiosks/commodity/2023-12-15_15-50-7-592307800.jpg");
+        ImageUtil.getFromResourcePath("/images/kiosks/commodity/2023-12-17_17-41-3-491144600.jpg");
     screenshot = manipulation.manipulate(screenshot);
 
     var submission = factory.build(screenshot);

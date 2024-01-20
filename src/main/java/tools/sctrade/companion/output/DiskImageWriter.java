@@ -36,7 +36,7 @@ public class DiskImageWriter implements ImageWriter {
     switch (type) {
       case SCREENSHOT:
         return settings.get(Setting.OUTPUT_SCREENSHOTS);
-      case BUY_BUTTON, SELL_BUTTON, PREPROCESSED:
+      case BUTTONS, BUY_BUTTON, SELL_BUTTON, PREPROCESSED:
         return settings.get(Setting.OUTPUT_TRANSIENT_IMAGES);
       default:
         return false;
