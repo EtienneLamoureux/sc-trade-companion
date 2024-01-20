@@ -4,8 +4,8 @@ import tools.sctrade.companion.utils.TimeFormat;
 import tools.sctrade.companion.utils.TimeUtil;
 
 public enum ImageType {
-  SCREENSHOT(""), BUY_BUTTON("_buy-button"), SELL_BUTTON("_sell-button"), PREPROCESSED(
-      "_preprocessed");
+  SCREENSHOT(""), BUTTONS("_buttons"), BUY_BUTTON("_buy_button"), SELL_BUTTON(
+      "_sell_button"), PREPROCESSED("_preprocessed");
 
   private String suffix;
 

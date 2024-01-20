@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import nu.pattern.OpenCV;
 import org.imgscalr.Scalr;
@@ -18,6 +21,7 @@ import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Mode;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfPoint;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
@@ -115,7 +119,8 @@ public class ImageUtil {
     return makeCopy(croppedImage);
   }
 
-  public static BufferedImage applyAdaptiveGaussianThreshold(BufferedImage image) {
+  public static BufferedImage applyAdaptiveGaussianThreshold(BufferedImage image,
+      int pixelNeighborhoodSize, int substractedConstant) {
     OpenCV.loadShared();
 
     try {
@@ -123,9 +128,41 @@ public class ImageUtil {
       Mat processed = new Mat(original.rows(), original.cols(), original.type());
 
       Imgproc.adaptiveThreshold(original, processed, 255, Imgproc.ADAPTIVE_THRESH_MEAN_C,
-          Imgproc.THRESH_BINARY, 41, 14);
+          Imgproc.THRESH_BINARY, pixelNeighborhoodSize, substractedConstant);
 
       return toBufferedImage(processed);
+    } catch (IOException e) {
+      throw new ImageProcessingException(e);
+    }
+  }
+
+  public static BufferedImage applyOtsuBinarization(BufferedImage image) {
+    OpenCV.loadShared();
+
+    try {
+      Mat original = toMat(image);
+      Mat processed = new Mat(original.rows(), original.cols(), original.type());
+
+      Imgproc.threshold(original, processed, Imgproc.THRESH_BINARY, 255, Imgproc.THRESH_OTSU);
+
+      return toBufferedImage(processed);
+    } catch (IOException e) {
+      throw new ImageProcessingException(e);
+    }
+  }
+
+  public static List<Rectangle> findBoundingBoxes(BufferedImage image) {
+    OpenCV.loadShared();
+
+    try {
+      Mat original = toMat(image);
+
+      List<MatOfPoint> contours = new ArrayList<>();
+      Imgproc.findContours(original, contours, new Mat(), Imgproc.RETR_TREE,
+          Imgproc.CHAIN_APPROX_SIMPLE);
+
+      return contours.parallelStream().map(n -> Imgproc.boundingRect(n))
+          .map(n -> new Rectangle(n.x, n.y, n.width, n.height)).collect(Collectors.toList());
     } catch (IOException e) {
       throw new ImageProcessingException(e);
     }

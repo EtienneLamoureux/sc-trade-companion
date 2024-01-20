@@ -19,9 +19,9 @@ import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.domain.image.ImageWriter;
+import tools.sctrade.companion.domain.image.manipulations.CommodityKioskTextThreshold;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
-import tools.sctrade.companion.domain.image.manipulations.Threshold;
 import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.LocatedColumn;
@@ -157,23 +157,31 @@ public class CommoditySubmissionFactory {
   }
 
   private TransactionType extractTransactionType(BufferedImage screenCapture, OcrResult result) {
-    screenCapture = ImageUtil.crop(screenCapture, new Rectangle((screenCapture.getWidth() / 2), 0,
-        (screenCapture.getWidth() / 2), screenCapture.getHeight()));
-    screenCapture = ImageUtil.makeGreyscaleCopy(screenCapture);
     Rectangle shopInv = getShopInventoryRectangle(result);
+    screenCapture = ImageUtil.crop(screenCapture, new Rectangle((screenCapture.getWidth() / 2), 0,
+        (screenCapture.getWidth() - (screenCapture.getWidth() / 2)), screenCapture.getHeight()));
+    screenCapture = ImageUtil.crop(screenCapture,
+        new Rectangle((int) shopInv.getMinX(), (int) (shopInv.getMinY() - shopInv.getHeight()),
+            (int) (shopInv.getWidth() * 3), (int) (shopInv.getHeight() * 4)));
+    screenCapture = ImageUtil.makeGreyscaleCopy(screenCapture);
 
-    int y = (int) (shopInv.getMaxY() + shopInv.getHeight());
-    int width = (int) shopInv.getWidth();
-    int height = (int) shopInv.getHeight();
+    var image = ImageUtil.makeCopy(screenCapture);
+    image = ImageUtil.applyOtsuBinarization(image);
+    imageWriter.write(image, ImageType.BUTTONS);
+    var boundingBoxes = ImageUtil.findBoundingBoxes(image);
 
-    var buyRectangle = new Rectangle((int) shopInv.getMinX(), y, width, height);
+    boundingBoxes
+        .sort((n, m) -> Double.compare(m.getWidth() * m.getHeight(), n.getWidth() * n.getHeight()));
+    var boundingBoxesOrderedByX = boundingBoxes.subList(0, 2);
+    boundingBoxesOrderedByX.sort((n, m) -> Double.compare(n.getMinX(), m.getMinX()));
+    Rectangle buyRectangle = boundingBoxesOrderedByX.get(0);
+    Rectangle sellRectangle = boundingBoxesOrderedByX.get(1);
+
     var buyImage = ImageUtil.crop(screenCapture, buyRectangle);
     var buyRectangleColor = ImageUtil.calculateAverageColor(buyImage);
     var buyRectangleLuminance = buyRectangleColor.getRed();
     imageWriter.write(buyImage, ImageType.BUY_BUTTON);
 
-    var sellRectangle =
-        new Rectangle((int) (shopInv.getMaxX() + (shopInv.getWidth() / 4)), y, width, height);
     var sellImage = ImageUtil.crop(screenCapture, sellRectangle);
     var sellRectangleColor = ImageUtil.calculateAverageColor(sellImage);
     var sellRectangleLuminance = sellRectangleColor.getRed();
@@ -245,7 +253,7 @@ public class CommoditySubmissionFactory {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
-    preprocessingManipulations.add(new Threshold());
+    preprocessingManipulations.add(new CommodityKioskTextThreshold());
     preprocessingManipulations.add(new WriteToDisk(imageWriter));
 
     return ThreadLocal
@@ -256,7 +264,7 @@ public class CommoditySubmissionFactory {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
     preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
-    preprocessingManipulations.add(new Threshold());
+    preprocessingManipulations.add(new CommodityKioskTextThreshold());
     preprocessingManipulations.add(new WriteToDisk(imageWriter));
 
     return ThreadLocal
