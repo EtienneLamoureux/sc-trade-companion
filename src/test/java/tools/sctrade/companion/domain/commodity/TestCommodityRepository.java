@@ -7,19 +7,19 @@ class TestCommodityRepository implements CommodityRepository {
 
   @Override
   public List<String> findAllCommodities() {
-    return Arrays.asList("AcryliPlex Composite", "Agricium", "Agricium (Ore)",
-        "Agricultural Supplies", "Altruciatoxin", "Aluminum", "Aluminum (Ore)", "Amioshi Plague",
-        "Aphorite", "Astatine", "Atlasium", "Beryl", "Beryl (Raw)", "Bexalite", "Bexalite (Raw)",
-        "Borase", "Borase (Ore)", "Chlorine", "Compboard", "Copper", "Copper (Ore)", "Corundum",
-        "Corundum (Raw)", "Degnous Root", "Diamond", "Diamond (Raw)", "Diluthermex",
-        "Distilled Spirits", "Dolivine", "Dymantium", "E'tam", "Fluorine", "Gold", "Gold (Ore)",
-        "Golden Medmon", "Hadanite", "Heart of the Woods", "Hephaestanite", "Hephaestanite (Raw)",
-        "Hydrogen", "Inert Materials", "Iodine", "Iron", "Iron (Ore)", "Janalite", "Laranite",
-        "Laranite (Raw)", "Maze", "Medical Supplies", "Neon", "Pitambu", "Processed Food", "Prota",
-        "Quantainium", "Quantainium (Raw)", "Quartz", "Quartz (Raw)", "Ranta Dung",
-        "Recycled Material Composite", "Revenant Pod", "Revenant Tree Pollen", "SLAM", "Scrap",
-        "Stims", "Sunset Berries", "Taranite", "Taranite (Raw)", "Titanium", "Titanium (Ore)",
-        "Tungsten", "Tungsten (Ore)", "Waste", "WiDoW", "Year of the Rooster Envelope",
-        "Zeta-Prolanide");
+    return Arrays.asList("acryliplex composite", "agricium", "agricium (ore)",
+        "agricultural supplies", "altruciatoxin", "aluminum", "aluminum (ore)", "amioshi plague",
+        "aphorite", "astatine", "atlasium", "beryl", "beryl (raw)", "bexalite", "bexalite (raw)",
+        "borase", "borase (ore)", "chlorine", "compboard", "copper", "copper (ore)", "corundum",
+        "corundum (raw)", "degnous root", "diamond", "diamond (raw)", "diluthermex",
+        "distilled spirits", "dolivine", "dymantium", "e'tam", "fluorine", "gold", "gold (ore)",
+        "golden medmon", "hadanite", "heart of the woods", "hephaestanite", "hephaestanite (raw)",
+        "hydrogen", "inert materials", "iodine", "iron", "iron (ore)", "janalite", "laranite",
+        "laranite (raw)", "maze", "medical supplies", "neon", "pitambu", "processed food", "prota",
+        "quantainium", "quantainium (raw)", "quartz", "quartz (raw)", "ranta dung",
+        "recycled material composite", "revenant pod", "revenant tree pollen", "slam", "scrap",
+        "stims", "sunset berries", "taranite", "taranite (raw)", "titanium", "titanium (ore)",
+        "tungsten", "tungsten (ore)", "waste", "widow", "year of the rooster envelope",
+        "zeta-prolanide");
   }
 }
