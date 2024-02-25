@@ -39,7 +39,7 @@ class CommoditySubmissionFactoryAccuracyTest {
   void givenCorrectSreenshotThenReadTextAccurately() throws IOException {
     var manipulation = new UpscaleTo4k();
     BufferedImage screenshot =
-        ImageUtil.getFromResourcePath("/images/kiosks/commodity/2023-12-17_17-41-3-491144600.jpg");
+        ImageUtil.getFromResourcePath("/images/kiosks/commodity/2023-12-31_22-25-47-990364500.jpg");
     screenshot = manipulation.manipulate(screenshot);
 
     var submission = factory.build(screenshot);
