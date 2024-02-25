@@ -193,8 +193,8 @@ public class CommoditySubmissionFactory {
 
   private ThreadLocal<Ocr> constructListingsOcr() {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
-    preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
+    preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new CommodityKioskTextThreshold());
     preprocessingManipulations.add(new WriteToDisk(imageWriter));
 
@@ -204,8 +204,8 @@ public class CommoditySubmissionFactory {
 
   private ThreadLocal<Ocr> constructLocationOcr() {
     List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
-    preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new InvertColors());
+    preprocessingManipulations.add(new ConvertToGreyscale());
     preprocessingManipulations.add(new CommodityKioskTextThreshold());
     preprocessingManipulations.add(new WriteToDisk(imageWriter));
 
