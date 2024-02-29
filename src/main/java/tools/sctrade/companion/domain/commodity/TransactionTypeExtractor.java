@@ -13,8 +13,7 @@ import tools.sctrade.companion.domain.ocr.OcrUtil;
 import tools.sctrade.companion.utils.ImageUtil;
 
 public class TransactionTypeExtractor {
-  private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactory.class);
-
+  private final Logger logger = LoggerFactory.getLogger(TransactionTypeExtractor.class);
   private static final String SHOP_INVENTORY = "shop inventory";
 
   private ImageWriter imageWriter;
