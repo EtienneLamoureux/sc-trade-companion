@@ -40,6 +40,8 @@ public class CommodityLocationReader {
       logger.debug("Read location '{}'", location);
 
       return location;
+    } catch (Exception e) {
+      return Optional.empty();
     } finally {
       locationOcr.remove();
     }

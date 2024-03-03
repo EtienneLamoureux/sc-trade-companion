@@ -12,7 +12,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 import nu.pattern.OpenCV;
@@ -63,6 +66,37 @@ public class ImageUtil {
       float brightnessOffset) {
     RescaleOp op = new RescaleOp(contrastScale, brightnessOffset, null);
     op.filter(image, image);
+  }
+
+  public static Color calculateDominantColor(BufferedImage image) {
+    return calculateDominantColor(image, new Rectangle(0, 0, image.getWidth(), image.getHeight()));
+  }
+
+  public static Color calculateDominantColor(BufferedImage image, Rectangle rectangle) {
+    Rectangle imageRectangle =
+        new Rectangle(image.getMinX(), image.getMinY(), image.getWidth(), image.getHeight());
+
+    if (!imageRectangle.contains(rectangle)) {
+      throw new RectangleOutOfBoundsException(rectangle, imageRectangle);
+    }
+
+    var countByApproximateColors = new HashMap<Color, Integer>();
+
+    for (int x = (int) rectangle.getMinX(); x < rectangle.getMaxX(); x++) {
+      for (int y = (int) rectangle.getMinY(); y < rectangle.getMaxY(); y++) {
+        Color pixel = new Color(image.getRGB(x, y));
+        Color approximateColor = new Color((pixel.getRed() - (pixel.getRed() % 5.0f)),
+            (pixel.getGreen() - (pixel.getGreen() % 5.0f)),
+            (pixel.getBlue() - (pixel.getBlue() % 5.0f)));
+        countByApproximateColors.merge(approximateColor,
+            countByApproximateColors.getOrDefault(approximateColor, 0), Integer::sum);
+      }
+    }
+
+    var approximateColorsByCount = countByApproximateColors.entrySet().stream()
+        .collect(Collectors.toMap(Entry::getValue, Entry::getKey));
+
+    return approximateColorsByCount.get(Collections.max(approximateColorsByCount.keySet()));
   }
 
   public static Color calculateAverageColor(BufferedImage image) {
