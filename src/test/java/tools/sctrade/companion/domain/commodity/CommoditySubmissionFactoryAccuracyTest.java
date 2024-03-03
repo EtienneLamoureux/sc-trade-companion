@@ -3,13 +3,21 @@ package tools.sctrade.companion.domain.commodity;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.image.ImageWriter;
+import tools.sctrade.companion.domain.image.manipulations.CommodityKioskTextThreshold;
+import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
+import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
+import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.user.Setting;
 import tools.sctrade.companion.domain.user.SettingRepository;
@@ -32,7 +40,7 @@ class CommoditySubmissionFactoryAccuracyTest {
     imageWriter = new DiskImageWriter(settings);
 
     factory = new CommoditySubmissionFactory(new UserService(settings), notificationService,
-        new TestCommodityRepository(), new TestLocationRepository(), imageWriter);
+        buildBestEffortCommodityLocationReader(), buildBestEffortCommodityListingFactory());
   }
 
   @Test
@@ -50,5 +58,42 @@ class CommoditySubmissionFactoryAccuracyTest {
     settings = new SettingRepository();
     settings.set(Setting.MY_IMAGES_PATH, Paths.get(".", "my-images").toAbsolutePath());
     settings.set(Setting.OUTPUT_TRANSIENT_IMAGES, true);
+  }
+
+  private BestEffortCommodityLocationReader buildBestEffortCommodityLocationReader() {
+    Collection<CommodityLocationReader> locationReaders = new ArrayList<>();
+    LocationRepository locationRepository = new TestLocationRepository();
+
+    locationReaders
+        .add(new CommodityLocationReader(
+            Arrays.asList(new InvertColors(), new ConvertToGreyscale(),
+                new CommodityKioskTextThreshold(), new WriteToDisk(imageWriter)),
+            locationRepository));
+    locationReaders
+        .add(new CommodityLocationReader(
+            Arrays.asList(new ConvertToGreyscale(), new InvertColors(),
+                new CommodityKioskTextThreshold(), new WriteToDisk(imageWriter)),
+            locationRepository));
+    locationReaders.add(new CommodityLocationReader(
+        Arrays.asList(new InvertColors(), new ConvertToGreyscale(), new WriteToDisk(imageWriter)),
+        locationRepository));
+
+    return new BestEffortCommodityLocationReader(locationReaders);
+  }
+
+  private BestEffortCommodityListingFactory buildBestEffortCommodityListingFactory() {
+    var commodityRepository = new TestCommodityRepository();
+
+    Collection<CommodityListingFactory> commodityListingFactories = new ArrayList<>();
+    commodityListingFactories.add(new CommodityListingFactory(commodityRepository, imageWriter,
+        Arrays.asList(new InvertColors(), new ConvertToGreyscale(),
+            new CommodityKioskTextThreshold(), new WriteToDisk(imageWriter))));
+    commodityListingFactories.add(new CommodityListingFactory(commodityRepository, imageWriter,
+        Arrays.asList(new ConvertToGreyscale(), new InvertColors(),
+            new CommodityKioskTextThreshold(), new WriteToDisk(imageWriter))));
+    commodityListingFactories.add(new CommodityListingFactory(commodityRepository, imageWriter,
+        Arrays.asList(new InvertColors(), new ConvertToGreyscale(), new WriteToDisk(imageWriter))));
+
+    return new BestEffortCommodityListingFactory(commodityListingFactories);
   }
 }
