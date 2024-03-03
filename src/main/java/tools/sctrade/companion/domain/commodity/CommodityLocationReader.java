@@ -41,6 +41,8 @@ public class CommodityLocationReader {
 
       return location;
     } catch (Exception e) {
+      logger.error("Error while reading location", e);
+
       return Optional.empty();
     } finally {
       locationOcr.remove();
