@@ -24,6 +24,8 @@ import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.CommodityKioskTextThreshold1;
+import tools.sctrade.companion.domain.image.manipulations.CommodityKioskTextThreshold2;
+import tools.sctrade.companion.domain.image.manipulations.CommodityKioskTextThreshold3;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
@@ -115,8 +117,13 @@ public class AppConfig {
             locationRepository));
     locationReaders
         .add(new CommodityLocationReader(
-            Arrays.asList(new ConvertToGreyscale(), new InvertColors(),
-                new CommodityKioskTextThreshold1(), new WriteToDisk(imageWriter)),
+            Arrays.asList(new InvertColors(), new ConvertToGreyscale(),
+                new CommodityKioskTextThreshold2(), new WriteToDisk(imageWriter)),
+            locationRepository));
+    locationReaders
+        .add(new CommodityLocationReader(
+            Arrays.asList(new InvertColors(), new ConvertToGreyscale(),
+                new CommodityKioskTextThreshold3(), new WriteToDisk(imageWriter)),
             locationRepository));
 
     return new BestEffortCommodityLocationReader(locationReaders);
@@ -130,8 +137,11 @@ public class AppConfig {
         Arrays.asList(new InvertColors(), new ConvertToGreyscale(),
             new CommodityKioskTextThreshold1(), new WriteToDisk(imageWriter))));
     commodityListingFactories.add(new CommodityListingFactory(commodityRepository, imageWriter,
-        Arrays.asList(new ConvertToGreyscale(), new InvertColors(),
-            new CommodityKioskTextThreshold1(), new WriteToDisk(imageWriter))));
+        Arrays.asList(new InvertColors(), new ConvertToGreyscale(),
+            new CommodityKioskTextThreshold2(), new WriteToDisk(imageWriter))));
+    commodityListingFactories.add(new CommodityListingFactory(commodityRepository, imageWriter,
+        Arrays.asList(new InvertColors(), new ConvertToGreyscale(),
+            new CommodityKioskTextThreshold3(), new WriteToDisk(imageWriter))));
 
     return new BestEffortCommodityListingFactory(commodityListingFactories);
   }
