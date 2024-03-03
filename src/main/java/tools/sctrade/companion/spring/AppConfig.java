@@ -3,6 +3,7 @@ package tools.sctrade.companion.spring;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -12,11 +13,21 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
+import tools.sctrade.companion.domain.LocationRepository;
+import tools.sctrade.companion.domain.commodity.BestEffortCommodityListingFactory;
+import tools.sctrade.companion.domain.commodity.BestEffortCommodityLocationReader;
+import tools.sctrade.companion.domain.commodity.CommodityListingFactory;
+import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
+import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommodityService;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
+import tools.sctrade.companion.domain.image.manipulations.CommodityKioskTextThreshold;
+import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
+import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
+import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.user.Setting;
@@ -93,13 +104,49 @@ public class AppConfig {
     return new DiskImageWriter(settingRepository);
   }
 
+  @Bean("BestEffortCommodityLocationReader")
+  public BestEffortCommodityLocationReader buildBestEffortCommodityLocationReader(
+      LocationRepository locationRepository, ImageWriter imageWriter) {
+    Collection<CommodityLocationReader> locationReaders = new ArrayList<>();
+    locationReaders
+        .add(new CommodityLocationReader(
+            Arrays.asList(new InvertColors(), new ConvertToGreyscale(),
+                new CommodityKioskTextThreshold(), new WriteToDisk(imageWriter)),
+            locationRepository));
+    locationReaders
+        .add(new CommodityLocationReader(
+            Arrays.asList(new ConvertToGreyscale(), new InvertColors(),
+                new CommodityKioskTextThreshold(), new WriteToDisk(imageWriter)),
+            locationRepository));
+    locationReaders.add(new CommodityLocationReader(
+        Arrays.asList(new InvertColors(), new ConvertToGreyscale(), new WriteToDisk(imageWriter)),
+        locationRepository));
+
+    return new BestEffortCommodityLocationReader(locationReaders);
+  }
+
+  @Bean("BestEffortCommodityListingFactory")
+  public BestEffortCommodityListingFactory buildBestEffortCommodityListingFactory(
+      CommodityRepository commodityRepository, ImageWriter imageWriter) {
+    Collection<CommodityListingFactory> commodityListingFactories = new ArrayList<>();
+    commodityListingFactories.add(new CommodityListingFactory(commodityRepository, imageWriter,
+        Arrays.asList(new InvertColors(), new ConvertToGreyscale(),
+            new CommodityKioskTextThreshold(), new WriteToDisk(imageWriter))));
+    commodityListingFactories.add(new CommodityListingFactory(commodityRepository, imageWriter,
+        Arrays.asList(new ConvertToGreyscale(), new InvertColors(),
+            new CommodityKioskTextThreshold(), new WriteToDisk(imageWriter))));
+    commodityListingFactories.add(new CommodityListingFactory(commodityRepository, imageWriter,
+        Arrays.asList(new InvertColors(), new ConvertToGreyscale(), new WriteToDisk(imageWriter))));
+
+    return new BestEffortCommodityListingFactory(commodityListingFactories);
+  }
+
   @Bean("CommoditySubmissionFactory")
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
-      NotificationService notificationService,
-      @Qualifier("ScTradeToolsClient") ScTradeToolsClient scTradeToolsClient,
-      ImageWriter imageWriter) {
-    return new CommoditySubmissionFactory(userService, notificationService, scTradeToolsClient,
-        scTradeToolsClient, imageWriter);
+      NotificationService notificationService, CommodityLocationReader commodityLocationReader,
+      CommodityListingFactory commodityListingFactory) {
+    return new CommoditySubmissionFactory(userService, notificationService, commodityLocationReader,
+        commodityListingFactory);
   }
 
   @Bean("CommodityService")

@@ -13,15 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
-import tools.sctrade.companion.domain.image.manipulations.CommodityKioskTextThreshold;
-import tools.sctrade.companion.domain.image.manipulations.ConvertToGreyscale;
-import tools.sctrade.companion.domain.image.manipulations.InvertColors;
-import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
 import tools.sctrade.companion.domain.ocr.LocatedColumn;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.exceptions.NoCloseStringException;
-import tools.sctrade.companion.exceptions.NoListingsException;
 import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
 import tools.sctrade.companion.utils.HashUtil;
 import tools.sctrade.companion.utils.StringUtil;
@@ -32,14 +27,14 @@ public class CommodityListingFactory {
 
   private TransactionTypeExtractor transactionTypeExtractor;
   private CommodityRepository commodityRepository;
-  private ImageWriter imageWriter;
   private ThreadLocal<Ocr> listingsOcr;
 
-  public CommodityListingFactory(CommodityRepository commodityRepository, ImageWriter imageWriter) {
+  public CommodityListingFactory(CommodityRepository commodityRepository, ImageWriter imageWriter,
+      List<ImageManipulation> preprocessingManipulations) {
     this.transactionTypeExtractor = new TransactionTypeExtractor(imageWriter);
     this.commodityRepository = commodityRepository;
-    this.imageWriter = imageWriter;
-    this.listingsOcr = constructListingsOcr();
+    this.listingsOcr = ThreadLocal
+        .withInitial(() -> new CommodityListingsTesseractOcr(preprocessingManipulations));
   }
 
   public Collection<CommodityListing> build(BufferedImage screenCapture, String location) {
@@ -109,10 +104,6 @@ public class CommodityListingFactory {
       TransactionType transactionType, List<RawCommodityListing> rawListings, String batchId) {
     rawListings = rawListings.parallelStream().filter(n -> n.isComplete()).toList();
 
-    if (rawListings.isEmpty()) {
-      throw new NoListingsException();
-    }
-
     Instant now = TimeUtil.getNow();
 
     return rawListings.parallelStream().map(n -> {
@@ -131,16 +122,5 @@ public class CommodityListingFactory {
     columns.forEach(n -> columnsBySizeDesc.put(n.getText().length(), n));
 
     return columnsBySizeDesc.values().iterator();
-  }
-
-  private ThreadLocal<Ocr> constructListingsOcr() {
-    List<ImageManipulation> preprocessingManipulations = new ArrayList<>();
-    preprocessingManipulations.add(new InvertColors());
-    preprocessingManipulations.add(new ConvertToGreyscale());
-    preprocessingManipulations.add(new CommodityKioskTextThreshold());
-    preprocessingManipulations.add(new WriteToDisk(imageWriter));
-
-    return ThreadLocal
-        .withInitial(() -> new CommodityListingsTesseractOcr(preprocessingManipulations));
   }
 }
