@@ -85,16 +85,20 @@ public class ImageUtil {
     for (int x = (int) rectangle.getMinX(); x < rectangle.getMaxX(); x++) {
       for (int y = (int) rectangle.getMinY(); y < rectangle.getMaxY(); y++) {
         Color pixel = new Color(image.getRGB(x, y));
-        Color approximateColor = new Color((pixel.getRed() - (pixel.getRed() % 5.0f)),
-            (pixel.getGreen() - (pixel.getGreen() % 5.0f)),
-            (pixel.getBlue() - (pixel.getBlue() % 5.0f)));
-        countByApproximateColors.merge(approximateColor,
-            countByApproximateColors.getOrDefault(approximateColor, 0), Integer::sum);
+        int approximateRed = pixel.getRed() - (pixel.getRed() % 10);
+        int approximateGreen = pixel.getGreen() - (pixel.getGreen() % 10);
+        int approximateBlue = pixel.getBlue() - (pixel.getBlue() % 10);
+        Color approximateColor = new Color(approximateRed, approximateGreen, approximateBlue);
+        countByApproximateColors.put(approximateColor,
+            countByApproximateColors.getOrDefault(approximateColor, 0) + 1);
       }
     }
 
-    var approximateColorsByCount = countByApproximateColors.entrySet().stream()
-        .collect(Collectors.toMap(Entry::getValue, Entry::getKey));
+    var approximateColorsByCount = new HashMap<Integer, Color>();
+
+    for (Entry<Color, Integer> entry : countByApproximateColors.entrySet()) {
+      approximateColorsByCount.put(entry.getValue(), entry.getKey());
+    }
 
     return approximateColorsByCount.get(Collections.max(approximateColorsByCount.keySet()));
   }

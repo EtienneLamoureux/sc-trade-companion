@@ -49,6 +49,10 @@ public class CommodityListingFactory {
       String batchId = HashUtil.hash(screenCapture);
 
       return buildCommodityListings(location, transactionType, rawListings, batchId);
+    } catch (Exception e) {
+      logger.error("Error while reading listings", e);
+
+      return Collections.emptyList();
     } finally {
       listingsOcr.remove();
     }
