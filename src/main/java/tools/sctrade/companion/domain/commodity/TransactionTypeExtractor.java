@@ -74,10 +74,10 @@ public class TransactionTypeExtractor {
   }
 
   private TransactionType extractByLuminance(BufferedImage buyImage, BufferedImage sellImage) {
-    var buyRectangleColor = ImageUtil.calculateAverageColor(buyImage);
+    var buyRectangleColor = ImageUtil.calculateDominantColor(buyImage);
     var buyRectangleLuminance = buyRectangleColor.getRed();
 
-    var sellRectangleColor = ImageUtil.calculateAverageColor(sellImage);
+    var sellRectangleColor = ImageUtil.calculateDominantColor(sellImage);
     var sellRectangleLuminance = sellRectangleColor.getRed();
 
     return (buyRectangleLuminance > sellRectangleLuminance) ? TransactionType.SELLS

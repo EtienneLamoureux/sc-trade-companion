@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.utils.ImageUtil;
 
-public class CommodityKioskTextThreshold implements ImageManipulation {
+public class CommodityKioskTextThreshold1 implements ImageManipulation {
 
   @Override
   public BufferedImage manipulate(BufferedImage image) {
