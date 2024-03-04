@@ -9,6 +9,8 @@ Desktop companion application for Star Citizen.
   - 🇬🇧 English
   - 🇫🇷 French
   - 🇩🇪 German
+  - 🇧🇷 Brazilian Portuguese
+  - 🇪🇸 Spanish
 - [Known issues](https://github.com/EtienneLamoureux/sc-trade-companion/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
 
 ## Installation
@@ -37,7 +39,7 @@ Desktop companion application for Star Citizen.
 2. Turn off hints (Options > Game settings > Show Hints, Control Hints)
 3. Turn off global chat (<kbd>F12</kbd> by default)
 4. If you use `r_DisplayInfo`, make sure the text doesn’t intrude on the screen
-5. Try to minimize glare
+5. Try to minimize glare, by positioning your character or by adjusting the "Gamma", "Brightness" and "Contrast" in the "Graphics" options
 
 ## F.A.Q.
 ### Why would I use this?
