@@ -25,6 +25,7 @@ import org.imgscalr.Scalr.Mode;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
@@ -179,9 +180,11 @@ public class ImageUtil {
 
     try {
       Mat original = toMat(image);
+      Mat filtered = new Mat(original.rows(), original.cols(), original.type());
       Mat processed = new Mat(original.rows(), original.cols(), original.type());
 
-      Imgproc.threshold(original, processed, Imgproc.THRESH_BINARY, 255, Imgproc.THRESH_OTSU);
+      Imgproc.GaussianBlur(original, filtered, new Size(5, 5), 0);
+      Imgproc.threshold(filtered, processed, Imgproc.THRESH_BINARY, 255, Imgproc.THRESH_OTSU);
 
       return toBufferedImage(processed);
     } catch (IOException e) {
