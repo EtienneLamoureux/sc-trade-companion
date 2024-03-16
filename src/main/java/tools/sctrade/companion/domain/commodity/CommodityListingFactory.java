@@ -51,7 +51,7 @@ public class CommodityListingFactory {
       return buildCommodityListings(location, transactionType, rawListings, batchId);
     } catch (Exception e) {
       logger.error("Error while reading listings", e);
-
+      // TODO
       return Collections.emptyList();
     } finally {
       listingsOcr.remove();

@@ -21,6 +21,7 @@ import tools.sctrade.companion.domain.user.Setting;
 import tools.sctrade.companion.domain.user.SettingRepository;
 import tools.sctrade.companion.exceptions.PublicationException;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
+import tools.sctrade.companion.utils.LocalizationUtil;
 
 public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmission>
     implements CommodityRepository, LocationRepository {
@@ -86,6 +87,9 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
           .toBodilessEntity();
       response.block();
       logger.info("Sent {} commodity listings to SC Trade Tools", submission.getListings().size());
+      notificationService.info(String.format(Locale.ROOT,
+          LocalizationUtil.get("infoCommodityListingsScTradeToolsOutput"),
+          submission.getListings().size()));
     } catch (WebClientResponseException e) {
       throw new PublicationException(e.getResponseBodyAsString());
     }

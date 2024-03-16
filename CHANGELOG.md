@@ -1,4 +1,11 @@
 # SC Trade Companion
+## 1.0.1
+### Bugs
+- Improve buy/sell detection in sub-optimal conditions
+
+### Other
+- Add an INFO level logs when listings are sent to the website
+
 ## 1.0.0
 ### Features
 - Spellcheck and auto-correct location and commodity names
