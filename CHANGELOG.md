@@ -1,4 +1,10 @@
 # SC Trade Companion
+## 1.0.2
+### Other
+- Improve text-reading accuracy
+- Include a "Run as administrator" script
+- Improve datetime format to allow proper sorting
+
 ## 1.0.1
 ### Bugs
 - Improve buy/sell detection in sub-optimal conditions
