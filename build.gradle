@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'tools.sctrade'
-version = '1.0.1'
+version = '1.0.2'
 
 java {
 	sourceCompatibility = '17'
@@ -100,6 +100,7 @@ task copyStartScript(type: Copy) {
 	from "./scripts"
 	into distributionDir
 	include "${rootProject.name}.bat"
+	include "${rootProject.name}-admin.bat"
 }
 
 task dist(dependsOn: ['copyJar', 'copyTessdata', 'copyStartScript', 'jlink']) {
