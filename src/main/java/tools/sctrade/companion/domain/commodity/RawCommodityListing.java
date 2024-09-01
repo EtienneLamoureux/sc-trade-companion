@@ -13,8 +13,8 @@ import tools.sctrade.companion.domain.ocr.LocatedColumn;
 import tools.sctrade.companion.utils.StringUtil;
 
 public class RawCommodityListing {
-  private static final Pattern RIGHT_PATTERN = Pattern
-      .compile("\\D*([0-9\\.\\,]+).+\\R.((\\d+[\\.\\,])?\\d+[k ]*)", Pattern.CASE_INSENSITIVE);
+  private static final Pattern RIGHT_PATTERN =
+      Pattern.compile("([0-9\\.]+)scu\\R¤([0-9\\.km]+)\\/", Pattern.CASE_INSENSITIVE);
 
   private final Logger logger = LoggerFactory.getLogger(RawCommodityListing.class);
 
@@ -107,11 +107,11 @@ public class RawCommodityListing {
 
   private void extractInventory() {
     try {
-      String rightText = getRightText().replace(".", ",");
+      String rightText = getRightText();
       Matcher matcher = RIGHT_PATTERN.matcher(rightText);
       matcher.find();
       String match = matcher.group(1).toLowerCase(Locale.ROOT);
-      match = match.replace(",", "");
+      match = match.replace(".", "");
 
       inventory = Optional.of(Integer.valueOf(match));
     } catch (Exception e) {
@@ -133,14 +133,6 @@ public class RawCommodityListing {
       double price = Double.parseDouble(match);
       isThousands = isThousands || (price % 1) > 0; // Decimals = metric notation, which is 99% kilo
 
-      if (price >= 1000.0) {
-        /*
-         * Prices never have more than 3 digits before the decimal character, as the metric notation
-         * is preferred. This indicates the '¤' character was read as a number: it must be stripped.
-         */
-        price %= 1000;
-      }
-
       if (isMillions) {
         price *= 1000000;
       } else if (isThousands) {
@@ -158,6 +150,6 @@ public class RawCommodityListing {
     return right.getText().strip().toLowerCase(Locale.ROOT).replace(" ", "").replace(",", ".")
         .replace("i", "1").replace("l", "1").replace("s", "5").replace("$", "5").replace("e", "5")
         .replace("g", "6").replace("b", "8").replace("o", "0").replace("5cu", "scu")
-        .replace("5cy", "scu");
+        .replace("5cy", "scu").replace("8cy", "scu");
   }
 }
