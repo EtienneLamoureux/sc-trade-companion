@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,11 +45,11 @@ class CommoditySubmissionFactoryAccuracyTest {
         buildBestEffortCommodityLocationReader(), buildBestEffortCommodityListingFactory());
   }
 
-  // @Test
+  @Test
   void givenCorrectSreenshotThenReadTextAccurately() throws IOException {
     var manipulation = new UpscaleTo4k();
     BufferedImage screenshot =
-        ImageUtil.getFromResourcePath("/images/kiosks/commodity/2023-12-15_21-5-11-930335300.jpg");
+        ImageUtil.getFromResourcePath("/images/kiosks/commodity/red-buy.png");
     screenshot = manipulation.manipulate(screenshot);
 
     var submission = factory.build(screenshot);
