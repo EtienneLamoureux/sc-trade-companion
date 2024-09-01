@@ -26,6 +26,7 @@ import tools.sctrade.companion.utils.TimeUtil;
 
 public class CommodityListingFactory {
   private final Logger logger = LoggerFactory.getLogger(CommodityListingFactory.class);
+  private static final String SHOP_INVENTORY = "shop inventory";
 
   private TransactionTypeExtractor transactionTypeExtractor;
   private CommodityRepository commodityRepository;
@@ -61,7 +62,7 @@ public class CommodityListingFactory {
   }
 
   private List<RawCommodityListing> buildRawListings(OcrResult result) {
-    result = removeWordsOutsideTab(result);
+    result = removeNonListingWords(result);
     var columns = result.getColumns();
 
     if (columns.size() < 2) {
@@ -88,12 +89,15 @@ public class CommodityListingFactory {
     return assembleRawListings(leftHalfListings, rightHalfListings);
   }
 
-  private OcrResult removeWordsOutsideTab(OcrResult result) {
-    Rectangle shopInventoryRectangle =
-        OcrUtil.getRectangleClosestTo(result, TransactionTypeExtractor.SHOP_INVENTORY);
+  private OcrResult removeNonListingWords(OcrResult result) {
+    var shopInventoryFragment = OcrUtil.findFragmentClosestTo(result, SHOP_INVENTORY);
+    Rectangle shopInventoryRectangle = shopInventoryFragment.getBoundingBox();
+    double minX =
+        shopInventoryRectangle.getMinX() + (2 * shopInventoryFragment.getCharacterWidth());
+
     var words = result.getColumns().stream().flatMap(n -> n.getFragments().stream())
         .flatMap(n -> n.getWordsInReadingOrder().stream())
-        .filter(n -> n.getBoundingBox().getMinX() > shopInventoryRectangle.getMinX())
+        .filter(n -> n.getBoundingBox().getMinX() > minX)
         .filter(n -> n.getBoundingBox().getMinY() > shopInventoryRectangle.getMinY()).toList();
 
     return new OcrResult(words);
