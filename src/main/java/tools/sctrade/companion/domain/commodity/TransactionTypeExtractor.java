@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.domain.image.ImageWriter;
-import tools.sctrade.companion.domain.ocr.LocatedFragment;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.OcrUtil;
 import tools.sctrade.companion.exceptions.UnreadableTransactionTypeException;
@@ -16,9 +15,9 @@ import tools.sctrade.companion.utils.ImageUtil;
 
 public class TransactionTypeExtractor {
   private final Logger logger = LoggerFactory.getLogger(TransactionTypeExtractor.class);
-  private static final String SHOP_INVENTORY = "shop inventory";
+  static final String SHOP_INVENTORY = "shop inventory";
   private static final String BUY = "buy";
-  private static final Object SELL = "sell";
+  private static final Object SELL = "local market value";
 
   private ImageWriter imageWriter;
 
@@ -58,22 +57,13 @@ public class TransactionTypeExtractor {
   }
 
   private Rectangle findButtonAreaBoundingBox(BufferedImage screenCapture, OcrResult result) {
-    Rectangle shopInventoryRectangle = getShopInventoryRectangle(result);
+    Rectangle shopInventoryRectangle = OcrUtil.getRectangleClosestTo(result, SHOP_INVENTORY);
     Rectangle buttonAreaBoundingBox = new Rectangle((int) shopInventoryRectangle.getMinX(),
         (int) (shopInventoryRectangle.getMinY() - shopInventoryRectangle.getHeight()),
         (int) (shopInventoryRectangle.getWidth() * 3),
         (int) (shopInventoryRectangle.getHeight() * 5));
 
     return buttonAreaBoundingBox;
-  }
-
-  private Rectangle getShopInventoryRectangle(OcrResult result) {
-    var fragments = result.getColumns().parallelStream()
-        .flatMap(n -> n.getFragments().parallelStream()).toList();
-    LocatedFragment shopInventoryFragment =
-        OcrUtil.findFragmentClosestTo(fragments, SHOP_INVENTORY);
-
-    return shopInventoryFragment.getBoundingBox();
   }
 
   private List<Rectangle> getButtonBoundingBoxes(BufferedImage screenCapture) {

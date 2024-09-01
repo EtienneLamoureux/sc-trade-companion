@@ -1,5 +1,6 @@
 package tools.sctrade.companion.domain.commodity;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.ocr.LocatedColumn;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OcrResult;
+import tools.sctrade.companion.domain.ocr.OcrUtil;
 import tools.sctrade.companion.exceptions.NoCloseStringException;
 import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
 import tools.sctrade.companion.utils.HashUtil;
@@ -59,6 +61,7 @@ public class CommodityListingFactory {
   }
 
   private List<RawCommodityListing> buildRawListings(OcrResult result) {
+    result = removeWordsOutsideTab(result);
     var columns = result.getColumns();
 
     if (columns.size() < 2) {
@@ -83,6 +86,17 @@ public class CommodityListingFactory {
     }
 
     return assembleRawListings(leftHalfListings, rightHalfListings);
+  }
+
+  private OcrResult removeWordsOutsideTab(OcrResult result) {
+    Rectangle shopInventoryRectangle =
+        OcrUtil.getRectangleClosestTo(result, TransactionTypeExtractor.SHOP_INVENTORY);
+    var words = result.getColumns().stream().flatMap(n -> n.getFragments().stream())
+        .flatMap(n -> n.getWordsInReadingOrder().stream())
+        .filter(n -> n.getBoundingBox().getMinX() > shopInventoryRectangle.getMinX())
+        .filter(n -> n.getBoundingBox().getMinY() > shopInventoryRectangle.getMinY()).toList();
+
+    return new OcrResult(words);
   }
 
   private List<RawCommodityListing> assembleRawListings(List<LocatedColumn> leftHalfListings,
