@@ -12,7 +12,7 @@ public abstract class LocatedText {
   }
 
   public double getCharacterWidth() {
-    return getText().length() / boundingBox.getWidth();
+    return boundingBox.getWidth() / getText().length();
   }
 
   @Override
