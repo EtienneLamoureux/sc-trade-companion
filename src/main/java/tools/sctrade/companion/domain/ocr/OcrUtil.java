@@ -1,5 +1,6 @@
 package tools.sctrade.companion.domain.ocr;
 
+import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentSkipListMap;
@@ -8,6 +9,14 @@ import tools.sctrade.companion.utils.StringUtil;
 
 public class OcrUtil {
   private OcrUtil() {}
+
+  public static Rectangle getRectangleClosestTo(OcrResult result, String text) {
+    var fragments = result.getColumns().parallelStream()
+        .flatMap(n -> n.getFragments().parallelStream()).toList();
+    LocatedFragment shopInventoryFragment = OcrUtil.findFragmentClosestTo(fragments, text);
+
+    return shopInventoryFragment.getBoundingBox();
+  }
 
   public static LocatedFragment findFragmentClosestTo(Collection<LocatedFragment> fragments,
       String string) {
