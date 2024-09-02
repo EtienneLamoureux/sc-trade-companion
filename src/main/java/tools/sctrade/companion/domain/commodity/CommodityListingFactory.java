@@ -44,6 +44,7 @@ public class CommodityListingFactory {
     try {
       logger.debug("Reading listings...");
       OcrResult listingsResult = listingsOcr.get().read(screenCapture);
+      listingsResult = removeNonListingWords(listingsResult);
       var rawListings = buildRawListings(listingsResult);
       logger.debug("Read {} listings", rawListings.size());
 
@@ -62,7 +63,6 @@ public class CommodityListingFactory {
   }
 
   private List<RawCommodityListing> buildRawListings(OcrResult result) {
-    result = removeNonListingWords(result);
     var columns = result.getColumns();
 
     if (columns.size() < 2) {
