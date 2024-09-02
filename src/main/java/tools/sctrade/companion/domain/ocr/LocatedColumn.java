@@ -26,16 +26,7 @@ public class LocatedColumn extends LocatedText {
   }
 
   public boolean shouldContain(LocatedFragment fragment) {
-    double fraction = 0.1;
-
-    for (var i = fraction; i < 1.0; i += fraction) {
-      if (contains(
-          fragment.getBoundingBox().getMinX() + (fragment.getBoundingBox().getWidth() * i))) {
-        return true;
-      }
-    }
-
-    return false;
+    return isLeftOrRightAligned(fragment) || hasSignificantXOverlap(fragment);
   }
 
   public void add(LocatedFragment fragment) {
@@ -82,11 +73,39 @@ public class LocatedColumn extends LocatedText {
         && ((getBoundingBox().getMaxY() - column.getBoundingBox().getMinY()) > 0);
   }
 
+  private boolean isLeftOrRightAligned(LocatedFragment fragment) {
+    var leeway = 1 * fragment.getCharacterWidth();
+
+    var isLeftAligned =
+        Math.abs(getBoundingBox().getMinX() - fragment.getBoundingBox().getMinX()) <= leeway;
+    var isRightAligned =
+        Math.abs(getBoundingBox().getMaxX() - fragment.getBoundingBox().getMaxX()) <= leeway;
+
+    return isLeftAligned || isRightAligned;
+  }
+
+  private boolean hasSignificantXOverlap(LocatedFragment fragment) {
+    var fragmentIsAtLeastHalfInColumn =
+        getBoundingBox().getMinX() < fragment.getBoundingBox().getCenterX()
+            && fragment.getBoundingBox().getCenterX() < getBoundingBox().getMaxX();
+    var columnIsAtLeastHalfInFragment =
+        fragment.getBoundingBox().getMinX() < getBoundingBox().getCenterX()
+            && getBoundingBox().getCenterX() < fragment.getBoundingBox().getMaxX();
+
+    var overlap = Math.min(getBoundingBox().getMaxX(), fragment.getBoundingBox().getMaxX())
+        - Math.max(getBoundingBox().getMinX(), fragment.getBoundingBox().getMinX());
+    var columnCoversMostOfFragment = (0.8 <= (overlap / fragment.getBoundingBox().getWidth()));
+    var fragmentCoversMostOfColumn = (0.8 <= (overlap / fragment.getBoundingBox().getWidth()));
+
+    return (fragmentIsAtLeastHalfInColumn && columnIsAtLeastHalfInFragment)
+        || columnCoversMostOfFragment || fragmentCoversMostOfColumn;
+  }
+
   /**
    * Calculates the gap, on the Y axis, above which the space between 2 lines means a new paragraph
    * has started
    *
-   * TODO Can be improve by assuming the `yGaps` is a binomial distribution and picking the first
+   * TODO Can be improved by assuming the `yGaps` is a binomial distribution and picking the first
    * local minimum.
    *
    * @return Paragraph gap
@@ -110,9 +129,5 @@ public class LocatedColumn extends LocatedText {
     yGaps.removeAll(MathUtil.calculateOuliers(yGaps));
 
     return MathUtil.calculateMean(yGaps);
-  }
-
-  private boolean contains(double x) {
-    return boundingBox.getMinX() < x && x < boundingBox.getMaxX();
   }
 }
