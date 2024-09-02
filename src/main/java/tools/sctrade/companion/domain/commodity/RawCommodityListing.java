@@ -63,8 +63,8 @@ public class RawCommodityListing {
         this.inventory.isPresent() ? String.format(Locale.ROOT, "%s SCU", this.inventory.get())
             : "? SCU";
     String commodity = this.commodity.orElse("?");
-    String price = this.price.isPresent() ? String.format(Locale.ROOT, "¤%f/unit", this.price.get())
-        : "¤?/unit";
+    String price =
+        this.price.isPresent() ? String.format(Locale.ROOT, "¤%f/scu", this.price.get()) : "¤?/scu";
     String inventoryLevel = this.inventoryLevel.isPresent()
         ? String.format(Locale.ROOT, "(%s)", this.inventoryLevel.get().getLabel())
         : "(?)";
