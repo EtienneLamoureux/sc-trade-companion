@@ -14,7 +14,7 @@ import tools.sctrade.companion.utils.StringUtil;
 
 public class RawCommodityListing {
   private static final Pattern RIGHT_PATTERN =
-      Pattern.compile("([0-9\\.]+)scu\\R¤([0-9\\.km]+)\\/", Pattern.CASE_INSENSITIVE);
+      Pattern.compile("([0-9\\.]+)[scu]+\\R¤([0-9\\.km]+)\\/", Pattern.CASE_INSENSITIVE);
 
   private final Logger logger = LoggerFactory.getLogger(RawCommodityListing.class);
 
