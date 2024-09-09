@@ -27,6 +27,9 @@ dependencies {
 	implementation 'com.formdev:flatlaf:3.2.5'
 	implementation 'com.formdev:flatlaf-intellij-themes:3.2.5'
 	
+	// System Tray
+	implementation 'com.dorkbox:SystemTray:4.4'
+	
 	// OCR
 	implementation 'net.sourceforge.tess4j:tess4j:5.8.0'
 	implementation 'org.openpnp:opencv:4.8.1-0'
