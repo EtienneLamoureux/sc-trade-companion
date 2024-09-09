@@ -37,8 +37,13 @@ dependencies {
 	// Utils
 	implementation 'org.imgscalr:imgscalr-lib:4.2'
 	implementation 'org.apache.commons:commons-math3:3.6.1'
+<<<<<<< HEAD
 	implementation 'commons-io:commons-io:2.18.0'
 	implementation 'com.opencsv:opencsv:5.9'
+=======
+	implementation 'com.opencsv:opencsv:5.7.1'
+	implementation 'com.github.oshi:oshi-core:6.6.3'
+>>>>>>> f0b0215 (build.gradle: Add oshi-core as a "Utils" dependency)
 	
 	// Tests	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
