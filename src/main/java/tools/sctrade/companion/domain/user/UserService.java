@@ -1,12 +1,21 @@
 package tools.sctrade.companion.domain.user;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import java.util.List;
 import java.util.UUID;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+<<<<<<< HEAD
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
+=======
+
+import oshi.SystemInfo;
+import oshi.hardware.CentralProcessor;
+import oshi.hardware.ComputerSystem;
+import oshi.hardware.HWDiskStore;
+import oshi.hardware.HardwareAbstractionLayer;
+>>>>>>> cbb30bd (UserService.java: Replace wmic invokation for a cross-platform solution based on computer hardware serial numbers.)
 import tools.sctrade.companion.utils.HashUtil;
 
 /**
@@ -57,38 +66,28 @@ public class UserService {
   }
 
   private String getId() {
-    String id;
+    SystemInfo si = new SystemInfo();
+    HardwareAbstractionLayer hal = si.getHardware();
+    CentralProcessor processor = hal.getProcessor();
+    ComputerSystem computerSystem = hal.getComputerSystem();
+    List<HWDiskStore> diskStores = hal.getDiskStores();
 
-    try {
-      id = getSystemUuid();
-    } catch (Exception e) {
-      logger.warn("Could not retrieve computer identifier", e);
-      UUID uuid = UUID.randomUUID();
-      id = uuid.toString();
+    // Get CPU ID
+    String processorId = processor.getProcessorIdentifier().getProcessorID();
+
+    // Get Motherboard Serial Number
+    String motherboardSerial = computerSystem.getBaseboard().getSerialNumber();
+
+    // Get Disk Serial Number (use first disk's serial number)
+    String diskSerial = "";
+    if (!diskStores.isEmpty()) {
+      diskSerial = diskStores.get(0).getSerial();  // Access first item in the list
     }
 
-    return HashUtil.hash(id);
-  }
+    // Combine hardware components into a string
+    String hardwareString = processorId + motherboardSerial + diskSerial;
 
-  private String getSystemUuid() throws Exception {
-    String system = System.getProperty("os.name").toLowerCase();
-
-    if (system.indexOf("win") >= 0) {
-      String[] cmd = {"wmic", "csproduct", "get", "UUID"};
-      Process process = Runtime.getRuntime().exec(cmd);
-      process.waitFor();
-      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-      String line = "";
-      StringBuilder output = new StringBuilder();
-
-      while ((line = reader.readLine()) != null) {
-        output.append(line);
-      }
-
-      return output.toString().replaceAll("\\s+", " ").strip();
-    } else {
-      throw new RuntimeException("System is not Windows");
-    }
+    // Generate hashed UUID based on the hardware components
+    return HashUtil.hash(UUID.nameUUIDFromBytes(hardwareString.getBytes()).toString());
   }
 }
