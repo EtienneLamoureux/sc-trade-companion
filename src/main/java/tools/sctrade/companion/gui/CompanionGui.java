@@ -1,20 +1,21 @@
 package tools.sctrade.companion.gui;
 
-import com.formdev.flatlaf.FlatLaf;
-import com.formdev.flatlaf.intellijthemes.FlatArcDarkOrangeIJTheme;
 import java.awt.AWTException;
 import java.awt.Image;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
 import java.util.Arrays;
 import java.util.Locale;
+
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
+
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.intellijthemes.FlatArcDarkOrangeIJTheme;
+
+import dorkbox.systemTray.MenuItem;
+import dorkbox.systemTray.SystemTray;
 import tools.sctrade.companion.domain.notification.NotificationLevel;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.user.SettingRepository;
@@ -106,38 +107,25 @@ public class CompanionGui extends JFrame implements NotificationRepository {
     add(tabbedPane);
   }
 
-  private void setupTray() throws AWTException {
-    if (SystemTray.isSupported()) {
-      setDefaultCloseOperation(HIDE_ON_CLOSE);
+  private void setupTray() {  
+    SystemTray systemTray = SystemTray.get(LocalizationUtil.get("applicationTitle"));
 
-      PopupMenu popupMenu = new PopupMenu();
-      popupMenu.add(buildOpenMenuItem());
-      popupMenu.add(buildExitMenuItem());
-
-      TrayIcon trayIcon = new TrayIcon(getIcon("icon16"));
-      trayIcon.setPopupMenu(popupMenu);
-      trayIcon.setImageAutoSize(true);
-      trayIcon.setToolTip(LocalizationUtil.get("applicationTitle"));
-
-      SystemTray systemTray = SystemTray.getSystemTray();
-      systemTray.add(trayIcon);
+    if (systemTray == null) {
+      setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
+    else{
+      setDefaultCloseOperation(HIDE_ON_CLOSE);
+      systemTray.setImage(getIcon("icon128"));
+      
+      systemTray.getMenu().add(new MenuItem(LocalizationUtil.get("menuItemOpen"), e->{ 
+        setVisible(true); 
+      }));
 
-    setDefaultCloseOperation(EXIT_ON_CLOSE);
-  }
-
-  private MenuItem buildOpenMenuItem() {
-    MenuItem openMenuItem = new MenuItem(LocalizationUtil.get("menuItemOpen"));
-    openMenuItem.addActionListener(e -> setVisible(true));
-
-    return openMenuItem;
-  }
-
-  private MenuItem buildExitMenuItem() {
-    MenuItem exitMenuItem = new MenuItem(LocalizationUtil.get("menuItemExit"));
-    exitMenuItem.addActionListener(e -> System.exit(0));
-
-    return exitMenuItem;
+      systemTray.getMenu().add(new MenuItem(LocalizationUtil.get("menuItemExit"), e->{
+        systemTray.shutdown();
+        System.exit(0);
+      }));
+    }
   }
 
   private Image getIcon(String name) {
