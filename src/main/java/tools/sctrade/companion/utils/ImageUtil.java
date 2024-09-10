@@ -239,7 +239,25 @@ public class ImageUtil {
   static void writeToDisk(BufferedImage image, Path path) throws IOException {
     Files.createDirectories(path.getParent());
     File imageFile = new File(path.toString());
-    String format = path.toString().substring(path.toString().lastIndexOf(".") + 1);
+
+    // Get the format from the file extension
+    String format = path.toString().substring(path.toString().lastIndexOf(".") + 1).toLowerCase();
+
+    // If the format is JPG, ensure no alpha channel is present
+    if ("jpg".equals(format) || "jpeg".equals(format)) {
+        if (image.getTransparency() != BufferedImage.OPAQUE) {
+            image = convertToJpgCompatible(image);
+        }
+    }
+
+    // Write the image to disk in the desired format
     ImageIO.write(image, format, imageFile);
+  }
+
+  // Helper method to convert an image to a JPG-compatible format (no alpha channel)
+  private static BufferedImage convertToJpgCompatible(BufferedImage image) {
+      BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+      newImage.createGraphics().drawImage(image, 0, 0, null);
+      return newImage;
   }
 }
