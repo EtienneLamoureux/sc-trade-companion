@@ -110,21 +110,19 @@ task copyStartScript(type: Copy) {
 }
 
 // Configure the Java execution environment to include OpenJFX modules
-tasks.withType(JavaExec) {
-    doFirst {
-        // Assuming your project has a "src/main/resources" directory for configuration files
-        // Adjust this path if needed
-        def modulePath = file("${projectDir}/src/main/resources/module-path") 
+tasks.all { task ->
+    if (task instanceof JavaExec) {
+        doFirst {
+            def modulePath = file("${projectDir}/src/main/resources/module-path") 
 
-        if (!modulePath.exists()) {
-            // Create the module-path file if it doesn't exist
-            modulePath.createNewFile()
-
-            // Add OpenJFX modules to the module path
-            modulePath.appendText("${configurations.runtimeClasspath.asPath.replace(':', ';')}") // Use ; as a separator on Windows 
+            if (!modulePath.exists()) {
+                modulePath.createNewFile()
+                modulePath.appendText("${configurations.runtimeClasspath.asPath.replace(':', ';')}") // Use ; as a separator on Windows 
+            }
         }
     }
 }
+
 
 task dist(dependsOn: ['copyJar', 'copyTessdata', 'copyStartScript', 'jlink']) {
 }
