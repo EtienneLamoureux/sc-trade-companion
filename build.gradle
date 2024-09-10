@@ -13,6 +13,7 @@ java {
 
 repositories {
 	mavenCentral()
+	maven { url "https://openjfx.io/maven/" }  // Add OpenJFX repository
 }
 
 dependencies {
@@ -35,6 +36,10 @@ dependencies {
 	implementation 'org.imgscalr:imgscalr-lib:4.2'
 	implementation 'org.apache.commons:commons-math3:3.6.1'
 	implementation 'com.opencsv:opencsv:5.7.1'
+
+	// Wayland
+	implementation 'org.openjfx:javafx-controls:19' // Core OpenJFX controls
+	implementation 'org.openjfx:javafx-graphics:19'  // Essential for graphics rendering
 	
 	// Tests	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
