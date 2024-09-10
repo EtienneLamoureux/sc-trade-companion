@@ -38,6 +38,7 @@ dependencies {
 	implementation 'com.opencsv:opencsv:5.7.1'
 
 	// Wayland
+	implementation platform('org.openjfx:javafx-bom:19') // Use BOM for version consistency
 	implementation 'org.openjfx:javafx-controls:19' // Core OpenJFX controls
 	implementation 'org.openjfx:javafx-graphics:19'  // Essential for graphics rendering
 	
@@ -106,6 +107,23 @@ task copyStartScript(type: Copy) {
 	into distributionDir
 	include "${rootProject.name}.bat"
 	include "${rootProject.name}-admin.bat"
+}
+
+// Configure the Java execution environment to include OpenJFX modules
+tasks.withType<JavaExec> {
+    doFirst {
+        // Assuming your project has a "src/main/resources" directory for configuration files
+        // Adjust this path if needed
+        def modulePath = file("${projectDir}/src/main/resources/module-path") 
+
+        if (!modulePath.exists()) {
+            // Create the module-path file if it doesn't exist
+            modulePath.createNewFile()
+
+            // Add OpenJFX modules to the module path
+            modulePath.appendText("${configurations.runtimeClasspath.asPath.replace(':', ';')}") // Use ; as a separator on Windows 
+        }
+    }
 }
 
 task dist(dependsOn: ['copyJar', 'copyTessdata', 'copyStartScript', 'jlink']) {
