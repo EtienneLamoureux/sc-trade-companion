@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 import org.opencv.core.Mat;
 import org.opencv.imgcodecs.Imgcodecs;
 
-public class WaylandScreenCapture {
+public class ScreenPrinterWayland {
 
     // Assuming you have OpenCV setup correctly in your project
 
