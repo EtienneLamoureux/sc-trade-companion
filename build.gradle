@@ -13,7 +13,7 @@ java {
 
 repositories {
 	mavenCentral()
-	maven { url "https://openjfx.io/maven/" }  // Add OpenJFX repository
+	maven { url "https://github.com/openjdk/jfx" }  // Add OpenJFX repository
 }
 
 dependencies {
