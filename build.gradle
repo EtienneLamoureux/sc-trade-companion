@@ -27,6 +27,9 @@ dependencies {
 	implementation 'com.formdev:flatlaf:3.2.5'
 	implementation 'com.formdev:flatlaf-intellij-themes:3.2.5'
 	
+	// System Tray
+	implementation 'com.dorkbox:SystemTray:4.4'
+	
 	// OCR
 	implementation 'net.sourceforge.tess4j:tess4j:5.8.0'
 	implementation 'org.openpnp:opencv:4.8.1-0'
@@ -35,6 +38,7 @@ dependencies {
 	implementation 'org.imgscalr:imgscalr-lib:4.2'
 	implementation 'org.apache.commons:commons-math3:3.6.1'
 	implementation 'com.opencsv:opencsv:5.7.1'
+	implementation 'com.github.oshi:oshi-core:6.6.3'
 	
 	// Tests	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
