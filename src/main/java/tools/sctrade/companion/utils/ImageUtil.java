@@ -231,7 +231,7 @@ public class ImageUtil {
   public static void writeToDiskNoFail(BufferedImage image, Path path) {
     try {
       writeToDisk(image, path.toAbsolutePath());
-    } catch (Exception e) {
+    } catch (IOException e) {
       logger.error("There was an error writing to disk", e);
     }
   }
