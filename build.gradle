@@ -35,7 +35,10 @@ dependencies {
 	implementation 'org.imgscalr:imgscalr-lib:4.2'
 	implementation 'org.apache.commons:commons-math3:3.6.1'
 	implementation 'com.opencsv:opencsv:5.7.1'
-	implementation 'com.github.hypfvieh:dbus-java:3.3.2'
+
+	// DBUS interaction libraries
+	implementation 'com.github.hypfvieh:dbus-java-core:5.1.0'
+	implementation 'com.github.hypfvieh:dbus-java-transport-junixsocket:5.1.0'
 	
 	// Tests	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
