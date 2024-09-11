@@ -9,6 +9,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,10 +18,10 @@ import java.util.concurrent.TransferQueue;
 
 import javax.imageio.ImageIO;
 
-import org.freedesktop.dbus.DBusMap;
 import org.freedesktop.dbus.DBusMatchRule;
 import org.freedesktop.dbus.DBusPath;
 import org.freedesktop.dbus.connections.impl.DBusConnection;
+import org.freedesktop.dbus.connections.impl.DBusConnectionBuilder;
 import org.freedesktop.dbus.interfaces.DBusSigHandler;
 import org.freedesktop.dbus.messages.DBusSignal;
 import org.freedesktop.dbus.types.UInt32;
@@ -58,11 +59,11 @@ public class ScreenshotUtil {
         }
     }
 
-    private static BufferedImage createDbusScreenshot() {
-        try {
-            LOG.debug("Taking DBus Screenshot...");
-            DBusConnection bus = DBusConnection.getConnection(DBusConnection.DBusBusType.SESSION);
-            LOG.debug("Unique name: %s%n", bus.getUniqueName());
+  private static BufferedImage createDbusScreenshot() {
+      try {
+          LOG.debug("Taking DBus Screenshot...");
+          DBusConnection bus = DBusConnectionBuilder.forSessionBus().build();
+          LOG.debug("Unique name: %s%n", bus.getUniqueName());
 
             String token = UUID.randomUUID().toString().replaceAll("-", "");
             String sender = bus.getUniqueName().substring(1).replace('.', '_');
@@ -70,17 +71,17 @@ public class ScreenshotUtil {
 
             TransferQueue<Optional<BufferedImage>> queue = new LinkedTransferQueue<>();
 
-            DBusMatchRule matchRule = new DBusMatchRule("signal", "org.freedesktop.portal.Request", "Response");
-            bus.addGenericSigHandler(matchRule, new DBusSigHandler<DBusSignal>() {
-                @Override
-                public void handle(DBusSignal t) {
-                    LOG.debug("DBUS signal received");
-                    if (path.equals(t.getPath())) {
-                        try {
-                            Object[] params = t.getParameters();
-                            LOG.debug("params: size=%d%n", params.length);
-                            UInt32 response = (UInt32) params[0];
-                            DBusMap<String, Variant> results = (DBusMap) params[1];
+          DBusMatchRule matchRule = new DBusMatchRule("signal", "org.freedesktop.portal.Request", "Response");
+          bus.addGenericSigHandler(matchRule, new DBusSigHandler<DBusSignal>() {
+              @Override
+              public void handle(DBusSignal t) {
+                  LOG.debug("DBUS signal received");
+                  if (path.equals(t.getPath())) {
+                      try {
+                          Object[] params = t.getParameters();
+                          LOG.debug("params: size=%d%n", params.length);
+                          UInt32 response = (UInt32) params[0];
+                          LinkedHashMap<String, Variant> results = (LinkedHashMap) params[1];
 
                             if (response.intValue() == 0) {
                                 LOG.debug("Screenshot successful");
@@ -99,13 +100,13 @@ public class ScreenshotUtil {
                                 queue.add(Optional.empty());
                             }
 
-                            bus.removeGenericSigHandler(matchRule, this);
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-            });
+                          bus.removeGenericSigHandler(matchRule, this);
+                      } catch (Exception e) {
+                          e.printStackTrace();
+                      }
+                  }
+              }
+          });
 
             ScreenshotInterface iface = bus.getRemoteObject("org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop", ScreenshotInterface.class);
             Map<String, Variant> options = new HashMap<>();
