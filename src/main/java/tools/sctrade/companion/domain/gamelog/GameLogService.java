@@ -24,11 +24,11 @@ public class GameLogService {
     }
 
     starCitizenLivePath = starCitizenLivePath.strip();
-    settings.set(Setting.STAR_CITIZEN_LIVE_PATH, starCitizenLivePath);
+    settings.set(Setting.STAR_CITIZEN_LIVE_PATH, starCitizenLivePath.replace("\\", "\\\\"));
   }
 
   public Optional<String> getStarCitizenLivePath() {
-    return Optional.ofNullable(settings.get(Setting.STAR_CITIZEN_LIVE_PATH));
+    return Optional.ofNullable(settings.get(Setting.STAR_CITIZEN_LIVE_PATH).toString());
   }
 
 }
