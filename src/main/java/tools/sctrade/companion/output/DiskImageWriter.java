@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.domain.image.ImageWriter;
-import tools.sctrade.companion.domain.user.Setting;
-import tools.sctrade.companion.domain.user.SettingRepository;
+import tools.sctrade.companion.domain.setting.Setting;
+import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.utils.ImageUtil;
 
 public class DiskImageWriter implements ImageWriter {

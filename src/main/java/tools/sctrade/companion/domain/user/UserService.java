@@ -5,6 +5,8 @@ import java.io.InputStreamReader;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.sctrade.companion.domain.setting.Setting;
+import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.utils.HashUtil;
 
 public class UserService {

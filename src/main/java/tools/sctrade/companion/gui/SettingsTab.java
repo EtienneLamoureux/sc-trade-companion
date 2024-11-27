@@ -7,19 +7,22 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import tools.sctrade.companion.domain.user.Setting;
-import tools.sctrade.companion.domain.user.SettingRepository;
+import tools.sctrade.companion.domain.gamelog.GameLogService;
+import tools.sctrade.companion.domain.setting.Setting;
+import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 public class SettingsTab extends JPanel {
   private static final long serialVersionUID = -3532718267415423680L;
 
-  public SettingsTab(UserService userService, SettingRepository settings) {
+  public SettingsTab(UserService userService, GameLogService gameLogService,
+      SettingRepository settings) {
     super();
     setLayout(new GridBagLayout());
 
     buildUsernameField(userService);
+    buildStarCitizenLivePathField(gameLogService);
     buildDataPathField(settings.get(Setting.MY_DATA_PATH).toString());
     buildImagesPathField(settings.get(Setting.MY_IMAGES_PATH).toString());
   }
@@ -34,20 +37,20 @@ public class SettingsTab extends JPanel {
     usernameField.getDocument().addDocumentListener(new DocumentListener() {
       @Override
       public void insertUpdate(DocumentEvent e) {
-        updateUserLabel();
+        updateUsername();
       }
 
       @Override
       public void removeUpdate(DocumentEvent e) {
-        updateUserLabel();
+        updateUsername();
       }
 
       @Override
       public void changedUpdate(DocumentEvent e) {
-        updateUserLabel();
+        updateUsername();
       }
 
-      private void updateUserLabel() {
+      private void updateUsername() {
         userService.updateUsername(usernameField.getText());
       }
     });
@@ -58,16 +61,51 @@ public class SettingsTab extends JPanel {
     buildLabel(2, " ");
   }
 
+  private void buildStarCitizenLivePathField(GameLogService gameLogService) {
+    var starCitizenLivePathLabel = buildLabel(3, LocalizationUtil.get("labelStarCitizenLivePath"));
+    var starCitizenLivePathField =
+        buildTextField(3, gameLogService.getStarCitizenLivePath().orElse(null));
+    starCitizenLivePathField.putClientProperty("JTextField.placeholderText",
+        LocalizationUtil.get("textFieldStarCitizenLivePathPlaceholder"));
+    starCitizenLivePathLabel.setLabelFor(starCitizenLivePathField);
+
+    starCitizenLivePathField.getDocument().addDocumentListener(new DocumentListener() {
+      @Override
+      public void insertUpdate(DocumentEvent e) {
+        updateStarCitizenLivePath();
+      }
+
+      @Override
+      public void removeUpdate(DocumentEvent e) {
+        updateStarCitizenLivePath();
+      }
+
+      @Override
+      public void changedUpdate(DocumentEvent e) {
+        updateStarCitizenLivePath();
+      }
+
+      private void updateStarCitizenLivePath() {
+        gameLogService.updateStarCitizenLivePath(starCitizenLivePathField.getText());
+      }
+    });
+
+    var tooltip = buildLabel(4, LocalizationUtil.get("tooltipStarCitizenLivePath"));
+    tooltip.putClientProperty("FlatLaf.styleClass", "small");
+    tooltip.setEnabled(false);
+    buildLabel(5, " ");
+  }
+
   private void buildDataPathField(String dataPath) {
-    var dataPathLabel = buildLabel(3, LocalizationUtil.get("labelMyData"));
-    var dataPathField = buildTextField(3, dataPath);
+    var dataPathLabel = buildLabel(6, LocalizationUtil.get("labelMyData"));
+    var dataPathField = buildTextField(6, dataPath);
     dataPathField.setEditable(false);
     dataPathLabel.setLabelFor(dataPathField);
   }
 
   private void buildImagesPathField(String imagesPath) {
-    var imagesPathLabel = buildLabel(4, LocalizationUtil.get("labelMyImages"));
-    var imagesPathField = buildTextField(4, imagesPath);
+    var imagesPathLabel = buildLabel(7, LocalizationUtil.get("labelMyImages"));
+    var imagesPathField = buildTextField(7, imagesPath);
     imagesPathField.setEditable(false);
     imagesPathLabel.setLabelFor(imagesPathField);
   }
