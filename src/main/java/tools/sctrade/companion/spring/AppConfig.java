@@ -21,7 +21,7 @@ import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommodityService;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
-import tools.sctrade.companion.domain.gamelog.GameLogService;
+import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.CommodityKioskTextThreshold1;
@@ -81,12 +81,12 @@ public class AppConfig {
   }
 
   @Bean("GameLogService")
-  public GameLogService buildGameLogService(SettingRepository settings) {
-    return new GameLogService(settings);
+  public GameLogPathSubject buildGameLogService(SettingRepository settings) {
+    return new GameLogPathSubject(settings);
   }
 
   @Bean("CompanionGui")
-  public CompanionGui buildCompanionGui(UserService userService, GameLogService gameLogService,
+  public CompanionGui buildCompanionGui(UserService userService, GameLogPathSubject gameLogService,
       SettingRepository settings) {
     return new CompanionGui(userService, gameLogService, settings, getVersion());
   }

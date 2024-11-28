@@ -7,7 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import tools.sctrade.companion.domain.gamelog.GameLogService;
+import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
@@ -16,7 +16,7 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 public class SettingsTab extends JPanel {
   private static final long serialVersionUID = -3532718267415423680L;
 
-  public SettingsTab(UserService userService, GameLogService gameLogService,
+  public SettingsTab(UserService userService, GameLogPathSubject gameLogService,
       SettingRepository settings) {
     super();
     setLayout(new GridBagLayout());
@@ -61,7 +61,7 @@ public class SettingsTab extends JPanel {
     buildLabel(2, " ");
   }
 
-  private void buildStarCitizenLivePathField(GameLogService gameLogService) {
+  private void buildStarCitizenLivePathField(GameLogPathSubject gameLogService) {
     var starCitizenLivePathLabel = buildLabel(3, LocalizationUtil.get("labelStarCitizenLivePath"));
     var starCitizenLivePathField = buildTextField(3, gameLogService.getStarCitizenLivePath().get());
     starCitizenLivePathField.putClientProperty("JTextField.placeholderText",
@@ -85,7 +85,7 @@ public class SettingsTab extends JPanel {
       }
 
       private void updateStarCitizenLivePath() {
-        gameLogService.updateStarCitizenLivePath(starCitizenLivePathField.getText());
+        gameLogService.setStarCitizenLivePath(starCitizenLivePathField.getText());
       }
     });
 

@@ -15,7 +15,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
-import tools.sctrade.companion.domain.gamelog.GameLogService;
+import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.notification.NotificationLevel;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.setting.SettingRepository;
@@ -28,12 +28,12 @@ public class CompanionGui extends JFrame implements NotificationRepository {
   private static final long serialVersionUID = -983766141308946535L;
 
   private transient UserService userService;
-  private transient GameLogService gameLogService;
+  private transient GameLogPathSubject gameLogService;
   private transient SettingRepository settings;
   private final String version;
   private LogsTab logsTab;
 
-  public CompanionGui(UserService userService, GameLogService gameLogService,
+  public CompanionGui(UserService userService, GameLogPathSubject gameLogService,
       SettingRepository settings, String version) {
     this.userService = userService;
     this.gameLogService = gameLogService;
