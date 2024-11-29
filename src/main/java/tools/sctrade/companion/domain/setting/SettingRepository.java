@@ -1,4 +1,4 @@
-package tools.sctrade.companion.domain.user;
+package tools.sctrade.companion.domain.setting;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,7 +13,8 @@ import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.utils.CsvUtil;
 
 public class SettingRepository {
-  private static final Collection<Setting> USER_DEFINED = Arrays.asList(Setting.USERNAME);
+  private static final Collection<Setting> USER_DEFINED =
+      Arrays.asList(Setting.USERNAME, Setting.STAR_CITIZEN_LIVE_PATH);
   private final Logger logger = LoggerFactory.getLogger(SettingRepository.class);
 
   private Map<Setting, String> settings;

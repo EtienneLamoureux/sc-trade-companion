@@ -21,6 +21,7 @@ import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommodityService;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
+import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.CommodityKioskTextThreshold1;
@@ -32,8 +33,8 @@ import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
 import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
-import tools.sctrade.companion.domain.user.Setting;
-import tools.sctrade.companion.domain.user.SettingRepository;
+import tools.sctrade.companion.domain.setting.Setting;
+import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.gui.CompanionGui;
 import tools.sctrade.companion.gui.LogsTab;
@@ -79,9 +80,15 @@ public class AppConfig {
     return new UserService(settings);
   }
 
+  @Bean("GameLogService")
+  public GameLogPathSubject buildGameLogService(SettingRepository settings) {
+    return new GameLogPathSubject(settings);
+  }
+
   @Bean("CompanionGui")
-  public CompanionGui buildCompanionGui(UserService userService, SettingRepository settings) {
-    return new CompanionGui(userService, settings, getVersion());
+  public CompanionGui buildCompanionGui(UserService userService, GameLogPathSubject gameLogService,
+      SettingRepository settings) {
+    return new CompanionGui(userService, gameLogService, settings, getVersion());
   }
 
   @Bean("NotificationService")
