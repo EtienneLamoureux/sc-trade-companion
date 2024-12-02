@@ -17,7 +17,7 @@ public class FileTailer extends FilePathObserver {
   private TailerListener listener;
   private Tailer tailer;
 
-  protected FileTailer(FilePathSubject subject, TailerListener listener) {
+  public FileTailer(FilePathSubject subject, TailerListener listener) {
     super(subject);
   }
 

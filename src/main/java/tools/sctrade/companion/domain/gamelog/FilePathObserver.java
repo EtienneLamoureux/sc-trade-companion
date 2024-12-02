@@ -8,6 +8,7 @@ public abstract class FilePathObserver {
 
   protected FilePathObserver(FilePathSubject subject) {
     this.subject = subject;
+    subject.attach(this);
   }
 
   protected void update() {
