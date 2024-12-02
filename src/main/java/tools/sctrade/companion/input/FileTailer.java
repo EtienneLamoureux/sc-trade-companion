@@ -12,13 +12,16 @@ import tools.sctrade.companion.domain.gamelog.FilePathSubject;
 public class FileTailer extends FilePathObserver {
   private static final Duration DELAY = Duration.ofSeconds(1);
 
-  private final Logger logger = LoggerFactory.getLogger(FileTailer.class);
+  private static final Logger logger = LoggerFactory.getLogger(FileTailer.class);
 
   private TailerListener listener;
   private Tailer tailer;
 
   public FileTailer(FilePathSubject subject, TailerListener listener) {
     super(subject);
+
+    this.listener = listener;
+    subject.attach(this);
   }
 
   @Override
@@ -33,6 +36,7 @@ public class FileTailer extends FilePathObserver {
       File file = new File(this.filePath.toString());
       tailer =
           Tailer.builder().setFile(file).setTailerListener(listener).setDelayDuration(DELAY).get();
+      tailer.run();
     } catch (Exception e) {
       logger.error("Could not tail file '{}'", this.filePath, e);
     }
