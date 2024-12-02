@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import org.apache.commons.io.input.TailerListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommodityService;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
+import tools.sctrade.companion.domain.gamelog.FilePathSubject;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
@@ -38,6 +40,7 @@ import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.gui.CompanionGui;
 import tools.sctrade.companion.gui.LogsTab;
+import tools.sctrade.companion.input.FileTailer;
 import tools.sctrade.companion.input.KeyListener;
 import tools.sctrade.companion.input.ScreenPrinter;
 import tools.sctrade.companion.output.DiskImageWriter;
@@ -80,9 +83,15 @@ public class AppConfig {
     return new UserService(settings);
   }
 
-  @Bean("GameLogService")
+
+  @Bean("GameLogPathSubject")
   public GameLogPathSubject buildGameLogService(SettingRepository settings) {
     return new GameLogPathSubject(settings);
+  }
+
+  @Bean()
+  public FileTailer buildFileTailer(FilePathSubject subject, TailerListener listener) {
+    return new FileTailer(subject, listener);
   }
 
   @Bean("CompanionGui")

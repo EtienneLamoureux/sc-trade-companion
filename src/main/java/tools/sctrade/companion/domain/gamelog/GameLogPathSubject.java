@@ -19,7 +19,6 @@ public class GameLogPathSubject extends FilePathSubject {
     super();
     this.settings = settings;
     this.observers = new ArrayList<>();
-    setState();
   }
 
   public void setStarCitizenLivePath(String starCitizenLivePath) {

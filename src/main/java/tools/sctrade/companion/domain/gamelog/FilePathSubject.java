@@ -9,6 +9,7 @@ public abstract class FilePathSubject {
 
   public void attach(FilePathObserver observer) {
     observers.add(observer);
+    setState();
   }
 
   public void detach(FilePathObserver observer) {
