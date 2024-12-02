@@ -22,8 +22,10 @@ import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommodityService;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
+import tools.sctrade.companion.domain.gamelog.FallbackLogLineProcessor;
 import tools.sctrade.companion.domain.gamelog.FilePathSubject;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
+import tools.sctrade.companion.domain.gamelog.LoadShopInventoryDataLogLineProcessor;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.CommodityKioskTextThreshold1;
@@ -42,10 +44,12 @@ import tools.sctrade.companion.gui.CompanionGui;
 import tools.sctrade.companion.gui.LogsTab;
 import tools.sctrade.companion.input.FileTailer;
 import tools.sctrade.companion.input.KeyListener;
+import tools.sctrade.companion.input.LineListener;
 import tools.sctrade.companion.input.ScreenPrinter;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
+import tools.sctrade.companion.utils.ChainOfResponsability;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
@@ -89,7 +93,15 @@ public class AppConfig {
     return new GameLogPathSubject(settings);
   }
 
-  @Bean()
+  @Bean("TailerListener")
+  public TailerListener buildTailerListener() {
+    ChainOfResponsability<String> lineProcessor = new LoadShopInventoryDataLogLineProcessor();
+    lineProcessor.setNext(new FallbackLogLineProcessor());
+
+    return new LineListener(lineProcessor);
+  }
+
+  @Bean("FileTailer")
   public FileTailer buildFileTailer(FilePathSubject subject, TailerListener listener) {
     return new FileTailer(subject, listener);
   }

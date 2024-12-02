@@ -9,13 +9,16 @@ public class LoadShopInventoryDataLogLineProcessor extends GameLogLineProcessor 
       LoggerFactory.getLogger(LoadShopInventoryDataLogLineProcessor.class);
 
   public LoadShopInventoryDataLogLineProcessor() {
-    this.pattern = Pattern.compile(
-        ".+LoadShopInventoryData.+shopName\\[(?<shopName>\\w+)\\] commodityName\\[ResourceType\\.(?<commodityName>\\w+)\\].+boxSize\\[(?<maxBoxSize>\\d+)\\] \\[Team_NAPU\\]\\[Shops\\]\\[UI\\]");
+    this.regex =
+        ".+LoadShopInventoryData.+shopName\\[(?<shopName>\\w+)\\] commodityName\\[ResourceType\\.(?<commodityName>\\w+)\\].+boxSize\\[(?<maxBoxSize>\\d+)\\] \\[Team_NAPU\\]\\[Shops\\]\\[UI\\]";
   }
 
   @Override
   protected void handle(String value) {
+    var pattern = Pattern.compile(regex);
     var matcher = pattern.matcher(value);
+    matcher.matches();
+
     var shopName = matcher.group("shopName");
     var commodityName = matcher.group("commodityName");
     var maxBoxSize = Integer.valueOf(matcher.group("maxBoxSize"));
