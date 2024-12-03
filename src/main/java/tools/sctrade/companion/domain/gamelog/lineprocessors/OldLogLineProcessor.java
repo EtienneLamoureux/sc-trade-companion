@@ -1,4 +1,4 @@
-package tools.sctrade.companion.domain.gamelog.lineprocessor;
+package tools.sctrade.companion.domain.gamelog.lineprocessors;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
