@@ -33,7 +33,7 @@ public class GameLogPathSubject extends FilePathSubject {
   }
 
   public Optional<String> getStarCitizenLivePath() {
-    return Optional.ofNullable(settings.get(Setting.STAR_CITIZEN_LIVE_PATH).toString());
+    return Optional.ofNullable(settings.get(Setting.STAR_CITIZEN_LIVE_PATH));
   }
 
   @Override
