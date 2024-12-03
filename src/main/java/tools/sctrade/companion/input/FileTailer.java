@@ -36,7 +36,6 @@ public class FileTailer extends FilePathObserver {
       File file = new File(this.filePath.toString());
       tailer =
           Tailer.builder().setFile(file).setTailerListener(listener).setDelayDuration(DELAY).get();
-      tailer.run();
     } catch (Exception e) {
       logger.error("Could not tail file '{}'", this.filePath, e);
     }
