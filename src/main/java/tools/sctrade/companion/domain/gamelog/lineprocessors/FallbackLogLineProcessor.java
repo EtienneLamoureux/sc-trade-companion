@@ -1,4 +1,4 @@
-package tools.sctrade.companion.domain.gamelog.lineprocessor;
+package tools.sctrade.companion.domain.gamelog.lineprocessors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
