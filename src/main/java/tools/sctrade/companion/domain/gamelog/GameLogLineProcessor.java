@@ -1,6 +1,6 @@
 package tools.sctrade.companion.domain.gamelog;
 
-import tools.sctrade.companion.utils.ChainOfResponsability;
+import tools.sctrade.companion.utils.patterns.ChainOfResponsability;
 
 public abstract class GameLogLineProcessor extends ChainOfResponsability<String> {
 

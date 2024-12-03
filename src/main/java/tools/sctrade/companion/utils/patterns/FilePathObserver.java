@@ -1,4 +1,4 @@
-package tools.sctrade.companion.domain.gamelog;
+package tools.sctrade.companion.utils.patterns;
 
 import java.nio.file.Path;
 

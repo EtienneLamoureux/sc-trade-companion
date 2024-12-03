@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
+import tools.sctrade.companion.utils.patterns.FilePathSubject;
 
 public class GameLogPathSubject extends FilePathSubject {
   static final String GAME_LOG_FILE = "Game.log";

@@ -1,4 +1,4 @@
-package tools.sctrade.companion.utils;
+package tools.sctrade.companion.utils.patterns;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

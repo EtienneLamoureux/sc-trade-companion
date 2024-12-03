@@ -1,10 +1,11 @@
-package tools.sctrade.companion.domain.gamelog;
+package tools.sctrade.companion.domain.gamelog.lineprocessor;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tools.sctrade.companion.domain.gamelog.lineprocessor.OldLogLineProcessor;
 
 class OldLogLineProcessorTest {
   private OldLogLineProcessor oldLogLineProcessor;

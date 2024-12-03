@@ -22,11 +22,10 @@ import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommodityService;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
-import tools.sctrade.companion.domain.gamelog.FallbackLogLineProcessor;
-import tools.sctrade.companion.domain.gamelog.FilePathSubject;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
-import tools.sctrade.companion.domain.gamelog.LoadShopInventoryDataLogLineProcessor;
-import tools.sctrade.companion.domain.gamelog.OldLogLineProcessor;
+import tools.sctrade.companion.domain.gamelog.lineprocessor.FallbackLogLineProcessor;
+import tools.sctrade.companion.domain.gamelog.lineprocessor.LoadShopInventoryDataLogLineProcessor;
+import tools.sctrade.companion.domain.gamelog.lineprocessor.OldLogLineProcessor;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.CommodityKioskTextThreshold1;
@@ -51,6 +50,7 @@ import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
 import tools.sctrade.companion.utils.SoundUtil;
+import tools.sctrade.companion.utils.patterns.FilePathSubject;
 
 @Configuration
 @EnableCaching
