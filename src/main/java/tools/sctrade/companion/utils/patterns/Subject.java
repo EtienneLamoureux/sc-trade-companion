@@ -1,23 +1,22 @@
 package tools.sctrade.companion.utils.patterns;
 
-import java.nio.file.Path;
 import java.util.Collection;
 
-public abstract class FilePathSubject {
-  Collection<FilePathObserver> observers;
-  Path filePath;
+public abstract class Subject<T> {
+  protected Collection<Observer<T>> observers;
+  protected T state;
 
-  public void attach(FilePathObserver observer) {
+  public void attach(Observer<T> observer) {
     observers.add(observer);
     setState();
   }
 
-  public void detach(FilePathObserver observer) {
+  public void detach(Observer<T> observer) {
     observers.remove(observer);
   }
 
-  public Path getState() {
-    return filePath;
+  public T getState() {
+    return state;
   }
 
   protected abstract void setState();
