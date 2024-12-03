@@ -106,8 +106,9 @@ public class AppConfig {
   }
 
   @Bean("FileTailer")
-  public FileTailer buildFileTailer(FilePathSubject subject, TailerListener listener) {
-    return new FileTailer(subject, listener);
+  public FileTailer buildFileTailer(FilePathSubject subject, TailerListener listener,
+      NotificationService notificationService) {
+    return new FileTailer(subject, listener, notificationService);
   }
 
   @Bean("CompanionGui")
