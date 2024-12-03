@@ -26,6 +26,7 @@ import tools.sctrade.companion.domain.gamelog.FallbackLogLineProcessor;
 import tools.sctrade.companion.domain.gamelog.FilePathSubject;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.gamelog.LoadShopInventoryDataLogLineProcessor;
+import tools.sctrade.companion.domain.gamelog.OldLogLineProcessor;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.CommodityKioskTextThreshold1;
@@ -49,7 +50,6 @@ import tools.sctrade.companion.input.ScreenPrinter;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
-import tools.sctrade.companion.utils.ChainOfResponsability;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
@@ -89,16 +89,20 @@ public class AppConfig {
 
 
   @Bean("GameLogPathSubject")
-  public GameLogPathSubject buildGameLogService(SettingRepository settings) {
+  public GameLogPathSubject buildGameLogSubject(SettingRepository settings) {
     return new GameLogPathSubject(settings);
   }
 
   @Bean("TailerListener")
   public TailerListener buildTailerListener() {
-    ChainOfResponsability<String> lineProcessor = new LoadShopInventoryDataLogLineProcessor();
-    lineProcessor.setNext(new FallbackLogLineProcessor());
+    var oldLogLineProcessor = new OldLogLineProcessor();
+    var loadShopInventoryDataLogLineProcessor = new LoadShopInventoryDataLogLineProcessor();
+    var fallbackLogLineProcessor = new FallbackLogLineProcessor();
 
-    return new LineListener(lineProcessor);
+    oldLogLineProcessor.setNext(loadShopInventoryDataLogLineProcessor);
+    loadShopInventoryDataLogLineProcessor.setNext(fallbackLogLineProcessor);
+
+    return new LineListener(oldLogLineProcessor);
   }
 
   @Bean("FileTailer")
