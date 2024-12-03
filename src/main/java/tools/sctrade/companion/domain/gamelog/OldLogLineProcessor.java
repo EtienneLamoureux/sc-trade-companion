@@ -29,8 +29,8 @@ public class OldLogLineProcessor extends ChainOfResponsability<String> {
 
     if (matcher.matches()) {
       var timestamp = matcher.group("timestamp");
-      var timestampInstant = LocalDateTime.parse(timestamp, DATE_TIME_FORMATTER)
-          .atZone(ZoneId.systemDefault()).toInstant();
+      var timestampInstant =
+          LocalDateTime.parse(timestamp, DATE_TIME_FORMATTER).atZone(ZoneId.of("UTC")).toInstant();
 
       return timestampInstant.isBefore(applicationOpenTime);
     } else {
