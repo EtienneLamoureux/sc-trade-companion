@@ -6,10 +6,10 @@ import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.sctrade.companion.domain.gamelog.FilePathObserver;
-import tools.sctrade.companion.domain.gamelog.FilePathSubject;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.utils.LocalizationUtil;
+import tools.sctrade.companion.utils.patterns.FilePathObserver;
+import tools.sctrade.companion.utils.patterns.FilePathSubject;
 
 public class FileTailer extends FilePathObserver {
   private static final Duration DELAY = Duration.ofSeconds(1);

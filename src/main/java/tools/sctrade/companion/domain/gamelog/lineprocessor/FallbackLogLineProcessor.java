@@ -1,8 +1,8 @@
-package tools.sctrade.companion.domain.gamelog;
+package tools.sctrade.companion.domain.gamelog.lineprocessor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.sctrade.companion.utils.ChainOfResponsability;
+import tools.sctrade.companion.utils.patterns.ChainOfResponsability;
 
 public class FallbackLogLineProcessor extends ChainOfResponsability<String> {
   private final Logger logger = LoggerFactory.getLogger(FallbackLogLineProcessor.class);

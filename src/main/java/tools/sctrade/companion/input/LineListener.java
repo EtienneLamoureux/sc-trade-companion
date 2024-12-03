@@ -3,7 +3,7 @@ package tools.sctrade.companion.input;
 import org.apache.commons.io.input.TailerListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.sctrade.companion.utils.ChainOfResponsability;
+import tools.sctrade.companion.utils.patterns.ChainOfResponsability;
 
 public class LineListener extends TailerListenerAdapter {
   private final Logger logger = LoggerFactory.getLogger(LineListener.class);

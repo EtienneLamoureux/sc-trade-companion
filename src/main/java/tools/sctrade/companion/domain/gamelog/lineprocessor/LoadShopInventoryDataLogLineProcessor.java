@@ -1,8 +1,9 @@
-package tools.sctrade.companion.domain.gamelog;
+package tools.sctrade.companion.domain.gamelog.lineprocessor;
 
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.sctrade.companion.domain.gamelog.GameLogLineProcessor;
 
 public class LoadShopInventoryDataLogLineProcessor extends GameLogLineProcessor {
   private final Logger logger =

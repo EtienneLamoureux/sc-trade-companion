@@ -1,4 +1,4 @@
-package tools.sctrade.companion.domain.gamelog;
+package tools.sctrade.companion.domain.gamelog.lineprocessor;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.sctrade.companion.utils.ChainOfResponsability;
+import tools.sctrade.companion.utils.patterns.ChainOfResponsability;
 
 public class OldLogLineProcessor extends ChainOfResponsability<String> {
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
