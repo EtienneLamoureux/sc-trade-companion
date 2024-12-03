@@ -1,6 +1,7 @@
 package tools.sctrade.companion.input;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.time.Duration;
 import org.apache.commons.io.input.Tailer;
 import org.apache.commons.io.input.TailerListener;
@@ -8,10 +9,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.utils.LocalizationUtil;
-import tools.sctrade.companion.utils.patterns.FilePathObserver;
-import tools.sctrade.companion.utils.patterns.FilePathSubject;
+import tools.sctrade.companion.utils.patterns.Observer;
+import tools.sctrade.companion.utils.patterns.Subject;
 
-public class FileTailer extends FilePathObserver {
+public class FileTailer extends Observer<Path> {
   private static final Duration DELAY = Duration.ofSeconds(1);
 
   private static final Logger logger = LoggerFactory.getLogger(FileTailer.class);
@@ -21,7 +22,7 @@ public class FileTailer extends FilePathObserver {
   private Tailer tailer;
 
 
-  public FileTailer(FilePathSubject subject, TailerListener listener,
+  public FileTailer(Subject<Path> subject, TailerListener listener,
       NotificationService notificationService) {
     super(subject);
 
@@ -40,13 +41,13 @@ public class FileTailer extends FilePathObserver {
     }
 
     try {
-      File file = new File(this.filePath.toString());
+      File file = new File(this.state.toString());
       tailer =
           Tailer.builder().setFile(file).setTailerListener(listener).setDelayDuration(DELAY).get();
-      logger.info("Started to tail {}", this.filePath);
+      logger.info("Started to tail {}", this.state);
       notificationService.info(LocalizationUtil.get("infoTailingGameLogs"));
     } catch (Exception e) {
-      logger.error("Could not tail file '{}'", this.filePath, e);
+      logger.error("Could not tail file '{}'", this.state, e);
       notificationService.error(LocalizationUtil.get("errorTailingGameLogs"));
     }
   }

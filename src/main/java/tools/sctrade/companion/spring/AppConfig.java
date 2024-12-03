@@ -50,7 +50,7 @@ import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
 import tools.sctrade.companion.utils.SoundUtil;
-import tools.sctrade.companion.utils.patterns.FilePathSubject;
+import tools.sctrade.companion.utils.patterns.Subject;
 
 @Configuration
 @EnableCaching
@@ -106,7 +106,7 @@ public class AppConfig {
   }
 
   @Bean("FileTailer")
-  public FileTailer buildFileTailer(FilePathSubject subject, TailerListener listener,
+  public FileTailer buildFileTailer(Subject subject, TailerListener listener,
       NotificationService notificationService) {
     return new FileTailer(subject, listener, notificationService);
   }
