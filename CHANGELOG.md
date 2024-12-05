@@ -3,6 +3,7 @@
 ### Other
 - Read location from game logs
   - *You should still select the location in the dropdown when taking screenshots*
+- Improve performance and security
 
 ## 1.0.3
 ### Other
