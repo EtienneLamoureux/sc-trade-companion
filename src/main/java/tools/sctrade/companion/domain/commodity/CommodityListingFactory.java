@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.TreeMap;
 import org.slf4j.Logger;
@@ -38,6 +39,16 @@ public class CommodityListingFactory {
     this.commodityRepository = commodityRepository;
     this.listingsOcr = ThreadLocal
         .withInitial(() -> new CommodityListingsTesseractOcr(preprocessingManipulations));
+  }
+
+  public CommodityListing build(String shopId, String shopName, String commodity,
+      int maxBoxSizeInScu) {
+    Instant now = TimeUtil.getNow();
+    String location = String.format(Locale.ROOT, "%s#%s", shopName, shopId);
+    String batchId = HashUtil.hash(String.format(Locale.ROOT, "%s%s%d%s", location, commodity,
+        maxBoxSizeInScu, now.toString()));
+    return new CommodityListing(location, TransactionType.SELLS, commodity, maxBoxSizeInScu,
+        batchId, now);
   }
 
   public Collection<CommodityListing> build(BufferedImage screenCapture, String location) {

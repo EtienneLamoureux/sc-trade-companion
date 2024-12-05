@@ -99,8 +99,9 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
     UserDto userDto = new UserDto(submission.getUser().id(), submission.getUser().label());
     List<CommodityListingDto> listings = submission.getListings().parallelStream()
         .map(n -> new CommodityListingDto(n.location(), n.transactionType().toString(),
-            n.commodity(), n.price(), n.inventory(), n.inventoryLevel().getSaturation(),
-            n.batchId(), new Timestamp(n.timestamp().toEpochMilli())))
+            n.commodity(), n.price(), n.inventory(),
+            (n.inventoryLevel() == null ? null : n.inventoryLevel().getSaturation()),
+            n.maxBoxSize(), n.batchId(), new Timestamp(n.timestamp().toEpochMilli())))
         .toList();
 
     return new CommoditySubmissionDto(userDto, listings);
@@ -113,7 +114,8 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
   }
 
   private record CommodityListingDto(String location, String transaction, String commodity,
-      double price, Integer quantity, double saturation, String batchId, Timestamp timestamp) {
+      Double price, Integer quantity, Double saturation, Integer maxBoxSizeInScu, String batchId,
+      Timestamp timestamp) {
   }
 
   private record LocationDto(String name, String type) {

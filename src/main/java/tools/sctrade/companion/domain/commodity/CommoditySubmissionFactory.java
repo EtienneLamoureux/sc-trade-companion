@@ -1,6 +1,7 @@
 package tools.sctrade.companion.domain.commodity;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.notification.NotificationService;
@@ -39,5 +40,9 @@ public class CommoditySubmissionFactory {
     }
 
     return new CommoditySubmission(userService.get(), listings);
+  }
+
+  CommoditySubmission build(CommodityListing commodityListing) {
+    return new CommoditySubmission(userService.get(), List.of(commodityListing));
   }
 }
