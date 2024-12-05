@@ -94,9 +94,11 @@ public class AppConfig {
   }
 
   @Bean("TailerListener")
-  public TailerListener buildTailerListener() {
+  public TailerListener buildTailerListener(CommodityListingFactory commodityListingFactory,
+      CommodityService commodityService, NotificationService notificationService) {
     var oldLogLineProcessor = new OldLogLineProcessor();
-    var loadShopInventoryDataLogLineProcessor = new LoadShopInventoryDataLogLineProcessor();
+    var loadShopInventoryDataLogLineProcessor = new LoadShopInventoryDataLogLineProcessor(
+        commodityListingFactory, commodityService, notificationService);
     var fallbackLogLineProcessor = new FallbackLogLineProcessor();
 
     oldLogLineProcessor.setNext(loadShopInventoryDataLogLineProcessor);

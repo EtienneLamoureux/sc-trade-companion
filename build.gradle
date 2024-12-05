@@ -5,10 +5,10 @@ plugins {
 }
 
 group = 'tools.sctrade'
-version = '1.0.4'
+version = '1.0.5'
 
 java {
-	sourceCompatibility = '17'
+	sourceCompatibility = '21'
 }
 
 repositories {
