@@ -2,6 +2,7 @@
 ## 1.0.4
 ### Other
 - Read location from game logs
+  - *You can set your LIVE game path through a new setting*
   - *You should still select the location in the dropdown when taking screenshots*
 - Improve performance and security
 
