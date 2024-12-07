@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,11 +33,21 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
     this.pendingSubmission = Optional.empty();
   }
 
+  public void process(CommodityListing commodityListing) throws InterruptedException {
+    CommoditySubmission submission = submissionFactory.build(commodityListing);
+
+    process(submission);
+  }
+
   @Override
   public void process(BufferedImage screenCapture) throws InterruptedException {
     CommoditySubmission submission = submissionFactory.build(screenCapture);
     notificationService.info(LocalizationUtil.get("infoCommodityListingsRead"));
 
+    process(submission);
+  }
+
+  private void process(CommoditySubmission submission) throws InterruptedException {
     try {
       logger.debug("Acquiring mutex...");
       mutex.acquire();
@@ -52,7 +63,7 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
     }
   }
 
-  @Scheduled(fixedDelay = 600)
+  @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
   public void flush() throws InterruptedException {
     try {
       logger.debug("Acquiring mutex...");

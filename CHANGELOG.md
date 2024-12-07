@@ -1,4 +1,16 @@
 # SC Trade Companion
+## 1.0.4
+### Other
+- Read location from game logs
+  - *You can set your LIVE game path through a new setting*
+  - *You should still select the location in the dropdown when taking screenshots*
+- Improve performance and security
+
+## 1.0.3
+### Other
+- Handle 3.24 kiosk layout
+- Improve character recognition accuracy
+
 ## 1.0.2
 ### Other
 - Improve text-reading accuracy

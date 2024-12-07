@@ -7,8 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
+import tools.sctrade.companion.utils.patterns.Subject;
 
-public class GameLogPathSubject extends FilePathSubject {
+public class GameLogPathSubject extends Subject<Path> {
   static final String GAME_LOG_FILE = "Game.log";
 
   private final Logger logger = LoggerFactory.getLogger(GameLogPathSubject.class);
@@ -19,7 +20,6 @@ public class GameLogPathSubject extends FilePathSubject {
     super();
     this.settings = settings;
     this.observers = new ArrayList<>();
-    setState();
   }
 
   public void setStarCitizenLivePath(String starCitizenLivePath) {
@@ -34,7 +34,7 @@ public class GameLogPathSubject extends FilePathSubject {
   }
 
   public Optional<String> getStarCitizenLivePath() {
-    return Optional.ofNullable(settings.get(Setting.STAR_CITIZEN_LIVE_PATH).toString());
+    return Optional.ofNullable(settings.get(Setting.STAR_CITIZEN_LIVE_PATH));
   }
 
   @Override
@@ -43,7 +43,7 @@ public class GameLogPathSubject extends FilePathSubject {
       return;
     }
 
-    filePath = Path.of(getStarCitizenLivePath().get(), GAME_LOG_FILE);
+    state = Path.of(getStarCitizenLivePath().get(), GAME_LOG_FILE);
     notifyObservers();
   }
 }

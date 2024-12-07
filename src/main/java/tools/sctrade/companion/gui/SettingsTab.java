@@ -63,7 +63,8 @@ public class SettingsTab extends JPanel {
 
   private void buildStarCitizenLivePathField(GameLogPathSubject gameLogService) {
     var starCitizenLivePathLabel = buildLabel(3, LocalizationUtil.get("labelStarCitizenLivePath"));
-    var starCitizenLivePathField = buildTextField(3, gameLogService.getStarCitizenLivePath().get());
+    var starCitizenLivePathField =
+        buildTextField(3, gameLogService.getStarCitizenLivePath().orElse(null));
     starCitizenLivePathField.putClientProperty("JTextField.placeholderText",
         LocalizationUtil.get("textFieldStarCitizenLivePathPlaceholder"));
     starCitizenLivePathLabel.setLabelFor(starCitizenLivePathField);

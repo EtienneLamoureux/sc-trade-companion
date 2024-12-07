@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import org.apache.commons.io.input.TailerListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +23,9 @@ import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommodityService;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
+import tools.sctrade.companion.domain.gamelog.lineprocessors.FallbackLogLineProcessor;
+import tools.sctrade.companion.domain.gamelog.lineprocessors.LoadShopInventoryDataLogLineProcessor;
+import tools.sctrade.companion.domain.gamelog.lineprocessors.OldLogLineProcessor;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.CommodityKioskTextThreshold1;
@@ -38,12 +42,15 @@ import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.gui.CompanionGui;
 import tools.sctrade.companion.gui.LogsTab;
+import tools.sctrade.companion.input.FileTailer;
 import tools.sctrade.companion.input.KeyListener;
+import tools.sctrade.companion.input.LineListener;
 import tools.sctrade.companion.input.ScreenPrinter;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
 import tools.sctrade.companion.utils.SoundUtil;
+import tools.sctrade.companion.utils.patterns.Subject;
 
 @Configuration
 @EnableCaching
@@ -80,9 +87,30 @@ public class AppConfig {
     return new UserService(settings);
   }
 
-  @Bean("GameLogService")
-  public GameLogPathSubject buildGameLogService(SettingRepository settings) {
+
+  @Bean("GameLogPathSubject")
+  public GameLogPathSubject buildGameLogSubject(SettingRepository settings) {
     return new GameLogPathSubject(settings);
+  }
+
+  @Bean("TailerListener")
+  public TailerListener buildTailerListener(CommodityListingFactory commodityListingFactory,
+      CommodityService commodityService, NotificationService notificationService) {
+    var oldLogLineProcessor = new OldLogLineProcessor();
+    var loadShopInventoryDataLogLineProcessor = new LoadShopInventoryDataLogLineProcessor(
+        commodityListingFactory, commodityService, notificationService);
+    var fallbackLogLineProcessor = new FallbackLogLineProcessor();
+
+    oldLogLineProcessor.setNext(loadShopInventoryDataLogLineProcessor);
+    loadShopInventoryDataLogLineProcessor.setNext(fallbackLogLineProcessor);
+
+    return new LineListener(oldLogLineProcessor);
+  }
+
+  @Bean("FileTailer")
+  public FileTailer buildFileTailer(Subject subject, TailerListener listener,
+      NotificationService notificationService) {
+    return new FileTailer(subject, listener, notificationService);
   }
 
   @Bean("CompanionGui")
