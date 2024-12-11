@@ -1,1 +1,1 @@
-start bin\jre\bin\javaw.exe -Xmx512m -jar bin\sc-trade-companion.jar
+start bin\jre\bin\javaw.exe -Xmx512m -jar -Djava.net.preferIPv4Stack=true bin\sc-trade-companion.jar
