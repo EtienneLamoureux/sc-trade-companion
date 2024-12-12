@@ -37,6 +37,10 @@ dependencies {
 	implementation 'commons-io:commons-io:2.18.0'
 	implementation 'com.opencsv:opencsv:5.9'
 	
+	// DBUS interaction libraries
+	implementation 'com.github.hypfvieh:dbus-java-core:5.1.0'
+	implementation 'com.github.hypfvieh:dbus-java-transport-junixsocket:5.1.0'
+
 	// Tests	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.3'
