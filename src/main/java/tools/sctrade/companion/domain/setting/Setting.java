@@ -12,8 +12,6 @@ public enum Setting {
         return (T) Boolean.valueOf(value);
       case MY_DATA_PATH, MY_IMAGES_PATH:
         return (T) Paths.get(value);
-      case STAR_CITIZEN_MONITOR:
-        return (T) Integer.valueOf(value);
       default:
         return (T) value;
     }

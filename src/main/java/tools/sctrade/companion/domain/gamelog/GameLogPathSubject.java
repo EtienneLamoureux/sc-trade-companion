@@ -28,8 +28,7 @@ public class GameLogPathSubject extends Subject<Path> {
       return;
     }
 
-    starCitizenLivePath = starCitizenLivePath.strip();
-    settings.set(Setting.STAR_CITIZEN_LIVE_PATH, starCitizenLivePath.replace("\\", "\\\\"));
+    settings.set(Setting.STAR_CITIZEN_LIVE_PATH, starCitizenLivePath);
     setState();
   }
 
