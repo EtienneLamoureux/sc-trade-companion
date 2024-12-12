@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import tools.sctrade.companion.domain.gamelog.lineprocessors.OldLogLineProcessor;
 
 class OldLogLineProcessorTest {
   private OldLogLineProcessor oldLogLineProcessor;

@@ -1,5 +1,6 @@
 package tools.sctrade.companion.spring;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -108,7 +109,7 @@ public class AppConfig {
   }
 
   @Bean("FileTailer")
-  public FileTailer buildFileTailer(Subject subject, TailerListener listener,
+  public FileTailer buildFileTailer(Subject<Path> subject, TailerListener listener,
       NotificationService notificationService) {
     return new FileTailer(subject, listener, notificationService);
   }
