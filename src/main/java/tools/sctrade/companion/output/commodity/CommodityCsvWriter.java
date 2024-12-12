@@ -68,9 +68,11 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
   }
 
   private List<String> buildLine(CommodityListing listing) {
-    return Arrays.asList(listing.location(), listing.transactionType().toString(),
-        listing.commodity(), String.valueOf(listing.price()), String.valueOf(listing.inventory()),
-        listing.inventoryLevel().getLabel(),
+    return Arrays.asList(listing.location(),
+        listing.transactionType() == null ? "" : listing.transactionType().toString(),
+        listing.commodity(), listing.price() == null ? "" : String.valueOf(listing.price()),
+        listing.inventory() == null ? "" : String.valueOf(listing.inventory()),
+        listing.inventoryLevel() == null ? "" : listing.inventoryLevel().getLabel(),
         TimeUtil.getAsString(TimeFormat.CSV_COLUMN, listing.timestamp()));
   }
 }
