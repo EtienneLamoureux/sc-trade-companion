@@ -1,7 +1,15 @@
 package tools.sctrade.companion.gui;
 
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Vector;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -28,9 +36,10 @@ public class SettingsTab extends JPanel {
 
     buildUsernameField(userService);
     buildStarCitizenLivePathField(gameLogService);
-    buildTextField(LocalizationUtil.get("labelMyData"),
+    buildStarCitizenMonitorComboBox(settings);
+    buildTextRow(LocalizationUtil.get("labelMyData"),
         settings.get(Setting.MY_DATA_PATH).toString());
-    buildTextField(LocalizationUtil.get("labelMyImages"),
+    buildTextRow(LocalizationUtil.get("labelMyImages"),
         settings.get(Setting.MY_IMAGES_PATH).toString());
   }
 
@@ -105,7 +114,28 @@ public class SettingsTab extends JPanel {
     buildLabel(rowIndex.getAndIncrement(), " ");
   }
 
-  private void buildTextField(String label, String value) {
+  private void buildStarCitizenMonitorComboBox(SettingRepository settings) {
+    GraphicsDevice[] monitors =
+        GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
+    List<String> monitorIds = Arrays.stream(monitors).map(n -> n.getIDstring()).toList();
+    String selectedMonitorId =
+        settings.get(Setting.STAR_CITIZEN_MONITOR, monitors[0].getIDstring());
+
+    var starCitizenMonitorLabel =
+        buildLabel(rowIndex.get(), LocalizationUtil.get("labelStarCitizenMonitor"));
+    var starCitizenMonitorComboBox =
+        buildComboBox(rowIndex.getAndIncrement(), monitorIds, selectedMonitorId);
+    starCitizenMonitorLabel.setLabelFor(starCitizenMonitorComboBox);
+
+    starCitizenMonitorComboBox.addActionListener(e -> {
+      @SuppressWarnings("unchecked")
+      var comboBox = (JComboBox<String>) e.getSource();
+      String value = (String) comboBox.getSelectedItem();
+      settings.set(Setting.STAR_CITIZEN_MONITOR, value);
+    });
+  }
+
+  private void buildTextRow(String label, String value) {
     var jLabel = buildLabel(rowIndex.get(), label);
     var jTextField = buildTextField(rowIndex.getAndIncrement(), value);
     jTextField.setEditable(false);
@@ -137,5 +167,21 @@ public class SettingsTab extends JPanel {
     add(textField, gridBagConstraints);
 
     return textField;
+  }
+
+  private JComboBox<String> buildComboBox(int y, Collection<String> values, String value) {
+    GridBagConstraints gridBagConstraints = new GridBagConstraints();
+    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = y;
+
+    Vector<String> orderedValues = new Vector<>(values);
+    Collections.sort(orderedValues);
+    JComboBox<String> comboBox = new JComboBox<>(orderedValues);
+    comboBox.setSelectedItem(value);
+
+    add(comboBox, gridBagConstraints);
+
+    return comboBox;
   }
 }

@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.utils.CsvUtil;
+import tools.sctrade.companion.utils.StringUtil;
 
 public class SettingRepository {
   private static final Collection<Setting> USER_DEFINED =
@@ -33,7 +34,7 @@ public class SettingRepository {
 
   public <T> T get(Setting setting, T defaultValue) {
     try {
-      return setting.cast(settings.get(setting));
+      return setting.cast(settings.get(setting).toString());
     } catch (Exception e) {
       logger.warn("Could not retreive the value of the {} setting", setting);
       return defaultValue;
@@ -68,9 +69,10 @@ public class SettingRepository {
   private void saveUserDefinedSettingsToDisk() {
     try {
       logger.debug("Saving user-defined settings to '{}'...", filePath);
-      Collection<List<String>> lines =
-          settings.entrySet().parallelStream().filter(n -> USER_DEFINED.contains(n.getKey()))
-              .map(n -> Arrays.asList(n.getKey().toString(), n.getValue())).toList();
+      Collection<List<String>> lines = settings.entrySet().parallelStream()
+          .filter(n -> USER_DEFINED.contains(n.getKey())).map(n -> Arrays
+              .asList(n.getKey().toString(), StringUtil.escapeBackslashes(n.getValue().strip())))
+          .toList();
       CsvUtil.write(filePath, lines, false);
       logger.info("Saved user defined settings to '{}'", filePath);
     } catch (Exception e) {

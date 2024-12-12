@@ -39,4 +39,9 @@ public class StringUtil {
 
     return possibilitiesByDistance.get(minDistance);
   }
+
+  public static String escapeBackslashes(String string) {
+    return string.replace("\\", "\\\\");
+
+  }
 }
