@@ -208,12 +208,12 @@ public class AppConfig {
   @Bean("ScreenPrinter")
   public ScreenPrinter buildScreenPrinter(
       @Qualifier("CommodityService") CommodityService commodityService, ImageWriter imageWriter,
-      SoundUtil soundPlayer, NotificationService notificationService) {
+      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
     return new ScreenPrinter(Arrays.asList(commodityService), postprocessingManipulations,
-        imageWriter, soundPlayer, notificationService);
+        imageWriter, soundPlayer, notificationService, settings);
   }
 
   @Bean("KeyListener")

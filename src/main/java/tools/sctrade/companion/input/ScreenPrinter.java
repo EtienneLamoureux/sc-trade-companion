@@ -1,8 +1,6 @@
 package tools.sctrade.companion.input;
 
-import java.awt.Rectangle;
 import java.awt.Robot;
-import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +11,10 @@ import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.notification.NotificationService;
+import tools.sctrade.companion.domain.setting.Setting;
+import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
+import tools.sctrade.companion.utils.GraphicsDeviceUtil;
 import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.SoundUtil;
 
@@ -27,20 +28,24 @@ public class ScreenPrinter implements Runnable {
   private ImageWriter imageWriter;
   private SoundUtil soundPlayer;
   private NotificationService notificationService;
+  private SettingRepository settings;
 
   public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
-      ImageWriter imageWriter, SoundUtil soundPlayer, NotificationService notificationService) {
-    this(imageProcessors, Collections.emptyList(), imageWriter, soundPlayer, notificationService);
+      ImageWriter imageWriter, SoundUtil soundPlayer, NotificationService notificationService,
+      SettingRepository settings) {
+    this(imageProcessors, Collections.emptyList(), imageWriter, soundPlayer, notificationService,
+        settings);
   }
 
   public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
       List<ImageManipulation> postprocessingManipulations, ImageWriter imageWriter,
-      SoundUtil soundPlayer, NotificationService notificationService) {
+      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
     this.imageProcessors = imageProcessors;
     this.postprocessingManipulations = postprocessingManipulations;
     this.imageWriter = imageWriter;
     this.soundPlayer = soundPlayer;
     this.notificationService = notificationService;
+    this.settings = settings;
   }
 
   @Override
@@ -48,8 +53,10 @@ public class ScreenPrinter implements Runnable {
     try {
       logger.debug("Printing screen...");
       soundPlayer.play(CAMERA_SHUTTER);
-      var screenRectangle = new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-      var screenCapture = postProcess(new Robot().createScreenCapture(screenRectangle));
+      var monitor = GraphicsDeviceUtil
+          .get(settings.get(Setting.STAR_CITIZEN_MONITOR, GraphicsDeviceUtil.getPrimaryId()));
+      var screenRectangle = monitor.getDefaultConfiguration().getBounds();
+      var screenCapture = postProcess(new Robot(monitor).createScreenCapture(screenRectangle));
       logger.debug("Printed screen");
 
       logger.debug("Calling image processors...");

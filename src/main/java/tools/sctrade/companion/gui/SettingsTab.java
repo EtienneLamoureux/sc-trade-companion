@@ -1,13 +1,9 @@
 package tools.sctrade.companion.gui;
 
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Vector;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -19,6 +15,7 @@ import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
+import tools.sctrade.companion.utils.GraphicsDeviceUtil;
 import tools.sctrade.companion.utils.IncrementingInt;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
@@ -115,11 +112,9 @@ public class SettingsTab extends JPanel {
   }
 
   private void buildStarCitizenMonitorComboBox(SettingRepository settings) {
-    GraphicsDevice[] monitors =
-        GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices();
-    List<String> monitorIds = Arrays.stream(monitors).map(n -> n.getIDstring()).toList();
+    var monitorIds = GraphicsDeviceUtil.getIds();
     String selectedMonitorId =
-        settings.get(Setting.STAR_CITIZEN_MONITOR, monitors[0].getIDstring());
+        settings.get(Setting.STAR_CITIZEN_MONITOR, GraphicsDeviceUtil.getPrimaryId());
 
     var starCitizenMonitorLabel =
         buildLabel(rowIndex.get(), LocalizationUtil.get("labelStarCitizenMonitor"));
