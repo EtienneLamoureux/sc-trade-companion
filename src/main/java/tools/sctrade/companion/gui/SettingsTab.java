@@ -11,25 +11,32 @@ import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
+import tools.sctrade.companion.utils.IncrementingInt;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 public class SettingsTab extends JPanel {
   private static final long serialVersionUID = -3532718267415423680L;
 
+  private IncrementingInt rowIndex;
+
   public SettingsTab(UserService userService, GameLogPathSubject gameLogService,
       SettingRepository settings) {
     super();
+    rowIndex = new IncrementingInt();
+
     setLayout(new GridBagLayout());
 
     buildUsernameField(userService);
     buildStarCitizenLivePathField(gameLogService);
-    buildDataPathField(settings.get(Setting.MY_DATA_PATH).toString());
-    buildImagesPathField(settings.get(Setting.MY_IMAGES_PATH).toString());
+    buildTextField(LocalizationUtil.get("labelMyData"),
+        settings.get(Setting.MY_DATA_PATH).toString());
+    buildTextField(LocalizationUtil.get("labelMyImages"),
+        settings.get(Setting.MY_IMAGES_PATH).toString());
   }
 
   private void buildUsernameField(UserService userService) {
-    var usernameLabel = buildLabel(0, LocalizationUtil.get("labelUsername"));
-    var usernameField = buildTextField(0, userService.get().label());
+    var usernameLabel = buildLabel(rowIndex.get(), LocalizationUtil.get("labelUsername"));
+    var usernameField = buildTextField(rowIndex.getAndIncrement(), userService.get().label());
     usernameField.putClientProperty("JTextField.placeholderText",
         LocalizationUtil.get("textFieldUsernamePlaceholder"));
     usernameLabel.setLabelFor(usernameField);
@@ -55,16 +62,17 @@ public class SettingsTab extends JPanel {
       }
     });
 
-    var tooltip = buildLabel(1, LocalizationUtil.get("tooltipUsername"));
+    var tooltip = buildLabel(rowIndex.getAndIncrement(), LocalizationUtil.get("tooltipUsername"));
     tooltip.putClientProperty("FlatLaf.styleClass", "small");
     tooltip.setEnabled(false);
-    buildLabel(2, " ");
+    buildLabel(rowIndex.getAndIncrement(), " ");
   }
 
   private void buildStarCitizenLivePathField(GameLogPathSubject gameLogService) {
-    var starCitizenLivePathLabel = buildLabel(3, LocalizationUtil.get("labelStarCitizenLivePath"));
-    var starCitizenLivePathField =
-        buildTextField(3, gameLogService.getStarCitizenLivePath().orElse(null));
+    var starCitizenLivePathLabel =
+        buildLabel(rowIndex.get(), LocalizationUtil.get("labelStarCitizenLivePath"));
+    var starCitizenLivePathField = buildTextField(rowIndex.getAndIncrement(),
+        gameLogService.getStarCitizenLivePath().orElse(null));
     starCitizenLivePathField.putClientProperty("JTextField.placeholderText",
         LocalizationUtil.get("textFieldStarCitizenLivePathPlaceholder"));
     starCitizenLivePathLabel.setLabelFor(starCitizenLivePathField);
@@ -90,24 +98,18 @@ public class SettingsTab extends JPanel {
       }
     });
 
-    var tooltip = buildLabel(4, LocalizationUtil.get("tooltipStarCitizenLivePath"));
+    var tooltip =
+        buildLabel(rowIndex.getAndIncrement(), LocalizationUtil.get("tooltipStarCitizenLivePath"));
     tooltip.putClientProperty("FlatLaf.styleClass", "small");
     tooltip.setEnabled(false);
-    buildLabel(5, " ");
+    buildLabel(rowIndex.getAndIncrement(), " ");
   }
 
-  private void buildDataPathField(String dataPath) {
-    var dataPathLabel = buildLabel(6, LocalizationUtil.get("labelMyData"));
-    var dataPathField = buildTextField(6, dataPath);
-    dataPathField.setEditable(false);
-    dataPathLabel.setLabelFor(dataPathField);
-  }
-
-  private void buildImagesPathField(String imagesPath) {
-    var imagesPathLabel = buildLabel(7, LocalizationUtil.get("labelMyImages"));
-    var imagesPathField = buildTextField(7, imagesPath);
-    imagesPathField.setEditable(false);
-    imagesPathLabel.setLabelFor(imagesPathField);
+  private void buildTextField(String label, String value) {
+    var jLabel = buildLabel(rowIndex.get(), label);
+    var jTextField = buildTextField(rowIndex.getAndIncrement(), value);
+    jTextField.setEditable(false);
+    jLabel.setLabelFor(jTextField);
   }
 
   private JLabel buildLabel(int y, String string) {
