@@ -14,7 +14,7 @@ import tools.sctrade.companion.utils.CsvUtil;
 
 public class SettingRepository {
   private static final Collection<Setting> USER_DEFINED =
-      Arrays.asList(Setting.USERNAME, Setting.STAR_CITIZEN_LIVE_PATH);
+      Arrays.asList(Setting.USERNAME, Setting.STAR_CITIZEN_LIVE_PATH, Setting.STAR_CITIZEN_MONITOR);
   private final Logger logger = LoggerFactory.getLogger(SettingRepository.class);
 
   private Map<Setting, String> settings;
@@ -29,6 +29,15 @@ public class SettingRepository {
 
   public <T> T get(Setting setting) {
     return setting.cast(settings.get(setting));
+  }
+
+  public <T> T get(Setting setting, T defaultValue) {
+    try {
+      return setting.cast(settings.get(setting));
+    } catch (Exception e) {
+      logger.warn("Could not retreive the value of the {} setting", setting);
+      return defaultValue;
+    }
   }
 
   public void set(Setting setting, Object value) {

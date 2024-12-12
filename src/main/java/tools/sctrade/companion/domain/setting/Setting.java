@@ -3,7 +3,7 @@ package tools.sctrade.companion.domain.setting;
 import java.nio.file.Paths;
 
 public enum Setting {
-  OUTPUT_SCREENSHOTS, OUTPUT_TRANSIENT_IMAGES, MY_IMAGES_PATH, MY_DATA_PATH, SC_TRADE_TOOLS_ROOT_URL, USERNAME, STAR_CITIZEN_LIVE_PATH;
+  OUTPUT_SCREENSHOTS, OUTPUT_TRANSIENT_IMAGES, MY_IMAGES_PATH, MY_DATA_PATH, SC_TRADE_TOOLS_ROOT_URL, USERNAME, STAR_CITIZEN_LIVE_PATH, STAR_CITIZEN_MONITOR;
 
   @SuppressWarnings("unchecked")
   public <T> T cast(String value) {
@@ -12,6 +12,8 @@ public enum Setting {
         return (T) Boolean.valueOf(value);
       case MY_DATA_PATH, MY_IMAGES_PATH:
         return (T) Paths.get(value);
+      case STAR_CITIZEN_MONITOR:
+        return (T) Integer.valueOf(value);
       default:
         return (T) value;
     }
