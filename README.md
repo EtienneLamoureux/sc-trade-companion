@@ -1,4 +1,6 @@
 # SC Trade Companion
+![Build status](https://github.com/EtienneLamoureux/sc-trade-companion/actions/workflows/gradle.yml/badge.svg?branch=main)
+
 Desktop companion application for Star Citizen.
 
 ## Features
