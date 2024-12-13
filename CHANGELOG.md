@@ -1,4 +1,15 @@
 # SC Trade Companion
+## 1.1.0
+### Features
+- Add a setting letting the user choose which monitor to capture and process
+
+### Bugs
+- Fix listings fail to be written to the local CSV file
+- Fix 'sc-trade.tools' fails to resolve
+
+### Other
+- Add missing translations
+
 ## 1.0.4
 ### Other
 - Read location from game logs
