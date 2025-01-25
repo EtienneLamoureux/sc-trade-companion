@@ -12,7 +12,7 @@ public class NotEnoughColumnsException extends RuntimeException {
 
   /**
    * Creates a new instance of the exception.
-   * 
+   *
    * @param minColumnCount the minimum number of columns expected
    * @param result the OCR result
    */

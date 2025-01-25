@@ -34,7 +34,7 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
 
   /**
    * Creates a new instance of the sc-trade.tools client.
-   * 
+   *
    * @param webClientBuilder The web client builder.
    * @param settings The settings repository.
    * @param notificationService The notification service.

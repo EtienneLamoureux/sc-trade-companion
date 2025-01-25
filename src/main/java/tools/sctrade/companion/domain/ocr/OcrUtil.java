@@ -15,7 +15,7 @@ public class OcrUtil {
   /**
    * Finds the fragment, from the provided result, that is closest (Levenshtein string distance) to
    * the target string.
-   * 
+   *
    * @param result The OCR result to search
    * @param text The target string
    * @return The fragment that is closest to the target string
@@ -31,7 +31,7 @@ public class OcrUtil {
   /**
    * Finds the fragment, from the provided collection, that is closest (Levenshtein string distance)
    * to the target string.
-   * 
+   *
    * @param fragments The collection of fragments to search
    * @param string The target string
    * @return The fragment that is closest to the target string

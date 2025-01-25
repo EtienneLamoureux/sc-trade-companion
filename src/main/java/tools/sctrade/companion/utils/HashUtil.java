@@ -8,15 +8,30 @@ import java.security.MessageDigest;
 import javax.imageio.ImageIO;
 import tools.sctrade.companion.exceptions.HashException;
 
+/**
+ * Utility class for hashing strings, byte arrays, and images.
+ */
 public class HashUtil {
   private static final String SHA3_256 = "SHA3-256";
 
   private HashUtil() {}
 
+  /**
+   * Hashes a string using SHA3-256.
+   *
+   * @param string The string to hash.
+   * @return The hash of the string.
+   */
   public static String hash(String string) {
     return hash(string.getBytes(StandardCharsets.UTF_8));
   }
 
+  /**
+   * Hashes an image using SHA3-256.
+   *
+   * @param image The image to hash.
+   * @return The hash of the image.
+   */
   public static String hash(BufferedImage image) {
     try {
       ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -29,6 +44,12 @@ public class HashUtil {
     }
   }
 
+  /**
+   * Hashes a byte array using SHA3-256.
+   *
+   * @param bytes The byte array to hash.
+   * @return The hash of the byte array.
+   */
   public static String hash(byte[] bytes) {
     try {
       final MessageDigest digest = MessageDigest.getInstance(SHA3_256);

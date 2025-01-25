@@ -11,8 +11,8 @@ public class RectangleOutOfBoundsException extends RuntimeException {
   private static final long serialVersionUID = 8627902304541564806L;
 
   /**
-   * Constructs a new RectangleOutOfBoundsException
-   * 
+   * Constructs a new RectangleOutOfBoundsException.
+   *
    * @param rectangle The rectangle that is out of bounds
    * @param imageRectangle The image rectangle that the rectangle is out of bounds of
    */

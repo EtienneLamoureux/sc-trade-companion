@@ -24,10 +24,25 @@ import tools.sctrade.companion.exceptions.CsvParsingException;
 public class CsvUtil {
   private CsvUtil() {}
 
+  /**
+   * Writes the lines to the file.
+   *
+   * @param path the path to the CSV file to write to
+   * @param lines the lines to write
+   * @throws IOException if an I/O error occurs
+   */
   public static void write(Path path, Collection<List<String>> lines) throws IOException {
     write(path, lines, true);
   }
 
+  /**
+   * Writes the lines to the file.
+   *
+   * @param path the path to the CSV file to write to
+   * @param lines the lines to write
+   * @param apprendLines whether to append the lines to the file, or replace the existing file
+   * @throws IOException if an I/O error occurs
+   */
   public static void write(Path path, Collection<List<String>> lines, boolean apprendLines)
       throws IOException {
     Files.createDirectories(path.getParent());
@@ -41,6 +56,13 @@ public class CsvUtil {
     }
   }
 
+  /**
+   * Reads the lines from the file. Loads the whole file into memory.
+   *
+   * @param path the path to the CSV file to read from
+   * @param hasHeader whether the file has a header
+   * @return the lines read from the file
+   */
   public static Collection<List<String>> read(Path path, boolean hasHeader) {
     try (Reader reader = new FileReader(path.toString())) {
       try (CSVReader csvReader =

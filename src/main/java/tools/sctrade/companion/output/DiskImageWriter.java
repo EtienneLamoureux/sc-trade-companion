@@ -21,7 +21,7 @@ public class DiskImageWriter implements ImageWriter {
 
   /**
    * Creates a new instance of the disk image writer.
-   * 
+   *
    * @param settings The settings repository.
    */
   public DiskImageWriter(SettingRepository settings) {

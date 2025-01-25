@@ -8,7 +8,7 @@ public class ImageProcessingException extends RuntimeException {
 
   /**
    * Creates a new instance of the ImageProcessingException class.
-   * 
+   *
    * @param e The exception that caused the error
    */
   public ImageProcessingException(Exception e) {

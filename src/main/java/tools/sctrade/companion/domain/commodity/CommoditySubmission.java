@@ -24,7 +24,7 @@ public class CommoditySubmission {
 
   /**
    * Returns the user that submitted the listings.
-   * 
+   *
    * @return the user that submitted the listings
    */
   public User getUser() {
@@ -33,7 +33,7 @@ public class CommoditySubmission {
 
   /**
    * Returns the listings submitted.
-   * 
+   *
    * @return the listings submitted
    */
   public Collection<CommodityListing> getListings() {
@@ -45,7 +45,7 @@ public class CommoditySubmission {
    * some of the listings, one is assigned from the located listings. This allows screenshots that
    * have been processed without selecting the location to still be valid if another screenshot
    * containing the location was at some point merged.
-   * 
+   *
    * @param submission the submission to merge
    */
   synchronized void merge(CommoditySubmission submission) {

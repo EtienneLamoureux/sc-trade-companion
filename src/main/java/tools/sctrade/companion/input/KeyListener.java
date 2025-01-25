@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Adapter for JNativeHook NativeKeyListener to listen for key events and trigger {@link Runnable}
  * downstream processes.
- * 
+ *
  * @see NativeKeyListener
  */
 public class KeyListener implements NativeKeyListener {
@@ -19,7 +19,7 @@ public class KeyListener implements NativeKeyListener {
 
   /**
    * Creates a new instance of the key listener.
-   * 
+   *
    * @param runnables The collection of {@link Runnable} to trigger when a specific key is pressed.
    */
   public KeyListener(Collection<Runnable> runnables) {

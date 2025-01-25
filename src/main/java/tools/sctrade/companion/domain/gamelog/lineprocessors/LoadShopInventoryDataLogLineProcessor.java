@@ -24,7 +24,7 @@ public class LoadShopInventoryDataLogLineProcessor extends GameLogLineProcessor 
 
   /**
    * Constructor.
-   * 
+   *
    * @param commodityListingFactory Factory for creating commodity listings
    * @param commodityService Service for processing commodity listings
    * @param notificationService Service for sending notifications

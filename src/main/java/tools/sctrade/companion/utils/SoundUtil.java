@@ -8,11 +8,22 @@ import javax.sound.sampled.Clip;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Utility class for playing sounds.
+ */
 public class SoundUtil {
   private static final Logger logger = LoggerFactory.getLogger(SoundUtil.class);
 
+  /**
+   * Creates a new instance of the sound util.
+   */
   public SoundUtil() {}
 
+  /**
+   * Plays a sound from a resource path. Never throws an exception, but logs it.
+   *
+   * @param resourcePath the path to the resource
+   */
   public void play(String resourcePath) {
     try (InputStream inputStream =
         new BufferedInputStream(SoundUtil.class.getResourceAsStream(resourcePath))) {

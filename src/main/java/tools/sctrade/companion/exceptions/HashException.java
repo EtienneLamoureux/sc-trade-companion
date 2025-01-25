@@ -8,7 +8,7 @@ public class HashException extends RuntimeException {
 
   /**
    * Creates a new instance of the HashException class.
-   * 
+   *
    * @param e The exception that caused this exception
    */
   public HashException(Exception e) {

@@ -31,7 +31,7 @@ public class SettingsTab extends JPanel {
 
   /**
    * Creates a new instance of the settings tab.
-   * 
+   *
    * @param userService User service.
    * @param gameLogService Game log service.
    * @param settings Settings repository.
