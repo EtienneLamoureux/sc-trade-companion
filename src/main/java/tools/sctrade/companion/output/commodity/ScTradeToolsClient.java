@@ -23,13 +23,24 @@ import tools.sctrade.companion.exceptions.PublicationException;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
+/**
+ * Asynchronous processor to send commodity listings to sc-trade.tools.
+ */
 public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmission>
     implements CommodityRepository, LocationRepository {
   private final Logger logger = LoggerFactory.getLogger(ScTradeToolsClient.class);
 
   private WebClient webClient;
 
-
+  /**
+   * Creates a new instance of the sc-trade.tools client.
+   * 
+   * @param webClientBuilder The web client builder.
+   * @param settings The settings repository.
+   * @param notificationService The notification service.
+   * @param version The version of this application (we don't want an submissions from an out of
+   *        date application).
+   */
   public ScTradeToolsClient(WebClient.Builder webClientBuilder, SettingRepository settings,
       NotificationService notificationService, String version) {
     super(notificationService);

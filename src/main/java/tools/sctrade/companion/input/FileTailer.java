@@ -12,6 +12,11 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.patterns.Observer;
 import tools.sctrade.companion.utils.patterns.Subject;
 
+/**
+ * Adapter for the Apache Commons IO Tailer to tail a file and notify a listener of changes.
+ * 
+ * @see Tailer
+ */
 public class FileTailer extends Observer<Path> {
   private static final Duration DELAY = Duration.ofSeconds(1);
 
@@ -21,7 +26,13 @@ public class FileTailer extends Observer<Path> {
   private NotificationService notificationService;
   private Tailer tailer;
 
-
+  /**
+   * Creates a new instance of the file tailer.
+   *
+   * @param subject Path of the file to tail.
+   * @param listener Listener to notify of changes.
+   * @param notificationService Notification service.
+   */
   public FileTailer(Subject<Path> subject, TailerListener listener,
       NotificationService notificationService) {
     super(subject);

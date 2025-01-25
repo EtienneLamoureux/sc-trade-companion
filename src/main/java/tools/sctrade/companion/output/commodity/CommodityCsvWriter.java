@@ -20,11 +20,20 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.TimeFormat;
 import tools.sctrade.companion.utils.TimeUtil;
 
+/**
+ * Asynchronous processor to write commodity listings to a CSV file.
+ */
 public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmission> {
   private final Logger logger = LoggerFactory.getLogger(CommodityCsvWriter.class);
 
   private Path folder;
 
+  /**
+   * Creates a new instance of the commodity CSV writer.
+   * 
+   * @param settings The settings repository.
+   * @param notificationService The notification service.
+   */
   public CommodityCsvWriter(SettingRepository settings, NotificationService notificationService) {
     super(notificationService);
 
@@ -32,6 +41,9 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
     logger.info("CSV output path: {}", folder);
   }
 
+  /**
+   * Processes a commodity submission by writing its listings to a CSV file.
+   */
   @Override
   public void process(CommoditySubmission submission) {
     var filePath = buildFilePath();

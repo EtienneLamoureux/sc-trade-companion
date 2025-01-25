@@ -24,6 +24,9 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.TimeFormat;
 import tools.sctrade.companion.utils.TimeUtil;
 
+/**
+ * The main GUI class for the companion application.
+ */
 public class CompanionGui extends JFrame implements NotificationRepository {
   private static final long serialVersionUID = -983766141308946535L;
 
@@ -33,6 +36,14 @@ public class CompanionGui extends JFrame implements NotificationRepository {
   private final String version;
   private LogsTab logsTab;
 
+  /**
+   * Creates a new instance of the companion GUI.
+   *
+   * @param userService The user service.
+   * @param gameLogService The game log service.
+   * @param settings The settings repository.
+   * @param version The version of the application.
+   */
   public CompanionGui(UserService userService, GameLogPathSubject gameLogService,
       SettingRepository settings, String version) {
     this.userService = userService;
@@ -41,6 +52,11 @@ public class CompanionGui extends JFrame implements NotificationRepository {
     this.version = version;
   }
 
+  /**
+   * Initializes the companion GUI.
+   *
+   * @throws AWTException If the system tray is not supported.
+   */
   public void initialize() throws AWTException {
     setLookAndFeel();
     setIconImages();

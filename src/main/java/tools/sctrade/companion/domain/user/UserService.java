@@ -9,12 +9,20 @@ import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.utils.HashUtil;
 
+/**
+ * Service for managing the user of this app.
+ */
 public class UserService {
   private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
   private SettingRepository settings;
   private User user;
 
+  /**
+   * Creates a new user service.
+   *
+   * @param settings The repository for settings
+   */
   public UserService(SettingRepository settings) {
     this.settings = settings;
   }
@@ -27,6 +35,11 @@ public class UserService {
     return user;
   }
 
+  /**
+   * Updates the username of the user.
+   * 
+   * @param username The new username.
+   */
   public void updateUsername(String username) {
     if (username == null || username.strip().isEmpty()) {
       logger.warn("Username is empty");

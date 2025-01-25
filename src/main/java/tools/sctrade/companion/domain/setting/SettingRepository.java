@@ -13,6 +13,9 @@ import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.utils.CsvUtil;
 import tools.sctrade.companion.utils.StringUtil;
 
+/**
+ * Repository for settings.
+ */
 public class SettingRepository {
   private static final Collection<Setting> USER_DEFINED =
       Arrays.asList(Setting.USERNAME, Setting.STAR_CITIZEN_LIVE_PATH, Setting.STAR_CITIZEN_MONITOR);
@@ -21,6 +24,9 @@ public class SettingRepository {
   private Map<Setting, String> settings;
   private Path filePath;
 
+  /**
+   * Creates a new setting repository.
+   */
   public SettingRepository() {
     this.settings = new EnumMap<>(Setting.class);
     filePath = Paths.get(".", "settings").normalize().toAbsolutePath();
@@ -28,10 +34,26 @@ public class SettingRepository {
     loadUserDefinedSettingsFromDisk();
   }
 
+  /**
+   * Gets the value of a setting.
+   *
+   * @param setting The setting to get.
+   * @param <T> The type of the setting.
+   * @return The value of the setting.
+   */
   public <T> T get(Setting setting) {
     return setting.cast(settings.get(setting));
   }
 
+  /**
+   * Gets the value of a setting.
+   *
+   * @param setting The setting to get.
+   * @param defaultValue The default value to return if the setting is not found or could not be
+   *        cast to the requested type.
+   * @param <T> The type of the setting.
+   * @return The value of the setting.
+   */
   public <T> T get(Setting setting, T defaultValue) {
     try {
       return setting.cast(settings.get(setting).toString());
@@ -41,6 +63,12 @@ public class SettingRepository {
     }
   }
 
+  /**
+   * Sets the value of a setting.
+   *
+   * @param setting The setting to set.
+   * @param value The value to set.
+   */
   public void set(Setting setting, Object value) {
     settings.put(setting, String.valueOf(value));
 
