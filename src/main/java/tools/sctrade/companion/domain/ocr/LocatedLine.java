@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Group of {@link LocatedWord} that form a line.
+ */
 class LocatedLine extends LocatedFragment {
   public LocatedLine(LocatedWord word) {
     super(word);

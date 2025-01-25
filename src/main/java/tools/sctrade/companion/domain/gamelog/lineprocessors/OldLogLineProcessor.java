@@ -10,6 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.utils.patterns.ChainOfResponsability;
 
+/**
+ * This class is responsible for processing log lines that are older than the application start
+ * time. Those log records are ignored.
+ */
 public class OldLogLineProcessor extends ChainOfResponsability<String> {
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ROOT); // 2024-11-13T15:01:11.106Z
@@ -19,6 +23,9 @@ public class OldLogLineProcessor extends ChainOfResponsability<String> {
   private final Pattern pattern = Pattern.compile("^<(?<timestamp>.{24})> .+");
   private final Instant applicationOpenTime;
 
+  /**
+   * Constructor.
+   */
   public OldLogLineProcessor() {
     this.applicationOpenTime = Instant.now();
   }

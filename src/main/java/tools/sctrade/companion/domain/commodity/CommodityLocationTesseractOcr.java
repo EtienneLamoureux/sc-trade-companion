@@ -13,9 +13,17 @@ import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.TesseractOcr;
 import tools.sctrade.companion.utils.ImageUtil;
 
+/**
+ * OCR implementation for extracting commodity location from the game's screenshots.
+ */
 public class CommodityLocationTesseractOcr extends TesseractOcr {
   private final Logger logger = LoggerFactory.getLogger(CommodityLocationTesseractOcr.class);
 
+  /**
+   * Constructor.
+   *
+   * @param preprocessingManipulations List of image manipulations to apply before OCR, in order.
+   */
   public CommodityLocationTesseractOcr(List<ImageManipulation> preprocessingManipulations) {
     super(preprocessingManipulations);
   }

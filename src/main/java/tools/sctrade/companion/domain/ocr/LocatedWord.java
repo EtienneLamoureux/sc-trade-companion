@@ -2,6 +2,10 @@ package tools.sctrade.companion.domain.ocr;
 
 import java.awt.Rectangle;
 
+/**
+ * Represents a word as read by the OCR. This is functionally different from a
+ * {@link LocatedFragment}.
+ */
 public class LocatedWord extends LocatedText {
   private String text;
 

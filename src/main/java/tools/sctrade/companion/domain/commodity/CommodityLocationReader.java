@@ -16,6 +16,9 @@ import tools.sctrade.companion.exceptions.LocationNotFoundException;
 import tools.sctrade.companion.exceptions.NoCloseStringException;
 import tools.sctrade.companion.utils.StringUtil;
 
+/**
+ * Reads the location of a commodity kiosk from the left side of a screen capture.
+ */
 public class CommodityLocationReader {
   private static final String YOUR_INVENTORIES = "your inventories";
 
@@ -24,6 +27,13 @@ public class CommodityLocationReader {
   private LocationRepository locationRepository;
   private ThreadLocal<Ocr> locationOcr;
 
+  /**
+   * Creates a new instance of the commodity location reader.
+   *
+   * @param preprocessingManipulations the preprocessing manipulations to apply to the screen
+   *        capture, in order
+   * @param locationRepository the location repository, used to spell check the read location
+   */
   public CommodityLocationReader(List<ImageManipulation> preprocessingManipulations,
       LocationRepository locationRepository) {
     this.locationRepository = locationRepository;
@@ -32,6 +42,12 @@ public class CommodityLocationReader {
         .withInitial(() -> new CommodityLocationTesseractOcr(preprocessingManipulations));
   }
 
+  /**
+   * Reads the location of a commodity kiosk from a screen capture.
+   *
+   * @param screenCapture the screen capture
+   * @return the location of the commodity kiosk, if found
+   */
   public Optional<String> read(BufferedImage screenCapture) {
     try {
       logger.debug("Reading location...");
