@@ -10,7 +10,7 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 
 /**
  * The logs tab for the companion GUI. This is where users can see the notifications.
- * 
+ *
  * @see NotificationRepository
  */
 public class LogsTab extends JPanel {

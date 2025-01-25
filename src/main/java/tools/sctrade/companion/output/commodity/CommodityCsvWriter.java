@@ -30,7 +30,7 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
 
   /**
    * Creates a new instance of the commodity CSV writer.
-   * 
+   *
    * @param settings The settings repository.
    * @param notificationService The notification service.
    */

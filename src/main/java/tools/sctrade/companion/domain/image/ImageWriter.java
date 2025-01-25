@@ -8,7 +8,7 @@ import java.awt.image.BufferedImage;
 public interface ImageWriter {
   /**
    * Writes the image to disk.
-   * 
+   *
    * @param image The image to write.
    * @param type The type of the image.
    */

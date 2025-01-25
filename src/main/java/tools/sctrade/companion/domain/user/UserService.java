@@ -27,6 +27,11 @@ public class UserService {
     this.settings = settings;
   }
 
+  /**
+   * Returns the user.
+   *
+   * @return The user.
+   */
   public User get() {
     if (user == null) {
       user = new User(getId(), settings.get(Setting.USERNAME));
@@ -37,7 +42,7 @@ public class UserService {
 
   /**
    * Updates the username of the user.
-   * 
+   *
    * @param username The new username.
    */
   public void updateUsername(String username) {

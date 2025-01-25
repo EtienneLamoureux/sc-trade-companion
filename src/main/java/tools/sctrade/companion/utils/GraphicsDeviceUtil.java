@@ -7,7 +7,16 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class for working with {@link GraphicsDevice}, aka computer monitors.
+ */
 public class GraphicsDeviceUtil {
+  /**
+   * Get a {@link GraphicsDevice} by its ID.
+   *
+   * @param id The ID of the {@link GraphicsDevice}.
+   * @return The {@link GraphicsDevice} with the given ID.
+   */
   public static GraphicsDevice get(String id) {
     return getAllById().get(id);
   }

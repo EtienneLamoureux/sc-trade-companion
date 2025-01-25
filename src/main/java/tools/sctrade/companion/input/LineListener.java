@@ -9,7 +9,7 @@ import tools.sctrade.companion.utils.patterns.ChainOfResponsability;
 /**
  * Adapter for the Apache Commons IO TailerListenerAdapter. This class listens for new lines and has
  * them processed by a {@link ChainOfResponsability}.
- * 
+ *
  * @see TailerListener
  */
 public class LineListener extends TailerListenerAdapter {
@@ -19,7 +19,7 @@ public class LineListener extends TailerListenerAdapter {
 
   /**
    * Creates a new instance of the line listener.
-   * 
+   *
    * @param lineProcessor The chain of responsability to process the lines.
    */
   public LineListener(ChainOfResponsability<String> lineProcessor) {
@@ -32,6 +32,11 @@ public class LineListener extends TailerListenerAdapter {
   }
 
   @Override
+  public void handle(Exception ex) {
+    logger.error("Error", ex);
+  }
+
+  @Override
   public void fileNotFound() {
     logger.debug("File not found");
   }
@@ -39,10 +44,5 @@ public class LineListener extends TailerListenerAdapter {
   @Override
   public void fileRotated() {
     logger.debug("File rotated");
-  }
-
-  @Override
-  public void handle(Exception ex) {
-    logger.error("Error", ex);
   }
 }

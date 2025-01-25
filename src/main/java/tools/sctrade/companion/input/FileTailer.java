@@ -14,7 +14,7 @@ import tools.sctrade.companion.utils.patterns.Subject;
 
 /**
  * Adapter for the Apache Commons IO Tailer to tail a file and notify a listener of changes.
- * 
+ *
  * @see Tailer
  */
 public class FileTailer extends Observer<Path> {

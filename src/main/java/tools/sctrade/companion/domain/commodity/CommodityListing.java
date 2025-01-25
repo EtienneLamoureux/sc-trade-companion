@@ -46,7 +46,7 @@ public record CommodityListing(String location, TransactionType transactionType,
 
   /**
    * Creates a new {@link CommodityListing} with the specified location.
-   * 
+   *
    * @param location New location.
    * @return New {@link CommodityListing} with the specified location.
    */

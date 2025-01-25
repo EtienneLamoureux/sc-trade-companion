@@ -13,7 +13,7 @@ public class LocationNotFoundException extends RuntimeException {
 
   /**
    * Creates a new instance of the LocationNotFoundException class.
-   * 
+   *
    * @param fragments The fragments that were searched
    */
   public LocationNotFoundException(List<LocatedFragment> fragments) {

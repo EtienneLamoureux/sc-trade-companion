@@ -35,7 +35,7 @@ public class ScreenPrinter implements Runnable {
 
   /**
    * Creates a new instance of the screen printer.
-   * 
+   *
    * @param imageProcessors The image processors to call after capturing the screen.
    * @param imageWriter The image writer to save the screen capture.
    * @param soundPlayer The sound player to play a sound when capturing the screen.
@@ -51,7 +51,7 @@ public class ScreenPrinter implements Runnable {
 
   /**
    * Creates a new instance of the screen printer.
-   * 
+   *
    * @param imageProcessors The image processors to call after capturing the screen.
    * @param postprocessingManipulations The postprocessing manipulations to apply to the screen
    *        capture, after capturing it but before handing it over to the image processors.

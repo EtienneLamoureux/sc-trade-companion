@@ -8,7 +8,7 @@ public class CsvParsingException extends RuntimeException {
 
   /**
    * Creates a new instance of the CsvParsingException class.
-   * 
+   *
    * @param e The exception that caused this exception
    */
   public CsvParsingException(Exception e) {

@@ -37,7 +37,7 @@ public class LocatedFragment extends LocatedText {
 
   /**
    * Add the word to the fragment.
-   * 
+   *
    * @param word The word to add.
    */
   public void add(LocatedWord word) {
@@ -45,13 +45,14 @@ public class LocatedFragment extends LocatedText {
 
     if (boundingBox != null) {
       boundingBox.add(word.getBoundingBox());
-    } else
+    } else {
       boundingBox = new Rectangle(word.getBoundingBox());
+    }
   }
 
   /**
    * Determines if the fragment is in the same column as another fragment.
-   * 
+   *
    * @param fragment The fragment to check.
    * @return True if both fragment overlap horizontally for more than twice the width of the widest
    *         character, false otherwise.
