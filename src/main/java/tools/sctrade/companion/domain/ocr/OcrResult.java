@@ -7,10 +7,18 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+/**
+ * Text, as read and located by the OCR.
+ */
 public class OcrResult {
   private Map<Double, LocatedLine> linesByY;
   private Map<Double, LocatedColumn> columnsByX;
 
+  /**
+   * Creates a new OCR result.
+   *
+   * @param words The words that were read.
+   */
   public OcrResult(Collection<LocatedWord> words) {
     linesByY = new TreeMap<>();
     columnsByX = new TreeMap<>();

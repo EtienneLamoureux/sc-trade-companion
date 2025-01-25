@@ -6,9 +6,18 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
+/**
+ * Decorator around multiple {@link CommodityListingFactory}. Runs each factory and keeps the
+ * results of the best performing one (the one who read the most commodity listings).
+ */
 public class BestEffortCommodityListingFactory extends CommodityListingFactory {
   private Collection<CommodityListingFactory> commodityListingFactory;
 
+  /**
+   * Constructor for {@link BestEffortCommodityListingFactory}.
+   *
+   * @param commodityListingFactory List of differently configured factories.
+   */
   public BestEffortCommodityListingFactory(
       Collection<CommodityListingFactory> commodityListingFactory) {
     super(null, null, Collections.emptyList());

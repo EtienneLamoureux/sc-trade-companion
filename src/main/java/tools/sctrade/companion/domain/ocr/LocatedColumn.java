@@ -8,9 +8,18 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 import tools.sctrade.companion.utils.MathUtil;
 
+/**
+ * Represents a column of text as read by the OCR. A column is a group of text fragments that are
+ * vertically aligned.
+ */
 public class LocatedColumn extends LocatedText {
   private Map<Double, LocatedFragment> fragmentsByY;
 
+  /**
+   * Creates a new column, seeded with a single fragment.
+   *
+   * @param fragment The fragment to add to the column.
+   */
   public LocatedColumn(LocatedFragment fragment) {
     super();
     fragmentsByY = new TreeMap<>();
@@ -25,23 +34,40 @@ public class LocatedColumn extends LocatedText {
         .collect(Collectors.joining(System.lineSeparator()));
   }
 
+  /**
+   * Determines if the column should contain the provided fragment.
+   *
+   * @param fragment The fragment to check.
+   * @return True if the column should contain the fragment, false otherwise.
+   */
   public boolean shouldContain(LocatedFragment fragment) {
     return isLeftOrRightAligned(fragment) || hasSignificantXOverlap(fragment);
   }
 
+  /**
+   * Adds a fragment to the column.
+   *
+   * @param fragment The fragment to add.
+   */
   public void add(LocatedFragment fragment) {
     fragmentsByY.put(fragment.getBoundingBox().getCenterY(), fragment);
 
     if (boundingBox != null) {
       boundingBox.add(fragment.getBoundingBox());
-    } else
+    } else {
       boundingBox = new Rectangle(fragment.getBoundingBox());
+    }
   }
 
   public List<LocatedFragment> getFragments() {
     return fragmentsByY.values().stream().toList();
   }
 
+  /**
+   * Splits the column into paragraphs, based on the gap between the fragments.
+   *
+   * @return A list of paragraphs.
+   */
   public List<LocatedColumn> getParagraphs() {
     double paragraphGap = getParagraphGap();
     List<LocatedColumn> paragraphs = new ArrayList<>();
@@ -68,6 +94,13 @@ public class LocatedColumn extends LocatedText {
     return paragraphs;
   }
 
+  /**
+   * Determines if the column overlaps with another column on the Y axis. Used to determine if two
+   * columns are part of the same horizontal block of text, such as a commodity listing.
+   *
+   * @param column The column to check.
+   * @return True if the columns overlap, false otherwise.
+   */
   public boolean hasYOverlapWith(LocatedColumn column) {
     return ((column.getBoundingBox().getMaxY() - getBoundingBox().getMinY()) > 0)
         && ((getBoundingBox().getMaxY() - column.getBoundingBox().getMinY()) > 0);

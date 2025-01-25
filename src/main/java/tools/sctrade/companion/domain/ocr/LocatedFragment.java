@@ -7,11 +7,17 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
- * Group of words that form a line, or part of a line, i.e. one row of one column of text
+ * Group of {@link LocatedWord} that form a {@link LocatedLine}, or part of a line, i.e. one row of
+ * one column of text
  */
 public class LocatedFragment extends LocatedText {
   protected Map<Double, LocatedWord> wordsByX;
 
+  /**
+   * Creates a new fragment, seeded with a single word.
+   *
+   * @param word The word to add to the fragment.
+   */
   public LocatedFragment(LocatedWord word) {
     super();
     wordsByX = new TreeMap<>();
@@ -29,6 +35,11 @@ public class LocatedFragment extends LocatedText {
     return wordsByX.values().stream().toList();
   }
 
+  /**
+   * Add the word to the fragment.
+   * 
+   * @param word The word to add.
+   */
   public void add(LocatedWord word) {
     wordsByX.put(word.getBoundingBox().getCenterX(), word);
 
@@ -38,6 +49,13 @@ public class LocatedFragment extends LocatedText {
       boundingBox = new Rectangle(word.getBoundingBox());
   }
 
+  /**
+   * Determines if the fragment is in the same column as another fragment.
+   * 
+   * @param fragment The fragment to check.
+   * @return True if both fragment overlap horizontally for more than twice the width of the widest
+   *         character, false otherwise.
+   */
   public boolean isInTheSameColumnAs(LocatedFragment fragment) {
     double threshold = 2 * Math.max(getCharacterWidth(), fragment.getCharacterWidth());
     return (threshold < Math.abs(boundingBox.getMinX() - fragment.getBoundingBox().getMinX()))

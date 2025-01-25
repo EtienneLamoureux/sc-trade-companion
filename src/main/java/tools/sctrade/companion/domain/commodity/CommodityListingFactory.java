@@ -25,6 +25,10 @@ import tools.sctrade.companion.utils.HashUtil;
 import tools.sctrade.companion.utils.StringUtil;
 import tools.sctrade.companion.utils.TimeUtil;
 
+/**
+ * Uses OCR to read and assemble a collection of {@link CommodityListing} from the image of a
+ * commodity kiosk.
+ */
 public class CommodityListingFactory {
   private final Logger logger = LoggerFactory.getLogger(CommodityListingFactory.class);
   private static final String SHOP_INVENTORY = "shop inventory";
@@ -33,6 +37,15 @@ public class CommodityListingFactory {
   private CommodityRepository commodityRepository;
   private ThreadLocal<Ocr> listingsOcr;
 
+  /**
+   * Constructor for {@link CommodityListingFactory}.
+   *
+   * @param commodityRepository Repository to get the commodity names from. Will be used to spell
+   *        check the OCR results.
+   * @param imageWriter Output port for images.
+   * @param preprocessingManipulations List of image manipulations to be applied, sequentially and
+   *        in order, before running the commodity OCR.
+   */
   public CommodityListingFactory(CommodityRepository commodityRepository, ImageWriter imageWriter,
       List<ImageManipulation> preprocessingManipulations) {
     this.transactionTypeExtractor = new TransactionTypeExtractor(imageWriter);
@@ -41,6 +54,15 @@ public class CommodityListingFactory {
         .withInitial(() -> new CommodityListingsTesseractOcr(preprocessingManipulations));
   }
 
+  /**
+   * Assembles a {@link CommodityListing} from the information taken from a game's log record.
+   *
+   * @param shopId Internal id as read from the game's logs
+   * @param shopName Internal name as read from the game's logs
+   * @param commodity Commodity name as read from the game's logs
+   * @param maxBoxSizeInScu Largest handled box size for the listing described
+   * @return An assembled commodity listing
+   */
   public CommodityListing build(String shopId, String shopName, String commodity,
       int maxBoxSizeInScu) {
     Instant now = TimeUtil.getNow();
@@ -51,6 +73,14 @@ public class CommodityListingFactory {
         batchId, now);
   }
 
+  /**
+   * Runs OCR on the image and assembles the readable commodity listings.
+   *
+   * @param screenCapture Image of the section of the commodity kiosk with the commodity listings
+   * @param location Pre-parsed location string, as it would appear on the left-side of the
+   *        commodity kiosk. See {@link CommodityLocationReader}.
+   * @return Final, assembled commodity listings
+   */
   public Collection<CommodityListing> build(BufferedImage screenCapture, String location) {
     try {
       logger.debug("Reading listings...");

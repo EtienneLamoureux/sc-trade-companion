@@ -15,9 +15,17 @@ import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.TesseractOcr;
 import tools.sctrade.companion.utils.ImageUtil;
 
+/**
+ * Tesseract OCR implementation for commodity listings.
+ */
 public class CommodityListingsTesseractOcr extends TesseractOcr {
   private final Logger logger = LoggerFactory.getLogger(CommodityListingsTesseractOcr.class);
 
+  /**
+   * Constructor.
+   *
+   * @param preprocessingManipulations Preprocessing manipulations, to apply in order.
+   */
   public CommodityListingsTesseractOcr(List<ImageManipulation> preprocessingManipulations) {
     super(preprocessingManipulations);
   }

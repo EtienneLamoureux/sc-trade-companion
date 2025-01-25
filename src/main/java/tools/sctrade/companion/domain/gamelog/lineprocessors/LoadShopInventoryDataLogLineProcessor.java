@@ -10,6 +10,10 @@ import tools.sctrade.companion.domain.gamelog.GameLogLineProcessor;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
+/**
+ * This class is responsible for processing log lines that contain information about the inventory
+ * of a shop. Those log records are processed into commodity listings.
+ */
 public class LoadShopInventoryDataLogLineProcessor extends GameLogLineProcessor {
   private final Logger logger =
       LoggerFactory.getLogger(LoadShopInventoryDataLogLineProcessor.class);
@@ -18,6 +22,13 @@ public class LoadShopInventoryDataLogLineProcessor extends GameLogLineProcessor 
   private CommodityListingFactory commodityListingFactory;
   private CommodityService commodityService;
 
+  /**
+   * Constructor.
+   * 
+   * @param commodityListingFactory Factory for creating commodity listings
+   * @param commodityService Service for processing commodity listings
+   * @param notificationService Service for sending notifications
+   */
   public LoadShopInventoryDataLogLineProcessor(CommodityListingFactory commodityListingFactory,
       CommodityService commodityService, NotificationService notificationService) {
     this.regex =

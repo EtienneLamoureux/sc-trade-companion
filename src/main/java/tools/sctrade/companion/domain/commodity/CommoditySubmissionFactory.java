@@ -9,6 +9,9 @@ import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.exceptions.NoListingsException;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
+/**
+ * Factory for building commodity submissions.
+ */
 public class CommoditySubmissionFactory {
   private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactory.class);
 
@@ -17,6 +20,14 @@ public class CommoditySubmissionFactory {
   private CommodityListingFactory commodityListingFactory;
   private CommodityLocationReader commodityLocationReader;
 
+  /**
+   * Constructor.
+   *
+   * @param userService the user service
+   * @param notificationService the notification service
+   * @param commodityLocationReader the commodity location reader
+   * @param commodityListingFactory the commodity listing factory
+   */
   public CommoditySubmissionFactory(UserService userService,
       NotificationService notificationService, CommodityLocationReader commodityLocationReader,
       CommodityListingFactory commodityListingFactory) {

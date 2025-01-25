@@ -12,6 +12,9 @@ import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
+/**
+ * Service that processes images into commodity listings and publishes them.
+ */
 public class CommodityService extends AsynchronousProcessor<BufferedImage> {
   private final Logger logger = LoggerFactory.getLogger(CommodityService.class);
 
@@ -22,6 +25,13 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
   private boolean publishNextTime;
   private Optional<CommoditySubmission> pendingSubmission;
 
+  /**
+   * Constructor.
+   *
+   * @param submissionFactory Factory that builds commodity submissions.
+   * @param publishers Publishers that export commodity submissions.
+   * @param notificationService Notification service.
+   */
   public CommodityService(CommoditySubmissionFactory submissionFactory,
       Collection<AsynchronousProcessor<CommoditySubmission>> publishers,
       NotificationService notificationService) {
@@ -33,12 +43,24 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
     this.pendingSubmission = Optional.empty();
   }
 
+  /**
+   * Processes a commodity listing.
+   *
+   * @param commodityListing Commodity listing.
+   * @throws InterruptedException If the thread is interrupted.
+   */
   public void process(CommodityListing commodityListing) throws InterruptedException {
     CommoditySubmission submission = submissionFactory.build(commodityListing);
 
     process(submission);
   }
 
+  /**
+   * Processes a screen capture.
+   *
+   * @param screenCapture Screen capture of a commodity kiosk.
+   * @throws InterruptedException If the thread is interrupted
+   */
   @Override
   public void process(BufferedImage screenCapture) throws InterruptedException {
     CommoditySubmission submission = submissionFactory.build(screenCapture);
@@ -63,6 +85,11 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
     }
   }
 
+  /**
+   * Publishes the commodity listings on a schedule.
+   *
+   * @throws InterruptedException If the thread is interrupted.
+   */
   @Scheduled(fixedDelay = 30, timeUnit = TimeUnit.SECONDS)
   public void flush() throws InterruptedException {
     try {
