@@ -5,13 +5,22 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
+/**
+ * The logs tab for the companion GUI. This is where users can see the notifications.
+ * 
+ * @see NotificationRepository
+ */
 public class LogsTab extends JPanel {
   private static final long serialVersionUID = 5664549029232335333L;
 
   private DefaultTableModel model;
 
+  /**
+   * Creates a new instance of the logs tab.
+   */
   public LogsTab() {
     super(new GridLayout());
 
@@ -20,6 +29,11 @@ public class LogsTab extends JPanel {
     add(new JScrollPane(table));
   }
 
+  /**
+   * Adds a log to the table.
+   *
+   * @param row The row to add.
+   */
   public void addLog(Object[] row) {
     model.addRow(row);
   }

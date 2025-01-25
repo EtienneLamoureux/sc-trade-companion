@@ -11,11 +11,19 @@ import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.utils.ImageUtil;
 
+/**
+ * Writes images to disk.
+ */
 public class DiskImageWriter implements ImageWriter {
   private final Logger logger = LoggerFactory.getLogger(DiskImageWriter.class);
 
   private SettingRepository settings;
 
+  /**
+   * Creates a new instance of the disk image writer.
+   * 
+   * @param settings The settings repository.
+   */
   public DiskImageWriter(SettingRepository settings) {
     this.settings = settings;
   }

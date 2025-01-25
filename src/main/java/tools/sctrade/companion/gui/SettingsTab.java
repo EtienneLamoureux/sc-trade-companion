@@ -19,11 +19,23 @@ import tools.sctrade.companion.utils.GraphicsDeviceUtil;
 import tools.sctrade.companion.utils.IncrementingInt;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
+/**
+ * The settings tab for the companion GUI. This is where users can configure the application.
+ *
+ * @see SettingRepository
+ */
 public class SettingsTab extends JPanel {
   private static final long serialVersionUID = -3532718267415423680L;
 
   private IncrementingInt rowIndex;
 
+  /**
+   * Creates a new instance of the settings tab.
+   * 
+   * @param userService User service.
+   * @param gameLogService Game log service.
+   * @param settings Settings repository.
+   */
   public SettingsTab(UserService userService, GameLogPathSubject gameLogService,
       SettingRepository settings) {
     super();

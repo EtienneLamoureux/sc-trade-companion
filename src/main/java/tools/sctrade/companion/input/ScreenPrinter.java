@@ -18,6 +18,9 @@ import tools.sctrade.companion.utils.GraphicsDeviceUtil;
 import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.SoundUtil;
 
+/**
+ * Runnable that captures the configured screen and processes it. Plays a sound when doing so.
+ */
 public class ScreenPrinter implements Runnable {
   private static final String CAMERA_SHUTTER = "/sounds/camera-shutter.wav";
 
@@ -30,6 +33,15 @@ public class ScreenPrinter implements Runnable {
   private NotificationService notificationService;
   private SettingRepository settings;
 
+  /**
+   * Creates a new instance of the screen printer.
+   * 
+   * @param imageProcessors The image processors to call after capturing the screen.
+   * @param imageWriter The image writer to save the screen capture.
+   * @param soundPlayer The sound player to play a sound when capturing the screen.
+   * @param notificationService The notification service to notify the user of the screen capture
+   * @param settings The settings repository.
+   */
   public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
       ImageWriter imageWriter, SoundUtil soundPlayer, NotificationService notificationService,
       SettingRepository settings) {
@@ -37,6 +49,17 @@ public class ScreenPrinter implements Runnable {
         settings);
   }
 
+  /**
+   * Creates a new instance of the screen printer.
+   * 
+   * @param imageProcessors The image processors to call after capturing the screen.
+   * @param postprocessingManipulations The postprocessing manipulations to apply to the screen
+   *        capture, after capturing it but before handing it over to the image processors.
+   * @param imageWriter The image writer to save the screen capture.
+   * @param soundPlayer The sound player to play a sound when capturing the screen.
+   * @param notificationService The notification service to notify the user of the screen capture
+   * @param settings The settings repository.
+   */
   public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
       List<ImageManipulation> postprocessingManipulations, ImageWriter imageWriter,
       SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
