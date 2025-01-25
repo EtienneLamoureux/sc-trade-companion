@@ -5,6 +5,7 @@ plugins {
  	id 'com.diffplug.spotless' version '7.0.2'
 }
 
+// JAR
 group = 'tools.sctrade'
 version = '1.1.0'
 
@@ -12,6 +13,7 @@ java {
 	sourceCompatibility = '21'
 }
 
+// Depedencies
 repositories {
 	mavenCentral()
 }
@@ -48,6 +50,7 @@ configurations.all {
 	exclude group: "commons-logging", module: "commons-logging"
 }
 
+// Misc
 tasks.named('test') {
 	useJUnitPlatform()
 }
@@ -59,15 +62,21 @@ springBoot {
 // Code formatting
 spotless {
 	java {
+		// Import order
 		importOrderFile('/contributing/companion.importorder')
 		removeUnusedImports()
 		
+		// Code style
 		eclipse().configFile('/contributing/GoogleStyle.xml')
 		formatAnnotations()
 	}
 }
 
-build.dependsOn spotlessApply
+// Documentation
+javadoc {
+	destinationDir = file("${buildDir}/javadoc")
+	include 'tools/sctrade/companion/**'
+}
 
 // Distribution-specific tasks
 def dependenciesDir = "$buildDir/dependencies"
