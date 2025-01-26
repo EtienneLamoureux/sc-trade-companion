@@ -15,14 +15,14 @@ class LocatedWordTest {
   static Object[][] provideWordsInSameColumn() {
     return new Object[][] {
         {"Same line, touching", new LocatedWord(SOME_WORD, new Rectangle(0, 0, 10, 1)),
-            new LocatedWord(SOME_OTHER_WORD, new Rectangle(10, 0, 20, 1))},
+            new LocatedWord(SOME_OTHER_WORD, new Rectangle(10, 0, 10, 1))},
         {"Same line, slightly separated", new LocatedWord(SOME_WORD, new Rectangle(0, 0, 10, 1)),
-            new LocatedWord(SOME_OTHER_WORD, new Rectangle(11, 0, 20, 1))},
+            new LocatedWord(SOME_OTHER_WORD, new Rectangle(11, 0, 10, 1))},
         {"Different lines, touching", new LocatedWord(SOME_WORD, new Rectangle(0, 0, 10, 1)),
-            new LocatedWord(SOME_OTHER_WORD, new Rectangle(10, 1, 20, 1))},
+            new LocatedWord(SOME_OTHER_WORD, new Rectangle(10, 1, 10, 1))},
         {"Different lines, slightly separated",
             new LocatedWord(SOME_WORD, new Rectangle(0, 0, 10, 1)),
-            new LocatedWord(SOME_OTHER_WORD, new Rectangle(11, 1, 21, 1))}};
+            new LocatedWord(SOME_OTHER_WORD, new Rectangle(11, 1, 10, 1))}};
   }
 
   @ParameterizedTest(name = "{0}")
@@ -37,13 +37,13 @@ class LocatedWordTest {
   static Object[][] provideWordsInDifferentColumns() {
     return new Object[][] {
         {"Same line, overlapping", new LocatedWord(SOME_WORD, new Rectangle(0, 0, 10, 1)),
-            new LocatedWord(SOME_OTHER_WORD, new Rectangle(5, 0, 15, 1))},
+            new LocatedWord(SOME_OTHER_WORD, new Rectangle(5, 0, 10, 1))},
         {"Different lines, overlapping", new LocatedWord(SOME_WORD, new Rectangle(0, 0, 10, 1)),
-            new LocatedWord(SOME_OTHER_WORD, new Rectangle(5, 1, 15, 1))},
+            new LocatedWord(SOME_OTHER_WORD, new Rectangle(5, 1, 10, 1))},
         {"Same line, very separated", new LocatedWord(SOME_WORD, new Rectangle(0, 0, 10, 1)),
-            new LocatedWord(SOME_OTHER_WORD, new Rectangle(20, 0, 30, 1))},
+            new LocatedWord(SOME_OTHER_WORD, new Rectangle(20, 0, 10, 1))},
         {"Different lines, very separated", new LocatedWord(SOME_WORD, new Rectangle(0, 0, 10, 1)),
-            new LocatedWord(SOME_OTHER_WORD, new Rectangle(20, 1, 30, 1))}};
+            new LocatedWord(SOME_OTHER_WORD, new Rectangle(20, 1, 10, 1))}};
   }
 
   @ParameterizedTest(name = "{0}")
