@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.domain.user.User;
 
-public class CommoditySubmissionTest {
+class CommoditySubmissionTest {
   private static final User USER = new User("id", "label");
   private static final String LOCATION = "tram & myers mining";
   private static final TransactionType TRANSACTION_TYPE = TransactionType.SELLS;
