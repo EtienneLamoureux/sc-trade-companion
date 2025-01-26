@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Group of {@link LocatedWord} that form a line.
+ * Group of {@link LocatedWord} that form a line. May be across multiple columns.
  */
 class LocatedLine extends LocatedFragment {
   public LocatedLine(LocatedWord word) {
