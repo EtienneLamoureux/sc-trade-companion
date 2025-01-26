@@ -9,6 +9,12 @@ import java.awt.Rectangle;
 public class LocatedWord extends LocatedText {
   private String text;
 
+  /**
+   * Creates a new LocatedWord.
+   *
+   * @param text The text of the word.
+   * @param boundingBox The location of the word in the image.
+   */
   public LocatedWord(String text, Rectangle boundingBox) {
     this.text = text.strip();
     this.boundingBox = boundingBox;
@@ -19,6 +25,14 @@ public class LocatedWord extends LocatedText {
     return text;
   }
 
+  /**
+   * Returns whether this word is separated from another word, i.e. the two words are part of
+   * different columns of text. Words are considered separated if the gap in the X axis between the
+   * two words is significant.
+   *
+   * @param word The other word.
+   * @return Whether the two words are separated.
+   */
   public boolean isSeparatedFrom(LocatedText word) {
     double maxCharacterWidth = Math.max(getCharacterWidth(), word.getCharacterWidth());
     double leeway = 2 * maxCharacterWidth;
