@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utility class for playing sounds.
+ * Utility class for playing sounds. Must be instanced to facilitate access to the resource files.
  */
 public class SoundUtil {
   private static final Logger logger = LoggerFactory.getLogger(SoundUtil.class);
@@ -20,7 +20,7 @@ public class SoundUtil {
   public SoundUtil() {}
 
   /**
-   * Plays a sound from a resource path. Never throws an exception, but logs it.
+   * Plays a sound from a resource path. Never throws an exception, but logs it if it occurs.
    *
    * @param resourcePath the path to the resource
    */
