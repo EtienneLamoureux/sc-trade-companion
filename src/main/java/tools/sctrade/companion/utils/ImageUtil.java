@@ -52,6 +52,44 @@ public class ImageUtil {
     return greyscaleImage;
   }
 
+  public static BufferedImage makeWeightedGreyscaleCopy(BufferedImage image, double coefficientRed, double coefficientGreen, double coefficientBlue) {
+    BufferedImage greyscaleImage =
+        new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+        for (int x = 0; x < image.getWidth(); x++) {
+          for (int y = 0; y < image.getHeight(); y++) {
+            int rgba = image.getRGB(x, y);
+            Color color = new Color(rgba, false);
+            int red = color.getRed();
+            int green = color.getGreen();
+            int blue = color.getBlue();
+
+            //Multiply each channel by it's coefficent, then add the results.
+            //1,0,0 would generate an exact copy of the red channel with no contrabution of other channels
+            //0,0,2 would double the values of the blue channel and use that
+            //Note that no averaging is done in this algorithm
+            double accumulate = (coefficientRed * red) + (coefficientBlue * blue) + (coefficientGreen * green);
+
+            //clip values to integers of 0 - 255
+            int greyValue = 0;
+            if(accumulate>255){
+              greyValue=255;
+            }
+            else{
+              if(accumulate<0){
+                greyValue=0;
+              }
+              else{
+                //truncate the decimal in the accumulator
+                greyValue = (int)accumulate;
+              }
+            }
+
+            greyscaleImage.setRGB(x, y, new Color(greyValue, greyValue, greyValue).getRGB());        
+          }
+        }
+    return greyscaleImage;
+  }
+
   public static void invertColors(BufferedImage image) {
     for (int x = 0; x < image.getWidth(); x++) {
       for (int y = 0; y < image.getHeight(); y++) {
@@ -191,6 +229,45 @@ public class ImageUtil {
       throw new ImageProcessingException(e);
     }
   }
+
+  public static BufferedImage applyThreshBinarization(BufferedImage image, int threshold) {
+    OpenCV.loadShared();
+
+    try {
+      Mat original = toMat(image);
+      Mat filtered = new Mat(original.rows(), original.cols(), original.type());
+      Mat processed = new Mat(original.rows(), original.cols(), original.type());
+
+      Imgproc.threshold(filtered, processed, threshold, 255, Imgproc.THRESH_BINARY);
+
+      return toBufferedImage(processed);
+    } catch (IOException e) {
+      throw new ImageProcessingException(e);
+    }
+  }
+
+  public static BufferedImage makeDilatedImage(BufferedImage image) {
+    OpenCV.loadShared();
+
+    //Dilate the font twice using a 2,2 'cross' kernel
+    try {
+      Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_CROSS, new Size(2, 2));
+
+      Mat original = toMat(image);
+
+      Mat dilatedImage = new Mat();
+      Imgproc.dilate(original, dilatedImage, kernel);
+    
+      Mat dilatedImage2 = new Mat();
+      Imgproc.dilate(dilatedImage, dilatedImage2, kernel);
+    
+      return toBufferedImage(dilatedImage2);
+    } catch (IOException e) {
+      throw new ImageProcessingException(e);
+    }
+  }
+
+
 
   public static List<Rectangle> findBoundingBoxes(BufferedImage image) {
     OpenCV.loadShared();
