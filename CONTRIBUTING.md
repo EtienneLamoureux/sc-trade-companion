@@ -32,7 +32,7 @@ Your changes do what they are supposed to? Great! You are ready to submit a pull
 
 ## Need help?
 ### Javadoc
-All public class and and methods are thoroughly documented using standard javadoc comments. You can refer to that documentation directly in the code, or use the `gradlew javadoc` command to generate HTML help pages, accessible at `/build/javadoc/index.html`.
+All public types and methods are thoroughly documented using standard javadoc comments. You can refer to that documentation directly in the code, or use the `gradlew javadoc` command to generate HTML help pages, accessible at `/build/javadoc/index.html`.
 
 ### Ask away!
 We're always happy to help would-be contributors to the project! If you run into issues or have comments/questions, feel free to reach out to the [#help channel](https://discord.com/channels/832608007313424444/832653828901568562) of [our Discord server](https://discord.gg/fdCxQAccpG). We're open to discuss anything code related, but we will not be able to provide assistance with environment setup or basic computer science fundamentals.
