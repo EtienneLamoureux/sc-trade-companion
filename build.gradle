@@ -72,12 +72,6 @@ spotless {
 	}
 }
 
-// Documentation
-javadoc {
-	destinationDir = file("${buildDir}/javadoc")
-	include 'tools/sctrade/companion/**'
-}
-
 // Distribution-specific tasks
 def dependenciesDir = "$buildDir/dependencies"
 def distributionDir = "$buildDir/SC Trade Companion"

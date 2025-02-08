@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class MathUtilTest {
+class MathUtilTest {
   @Test
   void givenDistributionWithLongTailWhenCalculatingOuliersThenReturnTail() {
     List<Double> distribution = Arrays.asList(12.0, 13.0, 14.0, 14.0, 14.0, 15.0, 15.0, 16.0, 16.0,
