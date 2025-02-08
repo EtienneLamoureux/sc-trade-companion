@@ -18,7 +18,6 @@ public record CommodityListing(String location, TransactionType transactionType,
    * @param price Price of the commodity.
    * @param inventory Current SCU amount.
    * @param inventoryLevel Level of inventory, aka how saturated the inventory is.
-   * @param maxBoxSize Maximum box size.
    * @param batchId Batch ID.
    * @param timestamp Time when the listing was recorded.
    */
