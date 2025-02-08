@@ -8,6 +8,13 @@ import java.nio.file.Paths;
 public enum Setting {
   OUTPUT_SCREENSHOTS, OUTPUT_TRANSIENT_IMAGES, MY_IMAGES_PATH, MY_DATA_PATH, SC_TRADE_TOOLS_ROOT_URL, USERNAME, STAR_CITIZEN_LIVE_PATH, STAR_CITIZEN_MONITOR;
 
+  /**
+   * Casts a string value to the appropriate type for the setting.
+   *
+   * @param <T> Type to cast to.
+   * @param value String value to cast.
+   * @return Casted value.
+   */
   @SuppressWarnings("unchecked")
   public <T> T cast(String value) {
     switch (this) {

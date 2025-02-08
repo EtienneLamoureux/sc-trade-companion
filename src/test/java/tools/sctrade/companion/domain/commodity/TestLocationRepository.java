@@ -4,8 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import tools.sctrade.companion.domain.LocationRepository;
 
-public class TestLocationRepository implements LocationRepository {
-
+class TestLocationRepository implements LocationRepository {
   @Override
   public List<String> findAllLocations() {
     return Arrays.asList("shubin mining facility sal-5", "\"no questions asked\" trading console",

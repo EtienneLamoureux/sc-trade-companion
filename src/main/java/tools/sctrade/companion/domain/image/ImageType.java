@@ -16,6 +16,11 @@ public enum ImageType {
     this.suffix = suffix;
   }
 
+  /**
+   * Generates a file name for an image of this type.
+   *
+   * @return File name for an image of this type.
+   */
   public String generateFileName() {
     return TimeUtil.getNowAsString(TimeFormat.IMAGE_FILENAME) + suffix + ".jpg";
   }
