@@ -59,21 +59,21 @@ springBoot {
     buildInfo()
 }
 
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
 // Code formatting
 spotless {
 	java {
 		// Import order
-		importOrderFile('/contributing/companion.importorder')
+		importOrderFile('contributing/companion.importorder')
 		removeUnusedImports()
 		
 		// Code style
-		eclipse().configFile('/contributing/GoogleStyle.xml')
+		eclipse().configFile('contributing/GoogleStyle.xml')
 		formatAnnotations()
 	}
-}
-
-tasks.withType(Javadoc) {
-    options.addStringOption('Xdoclint:none', '-quiet')
 }
 
 // Distribution-specific tasks
