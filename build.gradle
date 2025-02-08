@@ -72,6 +72,10 @@ spotless {
 	}
 }
 
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
+
 // Distribution-specific tasks
 def dependenciesDir = "$buildDir/dependencies"
 def distributionDir = "$buildDir/SC Trade Companion"
