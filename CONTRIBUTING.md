@@ -21,14 +21,18 @@ To ensure quality and consistency, we ask that contrbutions follow these guideli
 11. Changes SHOULD NOT introduce new [CheckStyle](https://github.com/EtienneLamoureux/sc-trade-companion/blob/main/contributing/google_style.xml) warnings
 
 ## Testing
+The test harness is still in development. For the moment, you can run the app locally and debug it when it processes screenshots as you would any java application.
 
 ## Submitting your contribution
-The project builds locally and your changes do what they are supposed to? Great! 
-Running `gradlew spotlessApply` will format the code and organize the imports correctly.
+The project builds locally and your changes do what they are supposed to? Great! You are ready to submit a pull request: 
+1. Make sure the `gradlew clean build` completes successfully
+2. Running `gradlew spotlessApply` will format the code and organize the imports correctly
+3. Create a pull request towards the `main` branch
+4. Feel free to let us know you have outstanding changes ready for review [in our slack channel](https://discord.com/channels/832608007313424444/1106015731516178483)
 
 ## Need help?
 ### Javadoc
-`gradlew javadoc`
+All public class and and methods are thoroughly documented using standard javadoc comments. You can refer to that documentation directly in the code, or use the `gradlew javadoc` command to generate HTML help pages, accessible at `/sc-trade-companion/build/javadoc/index.html`.
 
 ### Ask away!
 We're always happy to help would-be contributors to the project! If you run into issues or have comments/questions, feel free to reach out to the [#help channel](https://discord.com/channels/832608007313424444/832653828901568562) of [our Discord server](https://discord.gg/fdCxQAccpG). We're open to discuss anything code related, but we will not be able to provide assistance with environment setup or basic computer science fundamentals.
