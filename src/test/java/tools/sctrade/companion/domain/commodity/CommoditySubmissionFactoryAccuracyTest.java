@@ -23,6 +23,7 @@ import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
+import tools.sctrade.companion.domain.user.idgenerators.RandomUserIdGenerator;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.ImageUtil;
 
@@ -40,8 +41,9 @@ class CommoditySubmissionFactoryAccuracyTest {
     initializeSettings();
     imageWriter = new DiskImageWriter(settings);
 
-    factory = new CommoditySubmissionFactory(new UserService(settings), notificationService,
-        buildBestEffortCommodityLocationReader(), buildBestEffortCommodityListingFactory());
+    factory = new CommoditySubmissionFactory(new UserService(settings, new RandomUserIdGenerator()),
+        notificationService, buildBestEffortCommodityLocationReader(),
+        buildBestEffortCommodityListingFactory());
   }
 
   // @Test

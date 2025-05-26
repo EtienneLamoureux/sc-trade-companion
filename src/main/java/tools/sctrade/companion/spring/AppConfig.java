@@ -40,7 +40,12 @@ import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
+import tools.sctrade.companion.domain.user.UserIdGenerator;
 import tools.sctrade.companion.domain.user.UserService;
+import tools.sctrade.companion.domain.user.idgenerators.BestEffortUserIdGenerator;
+import tools.sctrade.companion.domain.user.idgenerators.HardwareUserIdGenerator;
+import tools.sctrade.companion.domain.user.idgenerators.RandomUserIdGenerator;
+import tools.sctrade.companion.domain.user.idgenerators.WindowsUserIdGenerator;
 import tools.sctrade.companion.gui.CompanionGui;
 import tools.sctrade.companion.gui.LogsTab;
 import tools.sctrade.companion.input.FileTailer;
@@ -83,9 +88,15 @@ public class AppConfig {
     return new LogsTab();
   }
 
+  @Bean("UserIdGenerator")
+  public UserIdGenerator buildUserIdGenerator() {
+    return new BestEffortUserIdGenerator(new WindowsUserIdGenerator(),
+        new HardwareUserIdGenerator(), new RandomUserIdGenerator());
+  }
+
   @Bean("UserService")
-  public UserService buildUserService(SettingRepository settings) {
-    return new UserService(settings);
+  public UserService buildUserService(SettingRepository settings, UserIdGenerator userIdGenerator) {
+    return new UserService(settings, userIdGenerator);
   }
 
 
