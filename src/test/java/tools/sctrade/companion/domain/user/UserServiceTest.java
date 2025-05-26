@@ -8,17 +8,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tools.sctrade.companion.domain.setting.SettingRepository;
+import tools.sctrade.companion.domain.user.idgenerators.RandomUserIdGenerator;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
   @Mock
   private SettingRepository settings;
+  private UserIdGenerator userIdGenerator;
 
   private UserService userService;
 
   @BeforeEach
-  public void setUp() {
-    this.userService = new UserService(settings);
+  void setUp() {
+    userIdGenerator = new RandomUserIdGenerator();
+
+    this.userService = new UserService(settings, userIdGenerator);
   }
 
   @Test
