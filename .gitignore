@@ -43,3 +43,6 @@ out/
 
 ### Windows ###
 *.bak
+
+### Git ###
+*.orig
