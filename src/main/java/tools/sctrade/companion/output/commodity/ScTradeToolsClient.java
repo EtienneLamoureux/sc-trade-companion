@@ -10,9 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.netty.http.client.HttpClient;
 import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommoditySubmission;
@@ -45,8 +47,12 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
       NotificationService notificationService, String version) {
     super(notificationService);
 
+    HttpClient httpClient = HttpClient.create();
+    httpClient = httpClient.resolver(nameResolverSpec -> nameResolverSpec.retryTcpOnTimeout(true));
+    ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
+
     this.webClient = webClientBuilder.baseUrl(settings.get(Setting.SC_TRADE_TOOLS_ROOT_URL))
-        .defaultHeader("x-companion-version", version).build();
+        .clientConnector(connector).defaultHeader("x-companion-version", version).build();
   }
 
   @Override
