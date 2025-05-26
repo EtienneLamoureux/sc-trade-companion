@@ -1,6 +1,5 @@
 package tools.sctrade.companion.spring;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +47,6 @@ import tools.sctrade.companion.domain.user.idgenerators.RandomUserIdGenerator;
 import tools.sctrade.companion.domain.user.idgenerators.WindowsUserIdGenerator;
 import tools.sctrade.companion.gui.CompanionGui;
 import tools.sctrade.companion.gui.LogsTab;
-import tools.sctrade.companion.input.FileTailer;
 import tools.sctrade.companion.input.KeyListener;
 import tools.sctrade.companion.input.LineListener;
 import tools.sctrade.companion.input.ScreenPrinter;
@@ -56,7 +54,6 @@ import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
 import tools.sctrade.companion.utils.SoundUtil;
-import tools.sctrade.companion.utils.patterns.Subject;
 
 @Configuration
 @EnableCaching
@@ -119,11 +116,11 @@ public class AppConfig {
     return new LineListener(oldLogLineProcessor);
   }
 
-  @Bean("FileTailer")
-  public FileTailer buildFileTailer(Subject<Path> subject, TailerListener listener,
-      NotificationService notificationService) {
-    return new FileTailer(subject, listener, notificationService);
-  }
+  // @Bean("FileTailer")
+  // public FileTailer buildFileTailer(Subject<Path> subject, TailerListener listener,
+  // NotificationService notificationService) {
+  // return new FileTailer(subject, listener, notificationService);
+  // }
 
   @Bean("CompanionGui")
   public CompanionGui buildCompanionGui(UserService userService, GameLogPathSubject gameLogService,
