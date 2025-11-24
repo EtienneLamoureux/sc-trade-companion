@@ -8,12 +8,12 @@ Please note that unsolicited contributions (features not in our backlog) may tak
 
 ## Guidelines
 To ensure quality and consistency, we ask that contrbutions follow these guidelines: 
-1. Your branch MUST compile through our [Java CI with Gradle](https://github.com/EtienneLamoureux/sc-trade-companion/actions/workflows/gradle.yml)
-2. Code MUST be formatted according to our [code style](https://github.com/EtienneLamoureux/sc-trade-companion/blob/main/contributing/GoogleStyle.xml) and defined [import order](https://github.com/EtienneLamoureux/sc-trade-companion/blob/main/contributing/companion.importorder)
-3. Files in `tools.sctrade.companion.domain` MUST NOT import files from outside the package, with the exception of `tools.sctrade.companion.utils`
+1. Your branch SHALL compile through our [Java CI with Gradle](https://github.com/EtienneLamoureux/sc-trade-companion/actions/workflows/gradle.yml)
+2. Code SHALL be formatted according to our [code style](https://github.com/EtienneLamoureux/sc-trade-companion/blob/main/contributing/GoogleStyle.xml) and defined [import order](https://github.com/EtienneLamoureux/sc-trade-companion/blob/main/contributing/companion.importorder)
+3. Files in `tools.sctrade.companion.domain` SHALL NOT import files from outside the package, with the exception of `tools.sctrade.companion.utils`
 4. Public classes and methods MUST be documented
-5. Changes MUST be unit tested
-6. Changes MUST NOT reduce the existing code coverage
+5. Changes SHALL be unit tested
+6. Changes SHALL NOT reduce the existing code coverage
 7. Changes SHOULD respect the general structure of the project
 8. Changes SHOULD be self-explanatory, using clear names and flow
 9. Libraries SHOULD be abstracted behind a [facade](https://en.wikipedia.org/wiki/Facade_pattern)

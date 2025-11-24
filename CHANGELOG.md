@@ -1,4 +1,8 @@
 # SC Trade Companion
+## 1.1.1
+### Bugs
+- Fix `java.lang.ClassNotFoundException: com.sun.java.accessibility.AccessBridge` crash on start-up
+
 ## 1.1.0
 ### Features
 - Add a setting letting the user choose which monitor to capture and process
