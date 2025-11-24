@@ -4,13 +4,13 @@
 - Fix `java.lang.ClassNotFoundException: com.sun.java.accessibility.AccessBridge` crash on start-up
 
 ## 1.1.1
-## Bugs
+### Bugs
 - Fix "Failed to resolve 'sc-trade.tools'"
 - Fix duplicate entries in the website's leaderboard
   - New duplicate entries will not be created, but the existing ones will be cleaned-up by hand in the coming days
 - Fix the app crashing on startup for Wine users
 
-## Other
+### Other
 - Disable log reading
   - The experiment has concluded for now
 
