@@ -13,7 +13,7 @@ import tools.sctrade.companion.domain.ocr.LocatedColumn;
 import tools.sctrade.companion.utils.StringUtil;
 
 /**
- * Represents a commodity listing that has not been spell checked, not has its location attached.
+ * Represents a commodity listing that has not been spell checked, nor has its location attached.
  */
 public class RawCommodityListing {
   private static final Pattern RIGHT_PATTERN =

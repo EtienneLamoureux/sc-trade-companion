@@ -12,8 +12,8 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 /**
  * Factory for building commodity submissions.
  */
-public class CommoditySubmissionFactory {
-  private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactory.class);
+public class TwoStepCommoditySubmissionFactory implements CommoditySubmissionFactory {
+  private final Logger logger = LoggerFactory.getLogger(TwoStepCommoditySubmissionFactory.class);
 
   private UserService userService;
   private NotificationService notificationService;
@@ -28,7 +28,7 @@ public class CommoditySubmissionFactory {
    * @param commodityLocationReader the commodity location reader
    * @param commodityListingFactory the commodity listing factory
    */
-  public CommoditySubmissionFactory(UserService userService,
+  public TwoStepCommoditySubmissionFactory(UserService userService,
       NotificationService notificationService, CommodityLocationReader commodityLocationReader,
       CommodityListingFactory commodityListingFactory) {
     this.userService = userService;
@@ -37,7 +37,8 @@ public class CommoditySubmissionFactory {
     this.commodityListingFactory = commodityListingFactory;
   }
 
-  CommoditySubmission build(BufferedImage screenCapture) {
+  @Override
+  public CommoditySubmission build(BufferedImage screenCapture) {
     var location = commodityLocationReader.read(screenCapture);
 
     if (location.isEmpty()) {

@@ -3,6 +3,7 @@ package tools.sctrade.companion.output;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageType;
@@ -14,7 +15,7 @@ import tools.sctrade.companion.utils.ImageUtil;
 /**
  * Writes images to disk.
  */
-public class DiskImageWriter implements ImageWriter {
+public class DiskImageWriter implements ImageWriter<Optional<Path>> {
   private final Logger logger = LoggerFactory.getLogger(DiskImageWriter.class);
 
   private SettingRepository settings;
@@ -29,15 +30,17 @@ public class DiskImageWriter implements ImageWriter {
   }
 
   @Override
-  public void write(BufferedImage image, ImageType type) {
+  public Optional<Path> write(BufferedImage image, ImageType type) {
     if (!shouldWrite(type)) {
       logger.debug("Configured to not write images of type {}, skipping", type);
-      return;
+      return Optional.empty();
     }
 
     Path path = Paths.get(settings.get(Setting.MY_IMAGES_PATH).toString(), type.generateFileName());
     logger.info("Writing '{}' to disk...", path);
     ImageUtil.writeToDiskNoFail(image, path);
+
+    return Optional.of(path);
   }
 
   private boolean shouldWrite(ImageType type) {

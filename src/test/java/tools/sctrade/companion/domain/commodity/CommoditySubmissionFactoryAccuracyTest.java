@@ -34,14 +34,14 @@ class CommoditySubmissionFactoryAccuracyTest {
 
   private SettingRepository settings;
   private ImageWriter imageWriter;
-  private CommoditySubmissionFactory factory;
+  private TwoStepCommoditySubmissionFactory factory;
 
   @BeforeEach
   void setUp() {
     initializeSettings();
     imageWriter = new DiskImageWriter(settings);
 
-    factory = new CommoditySubmissionFactory(new UserService(settings, new RandomUserIdGenerator()),
+    factory = new TwoStepCommoditySubmissionFactory(new UserService(settings, new RandomUserIdGenerator()),
         notificationService, buildBestEffortCommodityLocationReader(),
         buildBestEffortCommodityListingFactory());
   }
