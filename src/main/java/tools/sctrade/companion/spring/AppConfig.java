@@ -22,6 +22,7 @@ import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommodityService;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
+import tools.sctrade.companion.domain.commodity.TwoStepCommoditySubmissionFactory;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.gamelog.lineprocessors.FallbackLogLineProcessor;
 import tools.sctrade.companion.domain.gamelog.lineprocessors.LoadShopInventoryDataLogLineProcessor;
@@ -194,13 +195,13 @@ public class AppConfig {
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
       NotificationService notificationService, CommodityLocationReader commodityLocationReader,
       CommodityListingFactory commodityListingFactory) {
-    return new CommoditySubmissionFactory(userService, notificationService, commodityLocationReader,
+    return new TwoStepCommoditySubmissionFactory(userService, notificationService, commodityLocationReader,
         commodityListingFactory);
   }
 
   @Bean("CommodityService")
   public CommodityService buildCommodityService(
-      CommoditySubmissionFactory commoditySubmissionFactory,
+      TwoStepCommoditySubmissionFactory commoditySubmissionFactory,
       @Qualifier("CommodityCsvWriter") CommodityCsvWriter commodityCsvLogger,
       @Qualifier("ScTradeToolsClient") ScTradeToolsClient scTradeToolsClient,
       NotificationService notificationService) {
