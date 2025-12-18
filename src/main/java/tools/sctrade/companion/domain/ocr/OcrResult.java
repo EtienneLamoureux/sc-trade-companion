@@ -1,5 +1,6 @@
 package tools.sctrade.companion.domain.ocr;
 
+import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +46,21 @@ public class OcrResult {
 
   public String getTextByColumns() {
     return columnsByX.values().stream().map(n -> n.getText()).collect(Collectors.joining("\n\n"));
+  }
+
+  /**
+   * Creates a shallow copy of this object, containing only the {@link LocatedText} fully contained
+   * within the bounding box.
+   *
+   * @param boundingBox Rectangle
+   * @return OcrResult
+   */
+  public OcrResult crop(Rectangle boundingBox) {
+    var wordsInBoundingBox = linesByY.values().stream().map(n -> n.getFragments())
+        .flatMap(n -> n.stream()).map(n -> n.getWordsInReadingOrder()).flatMap(n -> n.stream())
+        .filter(n -> n.isContainedBy(boundingBox)).toList();
+
+    return new OcrResult(wordsInBoundingBox);
   }
 
   private void add(LocatedWord word) {

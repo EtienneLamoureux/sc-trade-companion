@@ -24,6 +24,10 @@ public abstract class LocatedText {
     return boundingBox.getWidth() / getText().length();
   }
 
+  public boolean isContainedBy(Rectangle boundingBox) {
+    return boundingBox.contains(this.boundingBox);
+  }
+
   @Override
   public String toString() {
     return getText();
