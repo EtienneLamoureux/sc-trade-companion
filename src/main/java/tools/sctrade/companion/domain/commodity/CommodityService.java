@@ -18,7 +18,7 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 public class CommodityService extends AsynchronousProcessor<BufferedImage> {
   private final Logger logger = LoggerFactory.getLogger(CommodityService.class);
 
-  private TwoStepCommoditySubmissionFactory submissionFactory;
+  private CommoditySubmissionFactory submissionFactory;
   private Collection<AsynchronousProcessor<CommoditySubmission>> publishers;
 
   private Semaphore mutex = new Semaphore(1, true);
@@ -32,7 +32,7 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
    * @param publishers Publishers that export commodity submissions.
    * @param notificationService Notification service.
    */
-  public CommodityService(TwoStepCommoditySubmissionFactory submissionFactory,
+  public CommodityService(CommoditySubmissionFactory submissionFactory,
       Collection<AsynchronousProcessor<CommoditySubmission>> publishers,
       NotificationService notificationService) {
     super(notificationService);

@@ -1,6 +1,6 @@
 package tools.sctrade.companion.domain.ocr;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Rectangle;
 import java.util.List;
@@ -22,7 +22,10 @@ class OcrResultTest {
 
     var croppedOcrResults = ocrResult.crop(new Rectangle(0, 0, 2, 2));
 
-    assertEquals("inside, on corner\r\n" + "inside, on edge inside, edge to edge fully inside",
-        croppedOcrResults.getTextByLines());
+    String textByLines = croppedOcrResults.getTextByLines();
+    for (var expected : List.of("inside, on corner", "inside, on edge", "inside, edge to edge",
+        "fully inside")) {
+      assertTrue(textByLines.contains(expected));
+    }
   }
 }

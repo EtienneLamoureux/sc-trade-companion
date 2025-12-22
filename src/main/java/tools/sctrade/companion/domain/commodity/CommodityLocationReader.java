@@ -1,6 +1,5 @@
 package tools.sctrade.companion.domain.commodity;
 
-import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -45,13 +44,13 @@ public class CommodityLocationReader {
   /**
    * Reads the location of a commodity kiosk from a screen capture.
    *
-   * @param screenCapture the screen capture
+   * @param locationResult the cropped ocr results corresponding to the location dropdown of the
+   *        commodity kiosk
    * @return the location of the commodity kiosk, if found
    */
-  public Optional<String> read(BufferedImage screenCapture) {
+  public Optional<String> read(OcrResult locationResult) {
     try {
       logger.debug("Reading location...");
-      OcrResult locationResult = locationOcr.get().read(screenCapture);
       var location = extractLocation(locationResult);
       logger.debug("Read location '{}'", location);
 

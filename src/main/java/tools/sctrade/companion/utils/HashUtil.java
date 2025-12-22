@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import javax.imageio.ImageIO;
+import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.exceptions.HashException;
 
 /**
@@ -15,6 +16,10 @@ public class HashUtil {
   private static final String SHA3_256 = "SHA3-256";
 
   private HashUtil() {}
+
+  public static String hash(OcrResult listingsResult) {
+    return hash(listingsResult.getTextByLines());
+  }
 
   /**
    * Hashes a string using SHA3-256.
