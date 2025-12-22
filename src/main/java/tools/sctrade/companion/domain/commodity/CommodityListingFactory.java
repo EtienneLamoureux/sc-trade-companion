@@ -1,7 +1,6 @@
 package tools.sctrade.companion.domain.commodity;
 
 import java.awt.Rectangle;
-import java.awt.image.BufferedImage;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,13 +13,12 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
-import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.ocr.LocatedColumn;
-import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.OcrUtil;
 import tools.sctrade.companion.exceptions.NoCloseStringException;
 import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
+import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.HashUtil;
 import tools.sctrade.companion.utils.StringUtil;
 import tools.sctrade.companion.utils.TimeUtil;
@@ -35,7 +33,6 @@ public class CommodityListingFactory {
 
   private TransactionTypeExtractor transactionTypeExtractor;
   private CommodityRepository commodityRepository;
-  private ThreadLocal<Ocr> listingsOcr;
 
   /**
    * Constructor for {@link CommodityListingFactory}.
@@ -46,12 +43,10 @@ public class CommodityListingFactory {
    * @param preprocessingManipulations List of image manipulations to be applied, sequentially and
    *        in order, before running the commodity OCR.
    */
-  public CommodityListingFactory(CommodityRepository commodityRepository, ImageWriter imageWriter,
-      List<ImageManipulation> preprocessingManipulations) {
-    this.transactionTypeExtractor = new TransactionTypeExtractor(imageWriter);
+  public CommodityListingFactory(CommodityRepository commodityRepository,
+      DiskImageWriter imageWriter, List<ImageManipulation> preprocessingManipulations) {
+    this.transactionTypeExtractor = new TransactionTypeExtractor();
     this.commodityRepository = commodityRepository;
-    this.listingsOcr = ThreadLocal
-        .withInitial(() -> new CommodityListingsTesseractOcr(preprocessingManipulations));
   }
 
   /**
@@ -76,30 +71,27 @@ public class CommodityListingFactory {
   /**
    * Runs OCR on the image and assembles the readable commodity listings.
    *
-   * @param screenCapture Image of the section of the commodity kiosk with the commodity listings
+   * @param listingsResult OcrResult cropped ocr results corresponding to the listings area of the
+   *        commodity kiosk
    * @param location Pre-parsed location string, as it would appear on the left-side of the
    *        commodity kiosk. See {@link CommodityLocationReader}.
    * @return Final, assembled commodity listings
    */
-  public Collection<CommodityListing> build(BufferedImage screenCapture, String location) {
+  public Collection<CommodityListing> build(OcrResult listingsResult, String location) {
     try {
       logger.debug("Reading listings...");
-      OcrResult listingsResult = listingsOcr.get().read(screenCapture);
       listingsResult = removeNonListingWords(listingsResult);
       var rawListings = buildRawListings(listingsResult);
       logger.debug("Read {} listings", rawListings.size());
 
-      TransactionType transactionType =
-          transactionTypeExtractor.extract(screenCapture, listingsResult);
-      String batchId = HashUtil.hash(screenCapture);
+      TransactionType transactionType = transactionTypeExtractor.extract(listingsResult);
+      String batchId = HashUtil.hash(listingsResult);
 
       return buildCommodityListings(location, transactionType, rawListings, batchId);
     } catch (Exception e) {
       logger.error("Error while reading listings", e);
       // TODO
       return Collections.emptyList();
-    } finally {
-      listingsOcr.remove();
     }
   }
 

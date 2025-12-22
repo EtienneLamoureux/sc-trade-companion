@@ -21,7 +21,7 @@ public class PaddleOcr extends Ocr {
   private DiskImageWriter diskImageWriter;
   private ProcessRunner processRunner;
 
-  protected PaddleOcr(List<ImageManipulation> preprocessingManipulations,
+  public PaddleOcr(List<ImageManipulation> preprocessingManipulations,
       DiskImageWriter diskImageWriter, ProcessRunner processRunner) {
     super(preprocessingManipulations);
 
