@@ -6,9 +6,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.LocationRepository;
-import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.ocr.LocatedFragment;
-import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.OcrUtil;
 import tools.sctrade.companion.exceptions.LocationNotFoundException;
@@ -24,21 +22,14 @@ public class CommodityLocationReader {
   private final Logger logger = LoggerFactory.getLogger(CommodityLocationReader.class);
 
   private LocationRepository locationRepository;
-  private ThreadLocal<Ocr> locationOcr;
 
   /**
    * Creates a new instance of the commodity location reader.
    *
-   * @param preprocessingManipulations the preprocessing manipulations to apply to the screen
-   *        capture, in order
    * @param locationRepository the location repository, used to spell check the read location
    */
-  public CommodityLocationReader(List<ImageManipulation> preprocessingManipulations,
-      LocationRepository locationRepository) {
+  public CommodityLocationReader(LocationRepository locationRepository) {
     this.locationRepository = locationRepository;
-
-    this.locationOcr = ThreadLocal
-        .withInitial(() -> new CommodityLocationTesseractOcr(preprocessingManipulations));
   }
 
   /**
@@ -59,8 +50,6 @@ public class CommodityLocationReader {
       logger.error("Error while reading location", e);
 
       return Optional.empty();
-    } finally {
-      locationOcr.remove();
     }
   }
 

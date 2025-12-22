@@ -13,8 +13,10 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
+import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.commodity.CommodityListingFactory;
 import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
+import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommodityService;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
 import tools.sctrade.companion.domain.commodity.CroppingCommoditySubmissionFactory;
@@ -142,6 +144,18 @@ public class AppConfig {
   public DiskImageWriter buildDiskImageWriter(SettingRepository settingRepository) {
     return new DiskImageWriter(settingRepository);
 
+  }
+
+  @Bean("CommodityLocationReader")
+  public CommodityLocationReader buildCommodityLocationReader(
+      LocationRepository locationRepository) {
+    return new CommodityLocationReader(locationRepository);
+  }
+
+  @Bean("CommodityListingFactory")
+  public CommodityListingFactory buildCommodityListingFactory(
+      CommodityRepository commodityRepository) {
+    return new CommodityListingFactory(commodityRepository);
   }
 
   @Bean("CommoditySubmissionFactory")
