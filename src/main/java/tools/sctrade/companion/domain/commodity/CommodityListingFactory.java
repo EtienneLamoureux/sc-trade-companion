@@ -12,13 +12,11 @@ import java.util.Optional;
 import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.ocr.LocatedColumn;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.OcrUtil;
 import tools.sctrade.companion.exceptions.NoCloseStringException;
 import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
-import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.HashUtil;
 import tools.sctrade.companion.utils.StringUtil;
 import tools.sctrade.companion.utils.TimeUtil;
@@ -39,12 +37,9 @@ public class CommodityListingFactory {
    *
    * @param commodityRepository Repository to get the commodity names from. Will be used to spell
    *        check the OCR results.
-   * @param imageWriter Output port for images.
-   * @param preprocessingManipulations List of image manipulations to be applied, sequentially and
-   *        in order, before running the commodity OCR.
+   * @param imageWriter Output port for images. in order, before running the commodity OCR.
    */
-  public CommodityListingFactory(CommodityRepository commodityRepository,
-      DiskImageWriter imageWriter, List<ImageManipulation> preprocessingManipulations) {
+  public CommodityListingFactory(CommodityRepository commodityRepository) {
     this.transactionTypeExtractor = new TransactionTypeExtractor();
     this.commodityRepository = commodityRepository;
   }
