@@ -130,6 +130,22 @@ public class CommodityListingFactory {
     return assembleRawListings(leftHalfListings, rightHalfListings);
   }
 
+  /**
+   * Removes text falling into one of those categories.
+   * <ul>
+   * <li>above the listings, i.e.
+   * <ul>
+   * <li>the player's balance</li>
+   * <li>outside the commodity terminal</li>
+   * <li>the debug info</li>
+   * </ul>
+   * </li>
+   * <li>in-between the 2 sides of the commodity terminal, in the graphic part of the screen</li>
+   * </ul>
+   *
+   * @param result OcrResult
+   * @return OcrResult
+   */
   private OcrResult removeNonListingWords(OcrResult result) {
     var shopInventoryFragment = OcrUtil.findFragmentClosestTo(result, SHOP_INVENTORY);
     Rectangle shopInventoryRectangle = shopInventoryFragment.getBoundingBox();
