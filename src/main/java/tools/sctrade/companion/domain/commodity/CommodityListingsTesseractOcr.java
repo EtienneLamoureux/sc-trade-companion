@@ -47,8 +47,38 @@ public class CommodityListingsTesseractOcr extends TesseractOcr {
   }
 
   private BufferedImage keepRightHalf(BufferedImage image) {
-    return ImageUtil.crop(image, new Rectangle((image.getWidth() / 2), 0,
-        (image.getWidth() - (image.getWidth() / 2)), image.getHeight()));
+    Rectangle listingsRegion = calculateListingsRegion(image);
+    return ImageUtil.crop(image, listingsRegion);
+  }
+
+  /**
+   * Calculates the region containing commodity listings based on aspect ratio. Uses conservative
+   * wide crops for ultrawide monitors to handle viewing angle variance.
+   *
+   * @param image The source image
+   * @return Rectangle defining the region to crop
+   */
+  private Rectangle calculateListingsRegion(BufferedImage image) {
+    int width = image.getWidth();
+    int height = image.getHeight();
+    double aspectRatio = (double) width / height;
+
+    // Super ultrawide (32:9, ratio > 3.0)
+    if (aspectRatio > 3.0) {
+      // Wide crop from 30% to 100% - covers any viewing angle
+      int startX = (int) (width * 0.30);
+      return new Rectangle(startX, 0, width - startX, height);
+    }
+
+    // Ultrawide (21:9, ratio > 2.0)
+    if (aspectRatio > 2.0) {
+      // Wide crop from 25% to 100% - accounts for angle variance
+      int startX = (int) (width * 0.25);
+      return new Rectangle(startX, 0, width - startX, height);
+    }
+
+    // Standard/widescreen (16:9, 16:10, 4:3) - original behavior
+    return new Rectangle(width / 2, 0, width / 2, height);
   }
 
   private List<Word> removeWordsRightOfTheListings(List<Word> words) {
