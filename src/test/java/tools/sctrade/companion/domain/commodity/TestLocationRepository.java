@@ -35,7 +35,7 @@ class TestLocationRepository implements LocationRepository {
         "rayari kaltag research outpost", "shubin mining facility smca-6", "refinement center",
         "stanton to magnus jump point", "bud's growery", "mic-l3 endless odyssey station",
         "arccorp mining area 061", "arccorp mining area 141", "private property",
-        "shubin mining facility sal-2", "shubin mining facility smca-8");
+        "shubin mining facility sal-2", "shubin mining facility smca-8", "levski");
   }
 
 }

@@ -42,17 +42,6 @@ public class ImageUtil {
   private ImageUtil() {}
 
   /**
-   * Get an image from a resource path.
-   *
-   * @param resourcePath The path to the image resource.
-   * @return The image.
-   * @throws IOException If the image could not be read/found.
-   */
-  public static BufferedImage getFromResourcePath(String resourcePath) throws IOException {
-    return ImageIO.read(ImageUtil.class.getResourceAsStream(resourcePath));
-  }
-
-  /**
    * Creates a greyscale copy of an image. The original is untouched.
    *
    * @param image The image to make a greyscale copy of.
