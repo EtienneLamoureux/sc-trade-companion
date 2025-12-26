@@ -19,7 +19,7 @@ import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommodityService;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
-import tools.sctrade.companion.domain.commodity.CroppingCommoditySubmissionFactory;
+import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.gamelog.lineprocessors.FallbackLogLineProcessor;
 import tools.sctrade.companion.domain.gamelog.lineprocessors.LoadShopInventoryDataLogLineProcessor;
@@ -164,7 +164,7 @@ public class AppConfig {
       CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter) {
     Ocr ocr = new PaddleOcr(List.of(), diskImageWriter, new ProcessRunner());
 
-    return new CroppingCommoditySubmissionFactory(userService, notificationService,
+    return new CommoditySubmissionFactory(userService, notificationService,
         commodityLocationReader, commodityListingFactory, ocr);
   }
 
