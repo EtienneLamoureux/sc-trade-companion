@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.domain.user.User;
@@ -16,6 +17,7 @@ class CommoditySubmissionTest {
   private static final double PRICE = 0;
   private static final int INVENTORY = 0;
   private static final InventoryLevel INVENTORY_LEVEL = InventoryLevel.MEDIUM;
+  private static final List<Integer> BOX_SIZES = List.of(1, 2, 4, 8);
   private static final String BATCH_ID = "batch id";
   private static final Instant TIMESTAMP = Instant.now();
 
@@ -26,10 +28,10 @@ class CommoditySubmissionTest {
   void given_existing_submission_with_location_when_merging_submission_with_no_location_then_assign_location() {
     var submissionWithLocation =
         new CommoditySubmission(USER, Arrays.asList(new CommodityListing(LOCATION, TRANSACTION_TYPE,
-            COMMODITY, PRICE, INVENTORY, INVENTORY_LEVEL, BATCH_ID, TIMESTAMP)));
+            COMMODITY, PRICE, INVENTORY, INVENTORY_LEVEL, BOX_SIZES, BATCH_ID, TIMESTAMP)));
     var submissionWithNoLocation =
         new CommoditySubmission(USER, Arrays.asList(new CommodityListing(null, TRANSACTION_TYPE,
-            COMMODITY, PRICE, INVENTORY, INVENTORY_LEVEL, BATCH_ID, TIMESTAMP)));
+            COMMODITY, PRICE, INVENTORY, INVENTORY_LEVEL, BOX_SIZES, BATCH_ID, TIMESTAMP)));
 
     submissionWithLocation.merge(submissionWithNoLocation);
 
@@ -41,10 +43,10 @@ class CommoditySubmissionTest {
   void given_existing_submission_with_no_location_when_merging_submission_with_location_then_assign_location() {
     var submissionWithNoLocation =
         new CommoditySubmission(USER, Arrays.asList(new CommodityListing(null, TRANSACTION_TYPE,
-            COMMODITY, PRICE, INVENTORY, INVENTORY_LEVEL, BATCH_ID, TIMESTAMP)));
+            COMMODITY, PRICE, INVENTORY, INVENTORY_LEVEL, BOX_SIZES, BATCH_ID, TIMESTAMP)));
     var submissionWithLocation =
         new CommoditySubmission(USER, Arrays.asList(new CommodityListing(LOCATION, TRANSACTION_TYPE,
-            COMMODITY, PRICE, INVENTORY, INVENTORY_LEVEL, BATCH_ID, TIMESTAMP)));
+            COMMODITY, PRICE, INVENTORY, INVENTORY_LEVEL, BOX_SIZES, BATCH_ID, TIMESTAMP)));
 
     submissionWithNoLocation.merge(submissionWithLocation);
 
