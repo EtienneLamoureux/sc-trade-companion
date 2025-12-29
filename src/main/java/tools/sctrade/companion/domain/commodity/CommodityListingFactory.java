@@ -240,7 +240,8 @@ public class CommodityListingFactory {
       try {
         return Optional.of(new CommodityListing(location, transactionType,
             StringUtil.spellCheck(n.getCommodity().get(), commodityRepository.findAllCommodities()),
-            n.getPrice().get(), n.getInventory().get(), n.getInventoryLevel().get(), batchId, now));
+            n.getPrice().get(), n.getInventory().get(), n.getInventoryLevel().get(),
+            n.getBoxSizesInScu().orElse(List.of()), batchId, now));
       } catch (NoCloseStringException e) {
         return Optional.empty();
       }

@@ -11,25 +11,6 @@ public record CommodityListing(String location, TransactionType transactionType,
     Double price, Integer inventory, InventoryLevel inventoryLevel, List<Integer> boxSizesInScu,
     String batchId, Instant timestamp) {
   /**
-   * Constructor for {@link CommodityListing}.
-   *
-   * @param location Location where the commodity is being transacted.
-   * @param transactionType Type of transaction (buy/sell).
-   * @param commodity Name of the commodity.
-   * @param price Price of the commodity.
-   * @param inventory Current SCU amount.
-   * @param inventoryLevel Level of inventory, aka how saturated the inventory is.
-   * @param batchId Batch ID.
-   * @param timestamp Time when the listing was recorded.
-   */
-  public CommodityListing(String location, TransactionType transactionType, String commodity,
-      double price, int inventory, InventoryLevel inventoryLevel, String batchId,
-      Instant timestamp) {
-    this(location, transactionType, commodity, price, inventory, inventoryLevel, List.of(), batchId,
-        timestamp);
-  }
-
-  /**
    * Constructor for {@link CommodityListing}. Omits inventory related information.
    *
    * @param location Location where the commodity is being transacted.
@@ -52,6 +33,6 @@ public record CommodityListing(String location, TransactionType transactionType,
    */
   public CommodityListing withLocation(String location) {
     return new CommodityListing(location, transactionType(), commodity(), price(), inventory(),
-        inventoryLevel(), batchId(), timestamp());
+        inventoryLevel(), boxSizesInScu(), batchId(), timestamp());
   }
 }
