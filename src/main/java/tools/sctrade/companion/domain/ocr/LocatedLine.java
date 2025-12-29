@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Group of {@link LocatedWord} that form a line. May be across multiple columns.
  */
-class LocatedLine extends LocatedFragment {
+public class LocatedLine extends LocatedFragment {
   public LocatedLine(LocatedWord word) {
     super(word);
   }
