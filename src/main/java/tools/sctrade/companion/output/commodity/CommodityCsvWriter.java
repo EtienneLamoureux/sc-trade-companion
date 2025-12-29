@@ -85,6 +85,7 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
         listing.commodity(), listing.price() == null ? "" : String.valueOf(listing.price()),
         listing.inventory() == null ? "" : String.valueOf(listing.inventory()),
         listing.inventoryLevel() == null ? "" : listing.inventoryLevel().getLabel(),
+        listing.boxSizesInScu().isEmpty() ? "" : listing.boxSizesInScu().toString(),
         TimeUtil.getAsString(TimeFormat.CSV_COLUMN, listing.timestamp()));
   }
 }

@@ -61,8 +61,8 @@ public class CommodityListingFactory {
     String location = String.format(Locale.ROOT, "%s#%s", shopName, shopId);
     String batchId = HashUtil.hash(String.format(Locale.ROOT, "%s%s%d%s", location, commodity,
         maxBoxSizeInScu, now.toString()));
-    return new CommodityListing(location, TransactionType.SELLS, commodity, maxBoxSizeInScu,
-        batchId, now);
+    return new CommodityListing(location, TransactionType.SELLS, commodity,
+        List.of(maxBoxSizeInScu), batchId, now);
   }
 
   /**
