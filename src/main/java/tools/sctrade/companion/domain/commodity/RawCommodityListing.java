@@ -2,8 +2,11 @@ package tools.sctrade.companion.domain.commodity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -17,7 +20,8 @@ import tools.sctrade.companion.utils.StringUtil;
  */
 public class RawCommodityListing {
   private static final Pattern RIGHT_PATTERN =
-      Pattern.compile("([0-9\\.]+)[scu]+\\R¤([0-9\\.km]+)\\/", Pattern.CASE_INSENSITIVE);
+      Pattern.compile("([0-9\\.]+) ?scu\\R¤?([0-9\\.km]+)\\/", Pattern.CASE_INSENSITIVE);
+  private static final Set<Integer> AVAILABLE_BOX_SIZES = Set.of(1, 2, 4, 8, 16, 24, 32);
 
   private final Logger logger = LoggerFactory.getLogger(RawCommodityListing.class);
 
@@ -28,6 +32,7 @@ public class RawCommodityListing {
   private Optional<InventoryLevel> inventoryLevel;
   private Optional<Integer> inventory;
   private Optional<Double> price;
+  private Optional<List<Integer>> availableBoxSizes;
 
   RawCommodityListing(LocatedColumn left, LocatedColumn right) {
     this.left = left;
@@ -37,6 +42,7 @@ public class RawCommodityListing {
     extractInventoryLevel();
     extractInventory();
     extractPrice();
+    extractAvailableBoxSize();
   }
 
   Optional<String> getCommodity() {
@@ -71,9 +77,11 @@ public class RawCommodityListing {
     String inventoryLevel = this.inventoryLevel.isPresent()
         ? String.format(Locale.ROOT, "(%s)", this.inventoryLevel.get().getLabel())
         : "(?)";
+    String availableBoxSizes =
+        this.availableBoxSizes.isPresent() ? this.availableBoxSizes.toString() : "?";
 
-    return String.format(Locale.ROOT, "%s of '%s' for %s %s", inventory, commodity, price,
-        inventoryLevel);
+    return String.format(Locale.ROOT, "%s of '%s' for %s %s available in %s", inventory, commodity,
+        price, inventoryLevel, availableBoxSizes);
   }
 
   private void extractCommodity() {
@@ -146,6 +154,26 @@ public class RawCommodityListing {
     } catch (Exception e) {
       logger.debug(String.format(Locale.ROOT, "Could not extract price from: %s", right));
       this.price = Optional.empty();
+    }
+  }
+
+  private void extractAvailableBoxSize() {
+    var parsedBoxSizes =
+        Arrays.stream(right.getFragments().getLast().getText().strip().split(" ")).map(n -> {
+          try {
+            return Integer.valueOf(n);
+          } catch (Exception e) {
+            return 0;
+          }
+        }).filter(n -> AVAILABLE_BOX_SIZES.contains(n)).toList();
+
+    var sortedParsedBoxSizes = new ArrayList<>(parsedBoxSizes);
+    Collections.sort(sortedParsedBoxSizes);
+
+    if (parsedBoxSizes.equals(sortedParsedBoxSizes)) {
+      this.availableBoxSizes = Optional.of(parsedBoxSizes);
+    } else {
+      this.availableBoxSizes = Optional.empty();
     }
   }
 

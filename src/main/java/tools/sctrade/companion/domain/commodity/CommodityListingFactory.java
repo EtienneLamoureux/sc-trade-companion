@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.ocr.LocatedColumn;
+import tools.sctrade.companion.domain.ocr.LocatedFragment;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.OcrUtil;
 import tools.sctrade.companion.exceptions.NoCloseStringException;
@@ -28,6 +29,7 @@ import tools.sctrade.companion.utils.TimeUtil;
 public class CommodityListingFactory {
   private final Logger logger = LoggerFactory.getLogger(CommodityListingFactory.class);
   private static final String SHOP_INVENTORY = "shop inventory";
+  private static final String AVAILABLE_CARGO_SIZE_SCU = "available cargo size (scu)";
 
   private TransactionTypeExtractor transactionTypeExtractor;
   private CommodityRepository commodityRepository;
@@ -149,6 +151,7 @@ public class CommodityListingFactory {
 
   private List<RawCommodityListing> assembleRawListings(List<LocatedColumn> leftHalfListings,
       List<LocatedColumn> rightHalfListings) {
+    rightHalfListings = mergeAvailableBoxSizeParagraphs(rightHalfListings);
     List<RawCommodityListing> rawListings = new ArrayList<>();
 
     for (var leftHalfListing : leftHalfListings) {
@@ -164,6 +167,67 @@ public class CommodityListingFactory {
     logger.info("Read {} commodity listings", rawListings.size());
 
     return rawListings;
+  }
+
+  /**
+   * Since the "Available cargo size" section of the listing can be considered another paragraph by
+   * the paragraph-splitter during post-processing, it needs to be merged to the quantity and price
+   * section. <br />
+   * Example:
+   * 
+   * <pre>
+   * shop quantity
+   * 263 scu
+   * 2.01900005k/scu
+   * </pre>
+   * 
+   * <pre>
+   * available cargd size iscui
+   * 1 2 4 8 16
+   * </pre>
+   * 
+   * Becomes:
+   * 
+   * <pre>
+   * shop quantity
+   * 263 scu
+   * 2.01900005k/scu
+   * available cargd size iscui
+   * 1 2 4 8 16
+   * </pre>
+   *
+   * @param rightHalfListings Whole right column, including all quantity, prices and available cargo
+   *        sizes.
+   * @return Merged paragraphs
+   */
+  private List<LocatedColumn> mergeAvailableBoxSizeParagraphs(
+      List<LocatedColumn> rightHalfListings) {
+    var mergedRightHalfListings = new ArrayList<LocatedColumn>();
+
+    for (var rightHalfListing : rightHalfListings) {
+      var fragments = rightHalfListing.getFragments();
+
+      if (mergedRightHalfListings.isEmpty() || fragments.size() != 2
+          || !isAvailableBoxSizeParagraph(fragments)) {
+        mergedRightHalfListings.add(rightHalfListing);
+        continue;
+      }
+
+      var previousParagraph = mergedRightHalfListings.get(mergedRightHalfListings.size() - 1);
+      fragments.stream().forEach(n -> previousParagraph.add(n));
+    }
+
+    return mergedRightHalfListings;
+  }
+
+  private boolean isAvailableBoxSizeParagraph(List<LocatedFragment> fragments) {
+    try {
+      OcrUtil.findFragmentClosestTo(fragments, AVAILABLE_CARGO_SIZE_SCU);
+
+      return true;
+    } catch (NoCloseStringException e) {
+      return false;
+    }
   }
 
   private Collection<CommodityListing> buildCommodityListings(String location,
