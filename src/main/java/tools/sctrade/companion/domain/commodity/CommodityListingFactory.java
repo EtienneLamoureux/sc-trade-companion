@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.TreeMap;
 import org.slf4j.Logger;
@@ -242,7 +243,7 @@ public class CommodityListingFactory {
             StringUtil.spellCheck(n.getCommodity().get(), commodityRepository.findAllCommodities()),
             n.getPrice().get(), n.getInventory().get(), n.getInventoryLevel().get(),
             n.getBoxSizesInScu().orElse(List.of()), batchId, now));
-      } catch (NoCloseStringException e) {
+      } catch (NoCloseStringException | NoSuchElementException e) {
         return Optional.empty();
       }
     }).filter(n -> n.isPresent()).map(n -> (CommodityListing) n.get()).toList();
