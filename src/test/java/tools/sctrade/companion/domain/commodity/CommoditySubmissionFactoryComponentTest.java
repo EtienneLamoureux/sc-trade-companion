@@ -55,11 +55,13 @@ class CommoditySubmissionFactoryComponentTest {
 
   @Test
   void bonjour() throws IOException, URISyntaxException {
-    String resourcePath = "/images/kiosks/commodity/levski-buy-1.jpg";
+    var filename = "arc-l1-sell-1";
+
+    String resourcePath = "/kiosks/commodity/images/" + filename + ".jpg";
     when(diskImageWriter.write(any(), any()))
         .thenReturn(Optional.of(Path.of(this.getClass().getResource(resourcePath).toURI())));
     when(processRunner.runNoFail(any()))
-        .thenReturn(ResourceUtil.getTextLines("/texts/kiosks/commodity/levski-buy-1.txt"));
+        .thenReturn(ResourceUtil.getTextLines("/kiosks/commodity/texts/" + filename + ".txt"));
 
     var image = ResourceUtil.getBufferedImage(resourcePath);
 
