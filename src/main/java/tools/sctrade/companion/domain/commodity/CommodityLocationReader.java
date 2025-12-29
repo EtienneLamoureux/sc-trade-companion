@@ -55,7 +55,7 @@ public class CommodityLocationReader {
 
   private Optional<String> extractLocation(OcrResult result) {
     List<LocatedFragment> fragments =
-        result.getColumns().stream().flatMap(n -> n.getFragments().stream()).toList();
+        result.getLines().stream().flatMap(n -> n.getFragments().stream()).toList();
     var yourInventoriesFragment = OcrUtil.findFragmentClosestTo(fragments, YOUR_INVENTORIES);
 
     // Return the fragment that follows "your inventories"
