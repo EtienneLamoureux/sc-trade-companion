@@ -28,7 +28,8 @@ public class LocatedWord extends LocatedText {
   /**
    * Returns whether this word is separated from another word, i.e. the two words are part of
    * different columns of text. Words are considered separated if the gap in the X axis between the
-   * two words is significant.
+   * two words is significant. <br />
+   * N.B. there is more leeway for entirely numerical words.
    *
    * @param word The other word.
    * @return Whether the two words are separated.
@@ -37,6 +38,10 @@ public class LocatedWord extends LocatedText {
     double maxCharacterWidth = Math.max(getCharacterWidth(), word.getCharacterWidth());
     double leeway = 2 * maxCharacterWidth;
     double distanceBetweenWords = Math.abs(boundingBox.getMaxX() - word.getBoundingBox().getMinX());
+
+    if (this.isNumerical() && word.isNumerical()) {
+      leeway *= 2;
+    }
 
     return distanceBetweenWords > leeway;
   }
