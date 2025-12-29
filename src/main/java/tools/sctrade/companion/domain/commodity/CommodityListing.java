@@ -1,13 +1,14 @@
 package tools.sctrade.companion.domain.commodity;
 
 import java.time.Instant;
+import java.util.List;
 
 /**
  * Represents a commodity listing: who buys what, at what price, and how much, and in which box
  * size. Also includes some metadata.
  */
 public record CommodityListing(String location, TransactionType transactionType, String commodity,
-    Double price, Integer inventory, InventoryLevel inventoryLevel, Integer maxBoxSize,
+    Double price, Integer inventory, InventoryLevel inventoryLevel, List<Integer> boxSizesInScu,
     String batchId, Instant timestamp) {
   /**
    * Constructor for {@link CommodityListing}.
@@ -24,7 +25,7 @@ public record CommodityListing(String location, TransactionType transactionType,
   public CommodityListing(String location, TransactionType transactionType, String commodity,
       double price, int inventory, InventoryLevel inventoryLevel, String batchId,
       Instant timestamp) {
-    this(location, transactionType, commodity, price, inventory, inventoryLevel, null, batchId,
+    this(location, transactionType, commodity, price, inventory, inventoryLevel, List.of(), batchId,
         timestamp);
   }
 
@@ -34,13 +35,13 @@ public record CommodityListing(String location, TransactionType transactionType,
    * @param location Location where the commodity is being transacted.
    * @param transactionType Type of transaction (buy/sell).
    * @param commodity Name of the commodity.
-   * @param maxBoxSize Maximum box size.
+   * @param boxSizesInScu List of box sizes, in SCU
    * @param batchId Batch ID.
    * @param timestamp Time when the listing was recorded.
    */
   public CommodityListing(String location, TransactionType transactionType, String commodity,
-      Integer maxBoxSize, String batchId, Instant timestamp) {
-    this(location, transactionType, commodity, null, null, null, maxBoxSize, batchId, timestamp);
+      List<Integer> boxSizesInScu, String batchId, Instant timestamp) {
+    this(location, transactionType, commodity, null, null, null, boxSizesInScu, batchId, timestamp);
   }
 
   /**

@@ -21,7 +21,7 @@ import tools.sctrade.companion.utils.StringUtil;
 public class RawCommodityListing {
   private static final Pattern RIGHT_PATTERN =
       Pattern.compile("([0-9\\.]+) ?scu\\R¤?([0-9\\.km]+)\\/", Pattern.CASE_INSENSITIVE);
-  private static final Set<Integer> AVAILABLE_BOX_SIZES = Set.of(1, 2, 4, 8, 16, 24, 32);
+  private static final Set<Integer> BOX_SIZES_IN_SCU = Set.of(1, 2, 4, 8, 16, 24, 32);
 
   private final Logger logger = LoggerFactory.getLogger(RawCommodityListing.class);
 
@@ -32,7 +32,7 @@ public class RawCommodityListing {
   private Optional<InventoryLevel> inventoryLevel;
   private Optional<Integer> inventory;
   private Optional<Double> price;
-  private Optional<List<Integer>> availableBoxSizes;
+  private Optional<List<Integer>> boxSizesInScu;
 
   RawCommodityListing(LocatedColumn left, LocatedColumn right) {
     this.left = left;
@@ -42,7 +42,7 @@ public class RawCommodityListing {
     extractInventoryLevel();
     extractInventory();
     extractPrice();
-    extractAvailableBoxSize();
+    extractBoxSizesInScu();
   }
 
   Optional<String> getCommodity() {
@@ -61,9 +61,13 @@ public class RawCommodityListing {
     return price;
   }
 
+  Optional<List<Integer>> getBoxSizesInScu() {
+    return boxSizesInScu;
+  }
+
   boolean isComplete() {
     return commodity.isPresent() && inventoryLevel.isPresent() && inventory.isPresent()
-        && price.isPresent();
+        && price.isPresent() /* && availableBoxSizes.isPresent() not mandatory for now */;
   }
 
   @Override
@@ -77,11 +81,11 @@ public class RawCommodityListing {
     String inventoryLevel = this.inventoryLevel.isPresent()
         ? String.format(Locale.ROOT, "(%s)", this.inventoryLevel.get().getLabel())
         : "(?)";
-    String availableBoxSizes =
-        this.availableBoxSizes.isPresent() ? this.availableBoxSizes.toString() : "?";
+    String boxSizesInScu =
+        this.boxSizesInScu.isPresent() ? this.boxSizesInScu.get().toString() : "?";
 
     return String.format(Locale.ROOT, "%s of '%s' for %s %s available in %s", inventory, commodity,
-        price, inventoryLevel, availableBoxSizes);
+        price, inventoryLevel, boxSizesInScu);
   }
 
   private void extractCommodity() {
@@ -157,23 +161,23 @@ public class RawCommodityListing {
     }
   }
 
-  private void extractAvailableBoxSize() {
-    var parsedBoxSizes =
+  private void extractBoxSizesInScu() {
+    var parsedBoxSizesInScu =
         Arrays.stream(right.getFragments().getLast().getText().strip().split(" ")).map(n -> {
           try {
             return Integer.valueOf(n);
           } catch (Exception e) {
             return 0;
           }
-        }).filter(n -> AVAILABLE_BOX_SIZES.contains(n)).toList();
+        }).filter(n -> BOX_SIZES_IN_SCU.contains(n)).toList();
 
-    var sortedParsedBoxSizes = new ArrayList<>(parsedBoxSizes);
+    var sortedParsedBoxSizes = new ArrayList<>(parsedBoxSizesInScu);
     Collections.sort(sortedParsedBoxSizes);
 
-    if (parsedBoxSizes.equals(sortedParsedBoxSizes)) {
-      this.availableBoxSizes = Optional.of(parsedBoxSizes);
+    if (parsedBoxSizesInScu.equals(sortedParsedBoxSizes)) {
+      this.boxSizesInScu = Optional.of(parsedBoxSizesInScu);
     } else {
-      this.availableBoxSizes = Optional.empty();
+      this.boxSizesInScu = Optional.empty();
     }
   }
 
