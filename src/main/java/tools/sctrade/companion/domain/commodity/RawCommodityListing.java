@@ -185,6 +185,6 @@ public class RawCommodityListing {
     return right.getText().strip().toLowerCase(Locale.ROOT).replace(" ", "").replace(",", ".")
         .replace("i", "1").replace("l", "1").replace("s", "5").replace("$", "5").replace("e", "5")
         .replace("g", "6").replace("b", "8").replace("o", "0").replace("5cu", "scu")
-        .replace("5cy", "scu").replace("8cy", "scu");
+        .replace("5cy", "scu").replace("8cy", "scu").replace("□", "¤");
   }
 }
