@@ -40,7 +40,6 @@ public class CommodityListingFactory {
    *
    * @param commodityRepository Repository to get the commodity names from. Will be used to spell
    *        check the OCR results.
-   * @param imageWriter Output port for images. in order, before running the commodity OCR.
    */
   public CommodityListingFactory(CommodityRepository commodityRepository) {
     this.transactionTypeExtractor = new TransactionTypeExtractor();

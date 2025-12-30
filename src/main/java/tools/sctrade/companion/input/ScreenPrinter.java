@@ -2,9 +2,11 @@ package tools.sctrade.companion.input;
 
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
@@ -28,7 +30,7 @@ public class ScreenPrinter implements Runnable {
 
   private Collection<AsynchronousProcessor<BufferedImage>> imageProcessors;
   private List<ImageManipulation> postprocessingManipulations;
-  private ImageWriter imageWriter;
+  private ImageWriter<Optional<Path>> imageWriter;
   private SoundUtil soundPlayer;
   private NotificationService notificationService;
   private SettingRepository settings;
@@ -43,8 +45,8 @@ public class ScreenPrinter implements Runnable {
    * @param settings The settings repository.
    */
   public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
-      ImageWriter imageWriter, SoundUtil soundPlayer, NotificationService notificationService,
-      SettingRepository settings) {
+      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
+      NotificationService notificationService, SettingRepository settings) {
     this(imageProcessors, Collections.emptyList(), imageWriter, soundPlayer, notificationService,
         settings);
   }
@@ -61,7 +63,7 @@ public class ScreenPrinter implements Runnable {
    * @param settings The settings repository.
    */
   public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
-      List<ImageManipulation> postprocessingManipulations, ImageWriter imageWriter,
+      List<ImageManipulation> postprocessingManipulations, ImageWriter<Optional<Path>> imageWriter,
       SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
     this.imageProcessors = imageProcessors;
     this.postprocessingManipulations = postprocessingManipulations;

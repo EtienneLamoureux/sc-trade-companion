@@ -1,9 +1,11 @@
 package tools.sctrade.companion.spring;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.io.input.TailerListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,7 +20,6 @@ import tools.sctrade.companion.domain.commodity.CommodityListingFactory;
 import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommodityService;
-import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.gamelog.lineprocessors.FallbackLogLineProcessor;
@@ -164,8 +165,8 @@ public class AppConfig {
       CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter) {
     Ocr ocr = new PaddleOcr(List.of(), diskImageWriter, new ProcessRunner());
 
-    return new CommoditySubmissionFactory(userService, notificationService,
-        commodityLocationReader, commodityListingFactory, ocr);
+    return new CommoditySubmissionFactory(userService, notificationService, commodityLocationReader,
+        commodityListingFactory, ocr);
   }
 
   @Bean("CommodityService")
@@ -185,8 +186,9 @@ public class AppConfig {
 
   @Bean("ScreenPrinter")
   public ScreenPrinter buildScreenPrinter(
-      @Qualifier("CommodityService") CommodityService commodityService, ImageWriter imageWriter,
-      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
+      @Qualifier("CommodityService") CommodityService commodityService,
+      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
+      NotificationService notificationService, SettingRepository settings) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
