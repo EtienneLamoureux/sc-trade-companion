@@ -114,9 +114,9 @@ task copyJar(type: Copy, dependsOn: 'build') {
 	rename "${rootProject.name}-${version}.jar", "${rootProject.name}.jar"
 }
 
-task copyTessdata(type: Copy) {
-	from "./bin/tessdata"
-	into "$binariesDir/tessdata"
+task copyPaddleOcr(type: Copy) {
+	from "./bin/paddleocr"
+	into "$binariesDir/paddleocr"
 }
 
 task copyStartScript(type: Copy) {
@@ -126,5 +126,5 @@ task copyStartScript(type: Copy) {
 	include "${rootProject.name}-admin.bat"
 }
 
-task dist(dependsOn: ['copyJar', 'copyTessdata', 'copyStartScript', 'jlink']) {
+task dist(dependsOn: ['copyJar', 'copyPaddleOcr', 'copyStartScript', 'jlink']) {
 }
