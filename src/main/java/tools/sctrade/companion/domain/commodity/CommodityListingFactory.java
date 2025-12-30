@@ -171,9 +171,9 @@ public class CommodityListingFactory {
   }
 
   /**
-   * Since the "Available cargo size" section of the listing can be considered another paragraph by
-   * the paragraph-splitter during post-processing, it needs to be merged to the quantity and price
-   * section. <br />
+   * Since the "Available cargo size" section of the listing can be considered different paragraphs
+   * by the paragraph-splitter during post-processing, it needs to be merged to the quantity and
+   * price section. <br />
    * Example:
    * 
    * <pre>
@@ -184,6 +184,32 @@ public class CommodityListingFactory {
    * 
    * <pre>
    * available cargd size iscui
+   * 1 2 4 8 16
+   * </pre>
+   * 
+   * Becomes:
+   * 
+   * <pre>
+   * shop quantity
+   * 263 scu
+   * 2.01900005k/scu
+   * available cargd size iscui
+   * 1 2 4 8 16
+   * </pre>
+   * 
+   * Or
+   * 
+   * <pre>
+   * shop quantity
+   * 263 scu
+   * 2.01900005k/scu
+   * </pre>
+   * 
+   * <pre>
+   * available cargd size iscui
+   * </pre>
+   * 
+   * <pre>
    * 1 2 4 8 16
    * </pre>
    * 
@@ -208,14 +234,25 @@ public class CommodityListingFactory {
     for (var rightHalfListing : rightHalfListings) {
       var fragments = rightHalfListing.getFragments();
 
-      if (mergedRightHalfListings.isEmpty() || fragments.size() != 2
-          || !isAvailableBoxSizeParagraph(fragments)) {
+      if (!mergedRightHalfListings.isEmpty() && fragments.size() == 2
+          && isAvailableBoxSizeParagraph(fragments)) {
+        // Merges both text and box size lines
+        var previousParagraph = mergedRightHalfListings.get(mergedRightHalfListings.size() - 1);
+        fragments.stream().forEach(n -> previousParagraph.add(n));
+      } else if (!mergedRightHalfListings.isEmpty() && fragments.size() == 1
+          && isAvailableBoxSizeParagraph(fragments)) {
+        // Merges text line only
+        var previousParagraph = mergedRightHalfListings.get(mergedRightHalfListings.size() - 1);
+        fragments.stream().forEach(n -> previousParagraph.add(n));
+      } else if (!mergedRightHalfListings.isEmpty() && fragments.size() == 1
+          && fragments.getLast().isNumerical()
+          && isAvailableBoxSizeParagraph(mergedRightHalfListings.getLast().getFragments())) {
+        // Merges box size line only
+        var previousParagraph = mergedRightHalfListings.getLast();
+        fragments.stream().forEach(n -> previousParagraph.add(n));
+      } else {
         mergedRightHalfListings.add(rightHalfListing);
-        continue;
       }
-
-      var previousParagraph = mergedRightHalfListings.get(mergedRightHalfListings.size() - 1);
-      fragments.stream().forEach(n -> previousParagraph.add(n));
     }
 
     return mergedRightHalfListings;

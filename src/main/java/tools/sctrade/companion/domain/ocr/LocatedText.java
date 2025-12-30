@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
  * words and larger text fragments. Encapsulates the coordinates of the text and the text itself.
  */
 public abstract class LocatedText {
-  private static final Pattern NUMERICAL_PATTERN = Pattern.compile("\\d+");
+  private static final Pattern NUMERICAL_PATTERN = Pattern.compile("[\\d\\w]+");
 
   protected Rectangle boundingBox;
 
@@ -36,7 +36,7 @@ public abstract class LocatedText {
     return getText();
   }
 
-  protected boolean isNumerical() {
+  public boolean isNumerical() {
     return NUMERICAL_PATTERN.matcher(getText()).find();
   }
 }

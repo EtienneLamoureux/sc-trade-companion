@@ -55,7 +55,7 @@ class CommoditySubmissionFactoryComponentTest {
 
   @Test
   void bonjour() throws IOException, URISyntaxException {
-    var filename = "mic-l1-sell-1";
+    var filename = "arc-l3-buy-1";
 
     String resourcePath = "/kiosks/commodity/images/" + filename + ".jpg";
     when(diskImageWriter.write(any(), any()))
