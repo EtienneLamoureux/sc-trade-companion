@@ -1,4 +1,18 @@
 # SC Trade Companion
+## 1.2.0
+### Features
+- Add available box sizes to the /my-data CSV output file
+- Support Pyro commodity kosks
+- Support Levski commodity kosks
+
+### Bugs
+- Fix many causes of "[Code 5] Listings could not be read"
+- Fix many causes of "[Code 6] The shop/city name was never selected in the "Your inventories" dropdown"
+
+### Other
+- Improve OCR success rate
+- Improve parsed-price accuracy
+
 ## 1.1.2
 ### Bugs
 - Fix `java.lang.ClassNotFoundException: com.sun.java.accessibility.AccessBridge` crash on start-up

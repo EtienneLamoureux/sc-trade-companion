@@ -7,7 +7,7 @@ plugins {
 
 // JAR
 group = 'tools.sctrade'
-version = '1.1.2'
+version = '1.2.0'
 
 java {
 	sourceCompatibility = '21'
@@ -31,7 +31,6 @@ dependencies {
 	implementation 'com.formdev:flatlaf-intellij-themes:3.5.2'
 	
 	// OCR
-	implementation 'net.sourceforge.tess4j:tess4j:5.13.0'
 	implementation 'org.openpnp:opencv:4.9.0-0'
 	
 	// Utils
