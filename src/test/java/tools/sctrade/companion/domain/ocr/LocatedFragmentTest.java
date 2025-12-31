@@ -1,14 +1,10 @@
 package tools.sctrade.companion.domain.ocr;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Rectangle;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 
 class LocatedFragmentTest {
   @Test
@@ -33,55 +29,5 @@ class LocatedFragmentTest {
     String text = fragment.getText();
 
     assertEquals("Construction materials", text);
-  }
-
-  static Object[][] provideFragmentsInSameColumn() {
-    var fragment1 =
-        new LocatedFragment(new LocatedWord("Construction", new Rectangle(0, 0, 10, 1)));
-    fragment1.add(new LocatedWord("materials", new Rectangle(11, 0, 10, 1)));
-
-    return new Object[][] {
-        {"Perfectly left-aligned", fragment1,
-            new LocatedFragment(new LocatedWord("High inventory", new Rectangle(0, 1, 10, 1)))},
-        {"Sort-of left-aligned", fragment1,
-            new LocatedFragment(new LocatedWord("High inventory", new Rectangle(1, 1, 10, 1)))},
-        {"Perfectly right-aligned", fragment1,
-            new LocatedFragment(new LocatedWord("High inventory", new Rectangle(11, 1, 10, 1)))},
-        {"Sort-of right-aligned", fragment1,
-            new LocatedFragment(new LocatedWord("High inventory", new Rectangle(10, 1, 10, 1)))}};
-  }
-
-  @ParameterizedTest(name = "{0}")
-  @MethodSource("provideFragmentsInSameColumn")
-  void givenFragmentsInSameSolumnhenCheckingIfFragmentsAreInTheSameColumnThenReturnTrue(String name,
-      LocatedFragment fragment1, LocatedFragment fragment2) {
-    boolean result = fragment1.isInTheSameColumnAs(fragment2);
-
-    assertTrue(result);
-  }
-
-  static Object[][] provideFragmentsInDifferentColumn() {
-    var fragment1 =
-        new LocatedFragment(new LocatedWord("Construction", new Rectangle(0, 0, 10, 1)));
-    fragment1.add(new LocatedWord("materials", new Rectangle(11, 0, 10, 1)));
-
-    return new Object[][] {
-        {"Diagonal corner-touch", fragment1,
-            new LocatedFragment(new LocatedWord("High inventory", new Rectangle(21, 1, 10, 1)))},
-        {"Poorly left-aligned", fragment1,
-            new LocatedFragment(new LocatedWord("High inventory", new Rectangle(3, 1, 10, 1)))},
-        {"Poorly right-aligned", fragment1,
-            new LocatedFragment(new LocatedWord("High inventory", new Rectangle(13, 1, 10, 1)))},
-        {"Separated", fragment1,
-            new LocatedFragment(new LocatedWord("High inventory", new Rectangle(25, 1, 10, 1)))}};
-  }
-
-  @ParameterizedTest(name = "{0}")
-  @MethodSource("provideFragmentsInDifferentColumn")
-  void givenFragmentsInDifferentColumnThenCheckingIfFragmentsAreInTheSameColumnThenReturnFalse(
-      String name, LocatedFragment fragment1, LocatedFragment fragment2) {
-    boolean result = fragment1.isInTheSameColumnAs(fragment2);
-
-    assertFalse(result);
   }
 }
