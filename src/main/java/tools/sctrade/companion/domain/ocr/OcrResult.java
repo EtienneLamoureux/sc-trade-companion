@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import tools.sctrade.companion.utils.MathUtil;
 
 /**
  * Text, as read and located by the OCR.
@@ -48,6 +49,25 @@ public class OcrResult {
     return columnsByX.values().stream().map(n -> n.getText()).collect(Collectors.joining("\n\n"));
   }
 
+  public List<LocatedColumn> getTwoColumns() {
+    var xGapCenters =
+        linesByY.values().stream().map(n -> n.getXGapCenters()).flatMap(n -> n.stream()).toList();
+    var meanXGapCenter = MathUtil.calculateMean(xGapCenters);
+
+    var leftColumn = new LocatedColumn();
+    var rightColumn = new LocatedColumn();
+
+    for (var fragment : getFragments()) {
+      if (fragment.getBoundingBox().getCenterX() > meanXGapCenter) {
+        leftColumn.add(fragment);
+      } else {
+        rightColumn.add(fragment);
+      }
+    }
+
+    return List.of(leftColumn, rightColumn);
+  }
+
   /**
    * Creates a shallow copy of this object, containing only the {@link LocatedText} fully contained
    * within the bounding box.
@@ -75,8 +95,7 @@ public class OcrResult {
   }
 
   private void buildColumns() {
-    var fragments = linesByY.values().stream().flatMap(n -> n.getFragments().stream())
-        .collect(Collectors.toList());
+    var fragments = getFragments();
     Collections.reverse(fragments);
 
     for (var fragment : fragments) {
@@ -89,5 +108,10 @@ public class OcrResult {
         columnsByX.put(newColumn.getBoundingBox().getCenterX(), newColumn);
       }
     }
+  }
+
+  private List<LocatedFragment> getFragments() {
+    return linesByY.values().stream().flatMap(n -> n.getFragments().stream())
+        .collect(Collectors.toList());
   }
 }

@@ -33,6 +33,33 @@ public class LocatedLine extends LocatedFragment {
     return fragments;
   }
 
+  /**
+   * Gets the midpoints of the gaps, on the X-axis, between this line's fragments.
+   *
+   * @return Ordered list, in reading order, of doubles
+   */
+  public List<Double> getXGapCenters() {
+    var xGapCenters = new ArrayList<Double>();
+
+    if (getFragments().isEmpty()) {
+      return xGapCenters;
+    }
+
+    var fragmentsIterator = getFragments().iterator();
+    var previousFragment = fragmentsIterator.next();
+
+    while (fragmentsIterator.hasNext()) {
+      var currentFragment = fragmentsIterator.next();
+      double xGap =
+          currentFragment.getBoundingBox().getMinX() - previousFragment.getBoundingBox().getMaxX();
+      var xGapCenter = previousFragment.getBoundingBox().getMaxX() + (xGap / 2);
+      xGapCenters.add(xGapCenter);
+      previousFragment = currentFragment;
+    }
+
+    return xGapCenters;
+  }
+
   public boolean shouldContain(LocatedWord word) {
     return boundingBox.getMaxY() > word.getBoundingBox().getCenterY()
         && word.getBoundingBox().getCenterY() > boundingBox.getMinY();
