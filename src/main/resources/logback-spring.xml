@@ -42,7 +42,7 @@
 		<appender-ref ref="STDOUT" />
 	</logger>
 
-	<!-- DO NOT LOG keyboard interupts -->
+	<!-- DO NOT log keyboard interupts -->
 	<logger name="org.jnativehook" level="off" additivity="false">
 		<appender-ref ref="FILE-ROLLING" />
 		<appender-ref ref="STDOUT" />
