@@ -93,7 +93,7 @@ public class CommodityListingFactory {
   }
 
   private List<RawCommodityListing> buildRawListings(OcrResult result) {
-    var columns = result.getColumns();
+    var columns = result.getTwoColumns();
 
     if (columns.size() < 2) {
       throw new NotEnoughColumnsException(2, result);
@@ -141,7 +141,7 @@ public class CommodityListingFactory {
     double minX =
         shopInventoryRectangle.getMinX() + (2 * shopInventoryFragment.getCharacterWidth());
 
-    var words = result.getColumns().stream().flatMap(n -> n.getFragments().stream())
+    var words = result.getLines().stream().flatMap(n -> n.getFragments().stream())
         .flatMap(n -> n.getWordsInReadingOrder().stream())
         .filter(n -> n.getBoundingBox().getMinX() > minX)
         .filter(n -> n.getBoundingBox().getMinY() > shopInventoryRectangle.getMinY()).toList();
