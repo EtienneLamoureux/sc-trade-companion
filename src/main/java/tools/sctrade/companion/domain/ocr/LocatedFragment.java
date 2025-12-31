@@ -49,16 +49,4 @@ public class LocatedFragment extends LocatedText {
       boundingBox = new Rectangle(word.getBoundingBox());
     }
   }
-
-  /**
-   * Determines if the fragment is in the same column as another fragment.
-   *
-   * @param fragment The fragment to check.
-   * @return True if fragments are both left or right-aligned together, false otherwise.
-   */
-  public boolean isInTheSameColumnAs(LocatedFragment fragment) {
-    double threshold = 2 * Math.max(getCharacterWidth(), fragment.getCharacterWidth());
-    return (threshold > Math.abs(boundingBox.getMinX() - fragment.getBoundingBox().getMinX()))
-        || (threshold > Math.abs(boundingBox.getMaxX() - fragment.getBoundingBox().getMaxX()));
-  }
 }
