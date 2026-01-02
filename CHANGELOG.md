@@ -1,4 +1,8 @@
 # SC Trade Companion
+## 1.2.1
+### Bugs
+- Fix many causes of "[Code 5] Listings could not be read"
+
 ## 1.2.0
 ### Features
 - Add available box sizes to the /my-data CSV output file
