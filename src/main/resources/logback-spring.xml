@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
+	<property resource="application.properties" />
+	
 	<property name="HOME_LOG" value="logs/app.log" />
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -18,9 +19,8 @@
 			<fileNamePattern>logs/archived/app.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
 			<!-- each archived file, size max 10MB -->
 			<maxFileSize>10MB</maxFileSize>
-			<!-- total size of all archive files, if total size > 20GB, it will
-         delete old archived file -->
-			<totalSizeCap>20GB</totalSizeCap>
+			<!-- total size of all archive files, if total size > 1GB, it will delete old archived file -->
+			<totalSizeCap>1GB</totalSizeCap>
 			<!-- 60 days to keep -->
 			<maxHistory>60</maxHistory>
 		</rollingPolicy>
@@ -30,22 +30,16 @@
 		</encoder>
 	</appender>
 
-	<!-- LOG everything at INFO level -->
-	<root level="info">
+	<root level="${root.level}">
 		<appender-ref ref="FILE-ROLLING" />
 		<appender-ref ref="STDOUT" />
 	</root>
 
-	<!-- LOG "tools.sctrade.companion" at INFO level -->
-	<logger name="tools.sctrade.companion" level="info" additivity="false">
-		<appender-ref ref="FILE-ROLLING" />
-		<appender-ref ref="STDOUT" />
+	<logger name="tools.sctrade.companion" level="${logger.tools.sctrade.companion}">
 	</logger>
 
 	<!-- DO NOT log keyboard interupts -->
-	<logger name="org.jnativehook" level="off" additivity="false">
-		<appender-ref ref="FILE-ROLLING" />
-		<appender-ref ref="STDOUT" />
+	<logger name="org.jnativehook" level="off">
 	</logger>
 
 </configuration>
