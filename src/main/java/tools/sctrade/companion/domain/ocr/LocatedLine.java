@@ -35,27 +35,6 @@ public class LocatedLine extends LocatedFragment {
     return fragments;
   }
 
-  public Optional<Double> getLargestXGapCenter() {
-    if (getFragments().isEmpty()) {
-      return Optional.empty();
-    }
-
-    var xGapCenters = new ArrayList<Double>();
-    var fragmentsIterator = getFragments().iterator();
-    var previousFragment = fragmentsIterator.next();
-
-    while (fragmentsIterator.hasNext()) {
-      var currentFragment = fragmentsIterator.next();
-      double xGapWidth =
-          currentFragment.getBoundingBox().getMinX() - previousFragment.getBoundingBox().getMaxX();
-      var xGapCenter = previousFragment.getBoundingBox().getMaxX() + (xGapWidth / 2);
-      xGapCenters.add(xGapCenter);
-      previousFragment = currentFragment;
-    }
-
-    return xGapCenters.isEmpty() ? Optional.empty() : Optional.of(Collections.max(xGapCenters));
-  }
-
   public boolean shouldContain(LocatedWord word) {
     return boundingBox.getMaxY() > word.getBoundingBox().getCenterY()
         && word.getBoundingBox().getCenterY() > boundingBox.getMinY();

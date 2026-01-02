@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import tools.sctrade.companion.utils.MathUtil;
+import tools.sctrade.companion.exceptions.NotEnoughColumnsException;
 
 /**
  * Text, as read and located by the OCR.
@@ -41,6 +41,26 @@ public class OcrResult {
         .collect(Collectors.joining(System.lineSeparator()));
   }
 
+  public Rectangle getBoundingBox() {
+    if (getFragments().isEmpty()) {
+      throw new IllegalStateException();
+    }
+
+    Rectangle boundingBox = null;
+
+    for (var fragment : getFragments()) {
+      var n = fragment.getBoundingBox();
+
+      if (boundingBox == null) {
+        boundingBox = n;
+      } else {
+        boundingBox = boundingBox.union(n);
+      }
+    }
+
+    return boundingBox;
+  }
+
   public List<LocatedColumn> getColumns() {
     return columnsByX.values().stream().toList();
   }
@@ -50,19 +70,23 @@ public class OcrResult {
   }
 
   public List<LocatedColumn> getTwoColumns() {
-    var xGapCenters = linesByY.values().stream().map(n -> n.getLargestXGapCenter())
-        .filter(n -> n.isPresent()).map(n -> n.get()).toList();
-    var meanXGapCenter = MathUtil.calculateMean(xGapCenters);
-
-    var leftColumn = new LocatedColumn();
-    var rightColumn = new LocatedColumn();
+    Rectangle boundingBox = getBoundingBox();
+    LocatedColumn leftColumn = null;
+    LocatedColumn rightColumn = null;
 
     for (var fragment : getFragments()) {
-      if (fragment.getBoundingBox().getCenterX() > meanXGapCenter) {
-        leftColumn.add(fragment);
+      var distanceToMinX = Math.abs(fragment.getBoundingBox().getMinX() - boundingBox.getMinX());
+      var distanceToMaxX = Math.abs(fragment.getBoundingBox().getMaxX() - boundingBox.getMaxX());
+
+      if (distanceToMinX > distanceToMaxX) {
+        leftColumn = upsert(leftColumn, fragment);
       } else {
-        rightColumn.add(fragment);
+        rightColumn = upsert(rightColumn, fragment);
       }
+    }
+
+    if (leftColumn == null || rightColumn == null) {
+      throw new NotEnoughColumnsException(2, this);
     }
 
     return List.of(leftColumn, rightColumn);
@@ -81,6 +105,16 @@ public class OcrResult {
         .filter(n -> n.isContainedBy(boundingBox)).toList();
 
     return new OcrResult(wordsInBoundingBox);
+  }
+
+  private LocatedColumn upsert(LocatedColumn column, LocatedFragment fragment) {
+    if (column == null) {
+      column = new LocatedColumn(fragment);
+    } else {
+      column.add(fragment);
+    }
+
+    return column;
   }
 
   private void add(LocatedWord word) {
