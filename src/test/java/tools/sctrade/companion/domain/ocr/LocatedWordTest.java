@@ -1,5 +1,6 @@
 package tools.sctrade.companion.domain.ocr;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -53,5 +54,20 @@ class LocatedWordTest {
     var result = locatedWord1.isSeparatedFrom(locatedWord2);
 
     assertTrue(result);
+  }
+
+  static Object[][] provideDifferentPotentiallyNumericalStrings() {
+    return new Object[][] {{"Integer", "123", true}, {"Decimal", "3.14159", false},
+        {"Alphanumerical", "a1b2c3", false}, {"Alphabetical", "bonjour", false},
+        {"Integers", "1 2 4 16 24 32", true}};
+  }
+
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("provideDifferentPotentiallyNumericalStrings")
+  void givenDifferentStringsWhenCheckingIsNumericalThenReturnExpected(String name, String string,
+      boolean expected) {
+    var locatedWord = new LocatedWord(string, new Rectangle());
+
+    assertEquals(expected, locatedWord.isNumerical());
   }
 }
