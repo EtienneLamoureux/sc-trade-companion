@@ -16,22 +16,14 @@ public class LocatedColumn extends LocatedText {
   private Map<Double, LocatedFragment> fragmentsByY;
 
   /**
-   * Creates a new, empty column.
-   */
-  public LocatedColumn() {
-    super();
-
-    fragmentsByY = new TreeMap<>();
-    boundingBox = null;
-  }
-
-  /**
    * Creates a new column, seeded with a single fragment.
    *
    * @param fragment The fragment to add to the column.
    */
   public LocatedColumn(LocatedFragment fragment) {
-    this();
+    super();
+
+    fragmentsByY = new TreeMap<>();
 
     add(fragment);
   }
