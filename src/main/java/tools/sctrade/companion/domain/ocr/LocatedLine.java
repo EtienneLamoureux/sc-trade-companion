@@ -2,9 +2,7 @@ package tools.sctrade.companion.domain.ocr;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Group of {@link LocatedWord} that form a line. May be across multiple columns.
