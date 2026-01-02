@@ -50,8 +50,8 @@ public class OcrResult {
   }
 
   public List<LocatedColumn> getTwoColumns() {
-    var xGapCenters =
-        linesByY.values().stream().map(n -> n.getXGapCenters()).flatMap(n -> n.stream()).toList();
+    var xGapCenters = linesByY.values().stream().map(n -> n.getLargestXGapCenter())
+        .filter(n -> n.isPresent()).map(n -> n.get()).toList();
     var meanXGapCenter = MathUtil.calculateMean(xGapCenters);
 
     var leftColumn = new LocatedColumn();
