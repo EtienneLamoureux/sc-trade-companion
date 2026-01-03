@@ -17,7 +17,7 @@ import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.notification.ConsoleNotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
-import tools.sctrade.companion.domain.ocr.PaddleOcr;
+import tools.sctrade.companion.domain.ocr.WindowsOcr;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.ProcessRunner;
@@ -44,7 +44,7 @@ class CommoditySubmissionFactoryComponentTest {
 
   @BeforeEach
   void setUp() {
-    ocr = new PaddleOcr(List.of(), diskImageWriter, processRunner);
+    ocr = new WindowsOcr(List.of(), diskImageWriter, processRunner, new com.fasterxml.jackson.databind.ObjectMapper());
     commodityLocationReader = new CommodityLocationReader(locationRepository);
     commodityListingFactory = new CommodityListingFactory(commodityRepository);
     notificationService = new NotificationService(new ConsoleNotificationRepository());
@@ -61,7 +61,7 @@ class CommoditySubmissionFactoryComponentTest {
     when(diskImageWriter.write(any(), any()))
         .thenReturn(Optional.of(Path.of(this.getClass().getResource(resourcePath).toURI())));
     when(processRunner.runNoFail(any()))
-        .thenReturn(ResourceUtil.getTextLines("/kiosks/commodity/texts/" + filename + ".txt"));
+        .thenReturn(ResourceUtil.getTextLines("/kiosks/commodity/jsons/" + filename + ".json"));
 
     var image = ResourceUtil.getBufferedImage(resourcePath);
 

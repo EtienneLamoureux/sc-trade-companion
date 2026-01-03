@@ -36,7 +36,7 @@ public class LocatedWord extends LocatedText {
    */
   public boolean isSeparatedFrom(LocatedText word) {
     double maxCharacterWidth = Math.max(getCharacterWidth(), word.getCharacterWidth());
-    double leeway = 2 * maxCharacterWidth;
+    double leeway = 1.6 * maxCharacterWidth;
     double distanceBetweenWords = Math.abs(boundingBox.getMaxX() - word.getBoundingBox().getMinX());
 
     if (this.isNumerical() && word.isNumerical()) {
