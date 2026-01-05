@@ -37,7 +37,7 @@ namespace WindowsOcrWrapper
                     return;
                 }
 
-                var softwareBitmap = await LoadImage(imagePath);
+                using var softwareBitmap = await LoadImage(imagePath);
                 var ocrResult = await ocrEngine.RecognizeAsync(softwareBitmap);
 
                 var output = ConvertToOutput(ocrResult);
