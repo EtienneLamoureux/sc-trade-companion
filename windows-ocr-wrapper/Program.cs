@@ -54,12 +54,48 @@ namespace WindowsOcrWrapper
 
         static async Task<SoftwareBitmap> LoadImage(string imagePath)
         {
-            var file = await StorageFile.GetFileFromPathAsync(Path.GetFullPath(imagePath));
-            using (IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read))
+            var fullPath = Path.GetFullPath(imagePath);
+
+            StorageFile file;
+            try
             {
-                var decoder = await BitmapDecoder.CreateAsync(stream);
-                // WindowsOCR requires Bgra8
-                return await decoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
+                file = await StorageFile.GetFileFromPathAsync(fullPath);
+            }
+            catch (Exception ex)
+            {
+                throw new IOException(
+                    $"Failed to access image file at '{fullPath}'. The file may be inaccessible, missing, or you may not have permission to read it.",
+                    ex);
+            }
+
+            try
+            {
+                using (IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read))
+                {
+                    BitmapDecoder decoder;
+                    try
+                    {
+                        decoder = await BitmapDecoder.CreateAsync(stream);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new InvalidOperationException(
+                            "Failed to decode image. The file may be corrupted or in an unsupported image format.",
+                            ex);
+                    }
+
+                    // WindowsOCR requires Bgra8
+                    return await decoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
+                }
+            }
+            catch (IOException)
+            {
+                // Re-throw IO-related exceptions without wrapping to preserve their specific messages.
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new IOException("Unexpected error while reading or decoding the image stream.", ex);
             }
         }
 
