@@ -6,8 +6,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>windows_ocr_wrapper</RootNamespace>
-    <!-- Allow unsafe blocks just in case, though not strictly needed for basic OCR -->
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
 </Project>
