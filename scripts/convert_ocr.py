@@ -14,6 +14,9 @@ if not os.path.exists(input_path):
     # try absolute path based on CWD
     input_path = os.path.abspath(input_path)
     print(f"Trying {input_path}")
+    if not os.path.exists(input_path):
+        print(f"Error: Input file still not found at {input_path}")
+        sys.exit(1)
 
 with open(input_path, 'r', encoding='utf-8') as f:
     for line in f:
