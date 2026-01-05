@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -35,9 +37,9 @@ public class WindowsOcr extends Ocr {
         .toString();
 
     // Command to run the windows-ocr-wrapper executable
-    // Assumes the wrapper is built and located at the specified relative path
+    // Uses adaptive path resolution to support both release and development builds
     var command = List.of(
-        "windows-ocr-wrapper/bin/Debug/net8.0-windows10.0.19041.0/windows-ocr-wrapper.exe",
+        resolveWrapperPath(),
         path
     );
 
@@ -74,6 +76,33 @@ public class WindowsOcr extends Ocr {
         (int) wordData.Height
     );
     return new LocatedWord(wordData.Text.toLowerCase(), rect);
+  }
+
+  private String resolveWrapperPath() {
+    String releasePath = "./bin/windows-ocr-wrapper.exe";
+    
+    if (Files.exists(Paths.get(releasePath))) {
+      logger.debug("Using release windows-ocr-wrapper at: {}", releasePath);
+      return releasePath;
+    }
+
+    // Search for development build regardless of .NET version
+    String debugDir = "windows-ocr-wrapper/bin/Debug";
+    try (var stream = Files.list(Paths.get(debugDir))) {
+      var devPath = stream
+          .filter(Files::isDirectory)
+          .map(p -> p.resolve("windows-ocr-wrapper.exe"))
+          .filter(Files::exists)
+          .map(Object::toString)
+          .findFirst()
+          .orElseThrow(() -> new RuntimeException(
+              "windows-ocr-wrapper.exe not found in release (./bin/) or development (" + debugDir + ") locations"));
+      
+      logger.debug("Using development windows-ocr-wrapper at: {}", devPath);
+      return devPath;
+    } catch (IOException e) {
+      throw new RuntimeException("Could not search for windows-ocr-wrapper.exe in " + debugDir, e);
+    }
   }
 
   // Helper class for JSON mapping
