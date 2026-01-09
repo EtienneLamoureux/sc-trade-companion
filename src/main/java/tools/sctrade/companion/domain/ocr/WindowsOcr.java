@@ -37,7 +37,7 @@ public class WindowsOcr extends Ocr {
     // Command to run the windows-ocr-wrapper executable
     // Assumes the wrapper is built and located at the specified relative path
     var command = List.of(
-        "windows-ocr-wrapper/bin/Debug/net8.0-windows10.0.19041.0/windows-ocr-wrapper.exe",
+        "windows-ocr-wrapper/dist/windows-ocr-wrapper.exe",
         path
     );
 
