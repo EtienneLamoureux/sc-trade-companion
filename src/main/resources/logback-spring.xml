@@ -39,7 +39,13 @@
 	</logger>
 
 	<!-- DO NOT log keyboard interupts -->
-	<logger name="org.jnativehook" level="off">
+	<logger name="org.jnativehook" level="off" />
+	</logger>
+	
+	<!-- Reactor Netty HTTP client wiretap -->
+	<logger name="reactor.netty.http.client" level="DEBUG" >
+	</logger>
+	<logger name="reactor.netty.transport" level="DEBUG" >
 	</logger>
 
 </configuration>
