@@ -55,7 +55,8 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
     super(notificationService);
 
     
-    /* Original Http Client
+    /** 
+     * Original Http Client
      * HttpClient httpClient = HttpClient.create(); httpClient =
      * httpClient.resolver(nameResolverSpec -> nameResolverSpec.retryTcpOnTimeout(true));
      * ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
