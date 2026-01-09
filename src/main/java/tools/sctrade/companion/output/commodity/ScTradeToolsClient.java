@@ -1,6 +1,9 @@
 package tools.sctrade.companion.output.commodity;
 
+import io.netty.channel.ChannelOption;
+import io.netty.handler.logging.LogLevel;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -9,12 +12,16 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.netty.http.HttpProtocol;
 import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
+import reactor.netty.transport.logging.AdvancedByteBufFormat;
 import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommoditySubmission;
@@ -47,12 +54,32 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
       NotificationService notificationService, String version) {
     super(notificationService);
 
-    HttpClient httpClient = HttpClient.create();
-    httpClient = httpClient.resolver(nameResolverSpec -> nameResolverSpec.retryTcpOnTimeout(true));
-    ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
+    
+    /** 
+     * Original Http Client
+     * HttpClient httpClient = HttpClient.create(); httpClient =
+     * httpClient.resolver(nameResolverSpec -> nameResolverSpec.retryTcpOnTimeout(true));
+     * ReactorClientHttpConnector connector = new ReactorClientHttpConnector(httpClient);
+     * 
+     * this.webClient = webClientBuilder.baseUrl(settings.get(Setting.SC_TRADE_TOOLS_ROOT_URL))
+     * .clientConnector(connector).defaultHeader("x-companion-version", version).build();
+     */
+
+    ConnectionProvider provider = ConnectionProvider.builder("sc-trade").maxConnections(50)
+        .pendingAcquireTimeout(Duration.ofSeconds(10)).build();
+
+    HttpClient httpClient = HttpClient.create(provider)
+        .wiretap("reactor.netty.http.client.HttpClient", LogLevel.DEBUG,
+            AdvancedByteBufFormat.TEXTUAL)
+        .responseTimeout(Duration.ofSeconds(10)).option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+        .protocol(HttpProtocol.HTTP11);
+
 
     this.webClient = webClientBuilder.baseUrl(settings.get(Setting.SC_TRADE_TOOLS_ROOT_URL))
-        .clientConnector(connector).defaultHeader("x-companion-version", version).build();
+        .clientConnector(new ReactorClientHttpConnector(httpClient))
+        .defaultHeader("x-companion-version", version)
+        .defaultHeader(HttpHeaders.USER_AGENT, "sc-companion/" + version)
+        .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE).build();
   }
 
   @Override
