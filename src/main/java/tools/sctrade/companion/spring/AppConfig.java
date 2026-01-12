@@ -1,6 +1,5 @@
 package tools.sctrade.companion.spring;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -163,9 +162,8 @@ public class AppConfig {
   @Bean("CommoditySubmissionFactory")
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
       NotificationService notificationService, CommodityLocationReader commodityLocationReader,
-      CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter,
-      ObjectMapper objectMapper) {
-    Ocr ocr = new WindowsOcr(List.of(), diskImageWriter, new ProcessRunner(), objectMapper);
+      CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter) {
+    Ocr ocr = new WindowsOcr(List.of(), diskImageWriter, new ProcessRunner());
 
     return new CommoditySubmissionFactory(userService, notificationService, commodityLocationReader,
         commodityListingFactory, ocr);

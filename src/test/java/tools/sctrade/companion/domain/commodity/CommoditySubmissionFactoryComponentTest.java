@@ -44,7 +44,7 @@ class CommoditySubmissionFactoryComponentTest {
 
   @BeforeEach
   void setUp() {
-    ocr = new WindowsOcr(List.of(), diskImageWriter, processRunner, new com.fasterxml.jackson.databind.ObjectMapper());
+    ocr = new WindowsOcr(List.of(), diskImageWriter, processRunner);
     commodityLocationReader = new CommodityLocationReader(locationRepository);
     commodityListingFactory = new CommodityListingFactory(commodityRepository);
     notificationService = new NotificationService(new ConsoleNotificationRepository());
