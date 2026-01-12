@@ -1,5 +1,6 @@
 package tools.sctrade.companion.spring;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
-import tools.sctrade.companion.domain.ocr.PaddleOcr;
+import tools.sctrade.companion.domain.ocr.WindowsOcr;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserIdGenerator;
@@ -162,8 +163,9 @@ public class AppConfig {
   @Bean("CommoditySubmissionFactory")
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
       NotificationService notificationService, CommodityLocationReader commodityLocationReader,
-      CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter) {
-    Ocr ocr = new PaddleOcr(List.of(), diskImageWriter, new ProcessRunner());
+      CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter,
+      ObjectMapper objectMapper) {
+    Ocr ocr = new WindowsOcr(List.of(), diskImageWriter, new ProcessRunner(), objectMapper);
 
     return new CommoditySubmissionFactory(userService, notificationService, commodityLocationReader,
         commodityListingFactory, ocr);

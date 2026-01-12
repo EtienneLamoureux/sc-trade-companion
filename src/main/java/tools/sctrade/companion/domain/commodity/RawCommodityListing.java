@@ -20,7 +20,7 @@ import tools.sctrade.companion.utils.StringUtil;
  */
 public class RawCommodityListing {
   private static final Pattern RIGHT_PATTERN =
-      Pattern.compile("([0-9\\.]+) ?scu\\R¤?([0-9\\.km]+)\\/", Pattern.CASE_INSENSITIVE);
+      Pattern.compile("([0-9\\.]+) ?scu\\R.*?([0-9\\.km]+)\\/", Pattern.CASE_INSENSITIVE);
   private static final Set<Integer> BOX_SIZES_IN_SCU = Set.of(1, 2, 4, 8, 16, 24, 32);
 
   private final Logger logger = LoggerFactory.getLogger(RawCommodityListing.class);
@@ -185,6 +185,6 @@ public class RawCommodityListing {
     return right.getText().strip().toLowerCase(Locale.ROOT).replace(" ", "").replace(",", ".")
         .replace("i", "1").replace("l", "1").replace("s", "5").replace("$", "5").replace("e", "5")
         .replace("g", "6").replace("b", "8").replace("o", "0").replace("5cu", "scu")
-        .replace("5cy", "scu").replace("8cy", "scu").replace("□", "¤");
+        .replace("5cy", "scu").replace("8cy", "scu").replace("□", "¤").replace("├ñ", "¤");
   }
 }
