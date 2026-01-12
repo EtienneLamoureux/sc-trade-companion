@@ -114,9 +114,9 @@ task copyJar(type: Copy, dependsOn: 'build') {
 	rename "${rootProject.name}-${version}.jar", "${rootProject.name}.jar"
 }
 
-task copyPaddleOcr(type: Copy) {
+task copyWindowsOcrWrapper(type: Copy) {
 	from "./bin/paddleocr"
-	into "$binariesDir/paddleocr"
+	into "$binariesDir/windowsocr"
 }
 
 task copyStartScript(type: Copy) {
@@ -126,5 +126,5 @@ task copyStartScript(type: Copy) {
 	include "${rootProject.name}-admin.bat"
 }
 
-task dist(dependsOn: ['copyJar', 'copyPaddleOcr', 'copyStartScript', 'jlink']) {
+task dist(dependsOn: ['copyJar', 'copyWindowsOcrWrapper', 'copyStartScript', 'jlink']) {
 }
