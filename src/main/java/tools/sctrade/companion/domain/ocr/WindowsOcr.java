@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -36,14 +35,12 @@ public class WindowsOcr extends Ocr {
 
     // Command to run the windows-ocr-wrapper executable
     // Assumes the wrapper is built and located at the specified relative path
-    var command = List.of(
-        "windows-ocr-wrapper/dist/windows-ocr-wrapper.exe",
-        path
-    );
+    var command = List.of("bin/windowsocr/windows-ocr-wrapper.exe", path);
 
     var outputLines = processRunner.runNoFail(command);
-    
-    // Join lines back into a single string for JSON parsing (in case of multiline output, though wrapper output is single line usually)
+
+    // Join lines back into a single string for JSON parsing (in case of multiline output, though
+    // wrapper output is single line usually)
     var jsonOutput = String.join("", outputLines);
 
     if (jsonOutput.isBlank()) {
@@ -52,11 +49,10 @@ public class WindowsOcr extends Ocr {
     }
 
     try {
-      List<WordData> words = objectMapper.readValue(jsonOutput, new TypeReference<List<WordData>>() {});
-      
-      var locatedWords = words.stream()
-          .map(this::toLocatedWord)
-          .collect(Collectors.toList());
+      List<WordData> words =
+          objectMapper.readValue(jsonOutput, new TypeReference<List<WordData>>() {});
+
+      var locatedWords = words.stream().map(this::toLocatedWord).collect(Collectors.toList());
 
       return new OcrResult(locatedWords);
 
@@ -67,12 +63,8 @@ public class WindowsOcr extends Ocr {
   }
 
   private LocatedWord toLocatedWord(WordData wordData) {
-    var rect = new Rectangle(
-        (int) wordData.X,
-        (int) wordData.Y,
-        (int) wordData.Width,
-        (int) wordData.Height
-    );
+    var rect = new Rectangle((int) wordData.X, (int) wordData.Y, (int) wordData.Width,
+        (int) wordData.Height);
     return new LocatedWord(wordData.Text.toLowerCase(), rect);
   }
 
