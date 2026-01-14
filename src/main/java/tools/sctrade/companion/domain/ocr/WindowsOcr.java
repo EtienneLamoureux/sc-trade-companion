@@ -64,6 +64,7 @@ public class WindowsOcr extends Ocr {
     return new LocatedWord(wordData.Text.toLowerCase(), rectangle);
   }
 
-  static record WindowsOcrLocatedWord(String Text, double X, double Y, double Width, double Height) {
+  private static record WindowsOcrLocatedWord(String Text, double X, double Y, double Width,
+      double Height) {
   }
 }
