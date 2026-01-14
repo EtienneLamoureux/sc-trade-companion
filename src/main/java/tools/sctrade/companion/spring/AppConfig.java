@@ -163,7 +163,7 @@ public class AppConfig {
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
       NotificationService notificationService, CommodityLocationReader commodityLocationReader,
       CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter) {
-    Ocr ocr = new WindowsOcr(List.of(), diskImageWriter, new ProcessRunner());
+    Ocr ocr = new WindowsOcr(List.of(), diskImageWriter, new ProcessRunner(), notificationService);
 
     return new CommoditySubmissionFactory(userService, notificationService, commodityLocationReader,
         commodityListingFactory, ocr);

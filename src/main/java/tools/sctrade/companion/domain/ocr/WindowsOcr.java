@@ -8,8 +8,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageType;
+import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.JsonUtil;
+import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.ProcessRunner;
 
 public class WindowsOcr extends Ocr {
@@ -17,13 +19,16 @@ public class WindowsOcr extends Ocr {
 
   private final DiskImageWriter diskImageWriter;
   private final ProcessRunner processRunner;
+  private final NotificationService notificationService;
 
   public WindowsOcr(List<ImageManipulation> preprocessingManipulations,
-      DiskImageWriter diskImageWriter, ProcessRunner processRunner) {
+      DiskImageWriter diskImageWriter, ProcessRunner processRunner,
+      NotificationService notificationService) {
     super(preprocessingManipulations);
 
     this.diskImageWriter = diskImageWriter;
     this.processRunner = processRunner;
+    this.notificationService = notificationService;
   }
 
   @Override
@@ -53,6 +58,7 @@ public class WindowsOcr extends Ocr {
       return words.stream().map(n -> toLocatedWord(n)).toList();
     } catch (Exception e) {
       logger.error("Could not parse Windows OCR output", e);
+      notificationService.error(LocalizationUtil.get("errorParsingOcrOutput"));
       return Collections.emptyList();
     }
   }

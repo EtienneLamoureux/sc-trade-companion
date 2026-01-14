@@ -44,7 +44,8 @@ class CommoditySubmissionFactoryComponentTest {
 
   @BeforeEach
   void setUp() {
-    ocr = new WindowsOcr(List.of(), diskImageWriter, processRunner);
+    ocr = new WindowsOcr(List.of(), diskImageWriter, processRunner,
+        new NotificationService(new ConsoleNotificationRepository()));
     commodityLocationReader = new CommodityLocationReader(locationRepository);
     commodityListingFactory = new CommodityListingFactory(commodityRepository);
     notificationService = new NotificationService(new ConsoleNotificationRepository());
