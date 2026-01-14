@@ -30,7 +30,7 @@ dependencies {
 	implementation 'com.formdev:flatlaf:3.5.2'
 	implementation 'com.formdev:flatlaf-intellij-themes:3.5.2'
 	
-	// OCR
+	// Computer vision
 	implementation 'org.openpnp:opencv:4.9.0-0'
 	
 	// Utils
