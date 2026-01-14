@@ -38,6 +38,9 @@
 	<logger name="tools.sctrade.companion" level="${logger.tools.sctrade.companion}">
 	</logger>
 
+	<logger name="tools.sctrade.companion.utils.ProcessRunner" level="${tools.sctrade.companion.utils.ProcessRunne}">
+	</logger>
+
 	<!-- DO NOT log keyboard interupts -->
 	<logger name="org.jnativehook" level="off">
 	</logger>
