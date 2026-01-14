@@ -1,4 +1,10 @@
 # SC Trade Companion
+## 1.3.0
+### Features
+- Reduce the image processing time
+- Reduce the application's CPU and RAM usage
+- Reduce the application's size
+
 ## 1.2.1
 ### Bugs
 - Fix many causes of "[Code 5] Listings could not be read"
