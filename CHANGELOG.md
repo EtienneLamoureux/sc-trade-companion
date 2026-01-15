@@ -1,4 +1,9 @@
 # SC Trade Companion
+## 1.3.1
+### Other
+- Sort logs by latest on top by default
+- Add clear [Code 9] error for missing or outdated .NET
+
 ## 1.3.0
 ### Features
 - Reduce the image processing time
