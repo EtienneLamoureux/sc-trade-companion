@@ -13,7 +13,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.image.ImageManipulation;
-import tools.sctrade.companion.domain.image.manipulations.EqualizeColor;
+import tools.sctrade.companion.domain.image.manipulations.ConvertToEqualizedGreyscale;
+import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
 import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
 import tools.sctrade.companion.domain.notification.ConsoleNotificationRepository;
@@ -55,8 +56,8 @@ class CommoditySubmissionFactoryITest {
     setupMocks();
 
     diskImageWriter = new DiskImageWriter(settings);
-    List<ImageManipulation> imageManipulations =
-        List.of(new UpscaleTo4k(), new WriteToDisk(diskImageWriter), new EqualizeColor());
+    List<ImageManipulation> imageManipulations = List.of(new UpscaleTo4k(),
+        new WriteToDisk(diskImageWriter), new InvertColors(), new ConvertToEqualizedGreyscale());
     ocr = new WindowsOcr(imageManipulations, diskImageWriter, processRunner,
         new NotificationService(new ConsoleNotificationRepository()));
 
@@ -66,7 +67,7 @@ class CommoditySubmissionFactoryITest {
 
   @Test
   void bonjour() throws IOException, URISyntaxException {
-    var filename = "canard-view-buy-1";
+    var filename = "levski-sell-1";
 
     String resourcePath = "/kiosks/commodity/images/" + filename + ".jpg";
     var image = ResourceUtil.getBufferedImage(resourcePath);
