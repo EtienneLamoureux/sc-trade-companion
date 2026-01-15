@@ -22,7 +22,6 @@ import nu.pattern.OpenCV;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Mode;
-import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfPoint;
@@ -42,27 +41,14 @@ public class ImageUtil {
 
   private ImageUtil() {}
 
-  public static BufferedImage applyHistogramEqualizationForColors(BufferedImage image) {
+  public static BufferedImage makeHistogramEqualizedGreyscaleCopy(BufferedImage image) {
+    image = makeGreyscaleCopy(image);
     OpenCV.loadShared();
 
     try {
-      // Convert to YCrCb color space
-      Mat original = new Mat();
-      Imgproc.cvtColor(toMat(image), original, Imgproc.COLOR_BGR2YCrCb);
-
-      // Split into channels
-      List<Mat> channels = new ArrayList<>();
-      Core.split(original, channels);
-
-      // Equalize only the Y (luminance) channel
-      Imgproc.equalizeHist(channels.get(0), channels.get(0));
-
-      // Merge channels back
-      Core.merge(channels, original);
-
-      // Convert back to BGR
-      Mat processed = new Mat();
-      Imgproc.cvtColor(original, processed, Imgproc.COLOR_YCrCb2BGR);
+      Mat original = toMat(image);
+      Mat processed = new Mat(original.rows(), original.cols(), original.type());
+      Imgproc.equalizeHist(original, processed);
 
       return toBufferedImage(processed);
     } catch (IOException e) {
@@ -70,7 +56,8 @@ public class ImageUtil {
     }
   }
 
-  public static BufferedImage applyClahe(BufferedImage image) {
+  public static BufferedImage makeClaheEqualizedGreyscaleCopy(BufferedImage image) {
+    image = makeGreyscaleCopy(image);
     OpenCV.loadShared();
 
     try {
