@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
  */
 public enum TimeFormat {
   IMAGE_FILENAME("yyyy-MM-dd_HH-mm-ss-n"), CSV_FILENAME("yyyy-MM"), CSV_COLUMN(
-      "yyyy-MM-dd HH:mm:ss");
+      "yyyy-MM-dd HH:mm:ss"), LOG_ENTRY("yyyy-MM-dd HH:mm:ss.SSS");
 
   public final String pattern;
 

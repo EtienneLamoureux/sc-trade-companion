@@ -76,7 +76,7 @@ public class CompanionGui extends JFrame implements NotificationRepository {
   public void add(NotificationLevel level, String message) {
     if (logsTab != null) {
       logsTab.addLog(
-          new Object[] {TimeUtil.getNowAsString(TimeFormat.CSV_COLUMN), level.toString(), message});
+          new Object[] {TimeUtil.getNowAsString(TimeFormat.LOG_ENTRY), level.toString(), message});
     }
   }
 
