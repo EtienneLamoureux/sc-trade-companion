@@ -42,11 +42,11 @@ public class ImageUtil {
   private ImageUtil() {}
 
   /**
-   * Makes a copy of the input, turning it to greyscale with equalized color.
+   * Creates a greyscale copy of an image with equalized colors. The original is untouched.
    *
    * @see {@link org.opencv.imgproc.Imgproc#equalizeHist Equalized histogram}
-   * @param image The image to make an equalized copy of.
-   * @return copy of the input, in equalized greyscale
+   * @param image The image to make a greyscale copy of.
+   * @return A greyscale copy of the image
    */
   public static BufferedImage makeHistogramEqualizedGreyscaleCopy(BufferedImage image) {
     image = makeGreyscaleCopy(image);
@@ -64,11 +64,11 @@ public class ImageUtil {
   }
 
   /**
-   * Makes a copy of the input, turning it to greyscale with equalized color.
+   * Creates a greyscale copy of an image with equalized colors. The original is untouched.
    *
    * @see {@link org.opencv.imgproc.CLAHE#apply Contrast Limited Adaptive Histogram Equalization}
-   * @param image The image to make an equalized copy of.
-   * @return copy of the input, in equalized greyscale
+   * @param image The image to make a greyscale copy of.
+   * @return A greyscale copy of the image
    */
   public static BufferedImage makeClaheEqualizedGreyscaleCopy(BufferedImage image) {
     image = makeGreyscaleCopy(image);
