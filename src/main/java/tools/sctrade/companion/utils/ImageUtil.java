@@ -41,6 +41,13 @@ public class ImageUtil {
 
   private ImageUtil() {}
 
+  /**
+   * Makes a copy of the input, turning it to greyscale with equalized color.
+   *
+   * @see {@link org.opencv.imgproc.Imgproc#equalizeHist Equalized histogram}
+   * @param image The image to make an equalized copy of.
+   * @return copy of the input, in equalized greyscale
+   */
   public static BufferedImage makeHistogramEqualizedGreyscaleCopy(BufferedImage image) {
     image = makeGreyscaleCopy(image);
     OpenCV.loadShared();
@@ -56,6 +63,13 @@ public class ImageUtil {
     }
   }
 
+  /**
+   * Makes a copy of the input, turning it to greyscale with equalized color.
+   *
+   * @see {@link org.opencv.imgproc.CLAHE#apply Contrast Limited Adaptive Histogram Equalization}
+   * @param image The image to make an equalized copy of.
+   * @return copy of the input, in equalized greyscale
+   */
   public static BufferedImage makeClaheEqualizedGreyscaleCopy(BufferedImage image) {
     image = makeGreyscaleCopy(image);
     OpenCV.loadShared();
