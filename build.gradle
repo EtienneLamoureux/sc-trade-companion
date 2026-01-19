@@ -39,6 +39,7 @@ dependencies {
 	implementation 'commons-io:commons-io:2.18.0'
 	implementation 'com.opencsv:opencsv:5.9'
 	implementation 'com.github.oshi:oshi-core:6.6.3'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	
 	// Tests	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
