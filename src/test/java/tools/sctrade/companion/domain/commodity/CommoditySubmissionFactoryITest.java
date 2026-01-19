@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,6 +14,8 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
@@ -24,7 +25,6 @@ import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToEqualizedGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
-import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
 import tools.sctrade.companion.domain.notification.ConsoleNotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
@@ -39,7 +39,7 @@ import tools.sctrade.companion.utils.ResourceUtil;
 
 @ExtendWith(MockitoExtension.class)
 class CommoditySubmissionFactoryITest {
-  private static final double CURRENT_ACCURACY = 25.0;
+  private static final double CURRENT_ACCURACY = 25.6;
 
   private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactoryITest.class);
 
@@ -69,8 +69,8 @@ class CommoditySubmissionFactoryITest {
     setupMocks();
 
     diskImageWriter = new DiskImageWriter(settings);
-    List<ImageManipulation> imageManipulations = List.of(new UpscaleTo4k(),
-        new WriteToDisk(diskImageWriter), new InvertColors(), new ConvertToEqualizedGreyscale());
+    List<ImageManipulation> imageManipulations =
+        List.of(new UpscaleTo4k(), new InvertColors(), new ConvertToEqualizedGreyscale());
     ocr = new WindowsOcr(imageManipulations, diskImageWriter, processRunner,
         new NotificationService(new ConsoleNotificationRepository()));
 
@@ -79,9 +79,11 @@ class CommoditySubmissionFactoryITest {
   }
 
   @Test
-  void bonjour() throws IOException, URISyntaxException {
+  void givenTestCasesByColorPaletteWhenProcessingThenCalculateOverallAccuracyScore()
+      throws IOException {
     var testCasesByColorPalette = Map.of("uee blue",
-        List.of("arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1", "pyro-gateway-sell-1"),
+        List.of("arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1", "pyro-gateway-sell-1",
+            "seraphim-station-buy-1", "seraphim-station-sell-1"),
         "pyro orange", List.of("canard-view-buy-1", "canard-view-sell-1", "checkmate-buy-1"),
         "levski grey", List.of("levski-buy-1", "levski-buy-2", "levski-sell-1"));
 
@@ -91,32 +93,31 @@ class CommoditySubmissionFactoryITest {
       double colorPaletteScore = 0.0;
 
       for (var testCase : testCasesByColorPalette.get(colorPalette)) {
-        var image = ResourceUtil.getBufferedImage("/kiosks/commodity/images/" + testCase + ".jpg");
-        var actualListings = getActualListingsNoFail(image);
-
-        var score = calulateScore(testCase, actualListings);
+        var score = calulateScore(testCase);
         scores.add(score);
         colorPaletteScore += score;
       }
 
-      logger.info("{} (score)\t\t\t{}%", colorPalette,
+      logger.info("{} (score)\t{}%", colorPalette,
           colorPaletteScore / testCasesByColorPalette.get(colorPalette).size());
     }
 
     double totalScore = scores.stream().mapToDouble(Double::doubleValue).sum() / scores.size();
-    logger.info("TOTAL (score)\t\t{}%", totalScore);
-    assertTrue(totalScore > CURRENT_ACCURACY);
+    logger.info("TOTAL (score)\t{}%", totalScore);
+    assertTrue(totalScore >= CURRENT_ACCURACY);
   }
 
-  private Collection<CommodityListing> getActualListingsNoFail(BufferedImage image) {
-    try {
-      return submissionFactory.build(image).getListings();
-    } catch (Exception e) {
-      return List.of();
-    }
+  @ParameterizedTest(name = "{0}")
+  @ValueSource(strings = {"arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1", "pyro-gateway-sell-1",
+      "seraphim-station-buy-1", "seraphim-station-sell-1", "canard-view-buy-1",
+      "canard-view-sell-1", "checkmate-buy-1", "levski-buy-1", "levski-buy-2", "levski-sell-1"})
+  void givenTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase) throws IOException {
+    calulateScore(testCase);
   }
 
-  private double calulateScore(String testCase, Collection<CommodityListing> actualListings) {
+  private double calulateScore(String testCase) throws IOException {
+    var image = ResourceUtil.getBufferedImage("/kiosks/commodity/images/" + testCase + ".jpg");
+    var actualListings = getActualListingsNoFail(image);
     var expectedListings = getExpectedListingsFor(testCase);
     var actualListingsIterator = actualListings.iterator();
 
@@ -179,9 +180,17 @@ class CommoditySubmissionFactoryITest {
     }
 
     double score = (points / total) * 100;
-    logger.debug("{} (score)\t\t{}%", testCase, score);
+    logger.info("{} (score)\t\t{}%", testCase, score);
 
     return score;
+  }
+
+  private Collection<CommodityListing> getActualListingsNoFail(BufferedImage image) {
+    try {
+      return submissionFactory.build(image).getListings();
+    } catch (Exception e) {
+      return List.of();
+    }
   }
 
   private List<CommodityListing> getExpectedListingsFor(String testCase) {
@@ -193,7 +202,7 @@ class CommoditySubmissionFactoryITest {
   }
 
   private void setupMocks() {
-    when(settings.get(Setting.OUTPUT_TRANSIENT_IMAGES)).thenReturn(true);
+    // when(settings.get(Setting.OUTPUT_TRANSIENT_IMAGES)).thenReturn(true);
     when(settings.get(Setting.OUTPUT_SCREENSHOTS)).thenReturn(true);
     when(settings.get(Setting.MY_IMAGES_PATH))
         .thenReturn(Paths.get(".", "test-images").normalize().toAbsolutePath());
