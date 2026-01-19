@@ -62,7 +62,7 @@ class CommoditySubmissionFactoryComponentTest {
     when(diskImageWriter.write(any(), any()))
         .thenReturn(Optional.of(Path.of(this.getClass().getResource(resourcePath).toURI())));
     when(processRunner.runNoFail(any()))
-        .thenReturn(ResourceUtil.getTextLines("/kiosks/commodity/jsons/" + filename + ".json"));
+        .thenReturn(ResourceUtil.getTextLines("/kiosks/commodity/actuals/" + filename + ".json"));
 
     var image = ResourceUtil.getBufferedImage(resourcePath);
 
