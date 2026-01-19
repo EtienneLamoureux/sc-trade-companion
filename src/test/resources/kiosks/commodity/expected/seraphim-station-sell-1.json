@@ -1,0 +1,57 @@
+[
+  {
+    "location": "Seraphim Station",
+    "transactionType": "BUYS",
+    "commodity": "Agricultural supplies",
+    "price": 1546.00000,
+    "inventory": 0,
+    "inventoryLevel": "SOLD_OUT",
+    "boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+    "batchId": "f91b6d84c6c9e5a7d4b2a9e8f3c1d0e6b5a4c2f9e8d7c1a0b3e5f4d2c9",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "Seraphim Station",
+    "transactionType": "BUYS",
+    "commodity": "amioshi plague",
+    "price": 27455.99937,
+    "inventory": 0,
+    "inventoryLevel": "SOLD_OUT",
+	"boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+    "batchId": "f91b6d84c6c9e5a7d4b2a9e8f3c1d0e6b5a4c2f9e8d7c1a0b3e5f4d2c9",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "Seraphim Station",
+    "transactionType": "BUYS",
+    "commodity": "aphorite",
+    "price": 200000,
+    "inventory": 0,
+    "inventoryLevel": "SOLD_OUT",
+	"boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+    "batchId": "f91b6d84c6c9e5a7d4b2a9e8f3c1d0e6b5a4c2f9e8d7c1a0b3e5f4d2c9",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "Seraphim Station",
+    "transactionType": "BUYS",
+    "commodity": "astatine",
+    "price": 3404.99997,
+    "inventory": 0,
+    "inventoryLevel": "SOLD_OUT",
+	"boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+    "batchId": "f91b6d84c6c9e5a7d4b2a9e8f3c1d0e6b5a4c2f9e8d7c1a0b3e5f4d2c9",
+    "timestamp": 1768675164.6528624
+  }	,
+  {
+    "location": "Seraphim Station",
+    "transactionType": "BUYS",
+    "commodity": "dynaflex",
+    "price": 2230.99994,
+    "inventory": 471,
+    "inventoryLevel": "VERY_LOW",
+	"boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+    "batchId": "f91b6d84c6c9e5a7d4b2a9e8f3c1d0e6b5a4c2f9e8d7c1a0b3e5f4d2c9",
+    "timestamp": 1768675164.6528624
+  }
+]
