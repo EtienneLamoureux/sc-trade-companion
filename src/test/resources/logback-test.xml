@@ -10,10 +10,10 @@
 		<appender-ref ref="STDOUT" />
 	</root>
 
-	<logger name="tools.sctrade.companion" level="INFO">
+	<logger name="tools.sctrade.companion" level="OFF">
 	</logger>
 
-	<logger name="tools.sctrade.companion.utils.ProcessRunner" level="DEBUG">
+	<logger name="tools.sctrade.companion.utils.ProcessRunner" level="INFO">
 	</logger>
 
 	<logger name="tools.sctrade.companion.domain.commodity.CommoditySubmissionFactoryITest" level="INFO">
