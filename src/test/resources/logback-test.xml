@@ -16,7 +16,7 @@
 	<logger name="tools.sctrade.companion.utils.ProcessRunner" level="DEBUG">
 	</logger>
 
-	<logger name="tools.sctrade.companion.domain.commodity.CommoditySubmissionFactoryITest" level="DEBUG">
+	<logger name="tools.sctrade.companion.domain.commodity.CommoditySubmissionFactoryITest" level="INFO">
 	</logger>
 
 	<!-- DO NOT log keyboard interupts -->

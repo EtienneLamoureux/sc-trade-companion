@@ -1,12 +1,16 @@
 package tools.sctrade.companion.domain.commodity;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +39,8 @@ import tools.sctrade.companion.utils.ResourceUtil;
 
 @ExtendWith(MockitoExtension.class)
 class CommoditySubmissionFactoryITest {
+  private static final double CURRENT_ACCURACY = 25.0;
+
   private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactoryITest.class);
 
   @Mock
@@ -74,12 +80,40 @@ class CommoditySubmissionFactoryITest {
 
   @Test
   void bonjour() throws IOException, URISyntaxException {
-    var testCase = "arc-l1-sell-1";
+    var testCasesByColorPalette = Map.of("uee blue",
+        List.of("arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1", "pyro-gateway-sell-1"),
+        "pyro orange", List.of("canard-view-buy-1", "canard-view-sell-1", "checkmate-buy-1"),
+        "levski grey", List.of("levski-buy-1", "levski-buy-2", "levski-sell-1"));
 
-    var image = ResourceUtil.getBufferedImage("/kiosks/commodity/images/" + testCase + ".jpg");
-    var actualListings = submissionFactory.build(image).getListings();
+    var scores = new ArrayList<Double>();
 
-    double score = calulateScore(testCase, actualListings);
+    for (var colorPalette : testCasesByColorPalette.keySet()) {
+      double colorPaletteScore = 0.0;
+
+      for (var testCase : testCasesByColorPalette.get(colorPalette)) {
+        var image = ResourceUtil.getBufferedImage("/kiosks/commodity/images/" + testCase + ".jpg");
+        var actualListings = getActualListingsNoFail(image);
+
+        var score = calulateScore(testCase, actualListings);
+        scores.add(score);
+        colorPaletteScore += score;
+      }
+
+      logger.info("{} (score)\t\t\t{}%", colorPalette,
+          colorPaletteScore / testCasesByColorPalette.get(colorPalette).size());
+    }
+
+    double totalScore = scores.stream().mapToDouble(Double::doubleValue).sum() / scores.size();
+    logger.info("TOTAL (score)\t\t{}%", totalScore);
+    assertTrue(totalScore > CURRENT_ACCURACY);
+  }
+
+  private Collection<CommodityListing> getActualListingsNoFail(BufferedImage image) {
+    try {
+      return submissionFactory.build(image).getListings();
+    } catch (Exception e) {
+      return List.of();
+    }
   }
 
   private double calulateScore(String testCase, Collection<CommodityListing> actualListings) {
@@ -93,6 +127,7 @@ class CommoditySubmissionFactoryITest {
       total += 6;
 
       if (actualListingsIterator.hasNext() == false) {
+        logger.debug("{} (missing listing)\t{}", testCase, expectedListing.commodity());
         continue;
       }
 
@@ -101,21 +136,21 @@ class CommoditySubmissionFactoryITest {
       if (expectedListing.location().equalsIgnoreCase(actualListing.location())) {
         points++;
       } else {
-        logger.debug("{}: {} != {}", testCase, expectedListing.location(),
+        logger.debug("{} (location)\t{} != {}", testCase, expectedListing.location(),
             actualListing.location());
       }
 
       if (expectedListing.transactionType().equals(actualListing.transactionType())) {
         points++;
       } else {
-        logger.debug("{}: {} != {}", testCase, expectedListing.transactionType(),
+        logger.debug("{} (transactionType)\t{} != {}", testCase, expectedListing.transactionType(),
             actualListing.transactionType());
       }
 
       if (expectedListing.commodity().equalsIgnoreCase(actualListing.commodity())) {
         points++;
       } else {
-        logger.debug("{}: {} != {}", testCase, expectedListing.commodity(),
+        logger.debug("{} (commodity)\t\t{} != {}", testCase, expectedListing.commodity(),
             actualListing.commodity());
       }
 
@@ -123,26 +158,28 @@ class CommoditySubmissionFactoryITest {
           expectedListing.price() - actualListing.price()) <= (0.05 * expectedListing.price())) {
         points++;
       } else {
-        logger.debug("{}: {} != {}", testCase, expectedListing.price(), actualListing.price());
+        logger.debug("{} (price)\t\t{} != {}", testCase, expectedListing.price(),
+            actualListing.price());
       }
 
-      if (expectedListing.inventory() == actualListing.inventory()) {
+      if (Math.abs(expectedListing.inventory() - actualListing.inventory()) <= (0.001
+          * expectedListing.inventory())) {
         points++;
       } else {
-        logger.debug("{}: {} != {}", testCase, expectedListing.inventory(),
+        logger.debug("{} (inventory)\t\t{} != {}", testCase, expectedListing.inventory(),
             actualListing.inventory());
       }
 
       if (expectedListing.boxSizesInScu().equals(actualListing.boxSizesInScu())) {
         points++;
       } else {
-        logger.debug("{}: {} != {}", testCase, expectedListing.boxSizesInScu(),
+        logger.debug("{} (boxSizesInScu)\t{} != {}", testCase, expectedListing.boxSizesInScu(),
             actualListing.boxSizesInScu());
       }
     }
 
     double score = (points / total) * 100;
-    logger.debug("{}: {}%", testCase, score);
+    logger.debug("{} (score)\t\t{}%", testCase, score);
 
     return score;
   }
