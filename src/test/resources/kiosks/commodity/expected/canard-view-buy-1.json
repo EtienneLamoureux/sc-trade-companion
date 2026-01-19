@@ -1,0 +1,35 @@
+[
+	{
+		"location": "Canard View",
+		"transactionType": "SELLS",
+		"commodity": "Diamond Laminate",
+		"price": 76071.99859,
+		"inventory": 5,
+		"inventoryLevel": "LOW",
+		"boxSizesInScu": [1, 2],
+		"batchId": "8b2e7fdb5a3b6bb4c9c8a0dff5c1e6c7b1cbbf0e91e3d7c3c2c0e5a77c1f",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "Canard View",
+		"transactionType": "SELLS",
+		"commodity": "Processed Food",
+		"price": 1202.00002,
+		"inventory": 6000,
+		"inventoryLevel": "MAX",
+		"boxSizesInScu": [1, 2, 4, 8],
+		"batchId": "8b2e7fdb5a3b6bb4c9c8a0dff5c1e6c7b1cbbf0e91e3d7c3c2c0e5a77c1f",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "Canard View",
+		"transactionType": "SELLS",
+		"commodity": "Recycled Material Composite",
+		"price": 5177.00004,
+		"inventory": 1050,
+		"inventoryLevel": "MAX",
+		"boxSizesInScu": [1, 2, 4, 8, 16],
+		"batchId": "8b2e7fdb5a3b6bb4c9c8a0dff5c1e6c7b1cbbf0e91e3d7c3c2c0e5a77c1f",
+		"timestamp": 1768675164.6528624
+	}
+]

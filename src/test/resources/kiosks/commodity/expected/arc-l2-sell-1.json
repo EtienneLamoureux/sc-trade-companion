@@ -1,0 +1,46 @@
+[
+  {
+    "location": "ARC-L2 Lively Pathway Station",
+    "transactionType": "BUYS",
+    "commodity": "Processed Food",
+    "price": 1523.0,
+    "inventory": 0,
+    "inventoryLevel": "SOLD_OUT",
+    "boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+    "batchId": "a2c6a91c7f4d5c8dbe8a71c4c1a9d8d5e3b44b1c0e2c1f6b7e0c9c8f4e1a9b2",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "ARC-L2 Lively Pathway Station",
+    "transactionType": "BUYS",
+    "commodity": "Astatine",
+    "price": 3839.99991,
+    "inventory": 988,
+    "inventoryLevel": "LOW",
+    "boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+    "batchId": "a2c6a91c7f4d5c8dbe8a71c4c1a9d8d5e3b44b1c0e2c1f6b7e0c9c8f4e1a9b2",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "ARC-L2 Lively Pathway Station",
+    "transactionType": "BUYS",
+    "commodity": "Nitrogen",
+    "price": 3530.99989,
+    "inventory": 0,
+    "inventoryLevel": "SOLD_OUT",
+    "boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+    "batchId": "a2c6a91c7f4d5c8dbe8a71c4c1a9d8d5e3b44b1c0e2c1f6b7e0c9c8f4e1a9b2",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "ARC-L2 Lively Pathway Station",
+    "transactionType": "BUYS",
+    "commodity": "Methane",
+    "price": 4155.00020,
+    "inventory": 112,
+    "inventoryLevel": "SOLD_OUT",
+    "boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+    "batchId": "a2c6a91c7f4d5c8dbe8a71c4c1a9d8d5e3b44b1c0e2c1f6b7e0c9c8f4e1a9b2",
+    "timestamp": 1768675164.6528624
+  }
+]

@@ -1,0 +1,46 @@
+[
+	{
+		"location": "ARC-L1 Wide Forest Station",
+		"transactionType": "BUYS",
+		"commodity": "Gold",
+		"price": 6423.99978,
+		"inventory": 460,
+		"inventoryLevel": "HIGH",
+		"boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+		"batchId": "f072f39e493a3a5c955f73507513e9e0c84612e24463ec207a64e62560472806",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "ARC-L1 Wide Forest Station",
+		"transactionType": "BUYS",
+		"commodity": "Nitrogen",
+		"price": 1500.0,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+		"batchId": "f072f39e493a3a5c955f73507513e9e0c84612e24463ec207a64e62560472806",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "ARC-L1 Wide Forest Station",
+		"transactionType": "BUYS",
+		"commodity": "Methane",
+		"price": 2292.00005,
+		"inventory": 1699,
+		"inventoryLevel": "HIGH",
+		"boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+		"batchId": "f072f39e493a3a5c955f73507513e9e0c84612e24463ec207a64e62560472806",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "ARC-L1 Wide Forest Station",
+		"transactionType": "BUYS",
+		"commodity": "Omnapoxy",
+		"price": 2772.00007,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+		"batchId": "f072f39e493a3a5c955f73507513e9e0c84612e24463ec207a64e62560472806",
+		"timestamp": 1768675164.6528624
+	}
+]

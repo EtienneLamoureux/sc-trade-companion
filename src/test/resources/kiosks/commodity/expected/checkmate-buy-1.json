@@ -1,0 +1,35 @@
+[
+  {
+    "location": "Checkmate",
+    "transactionType": "SELLS",
+    "commodity": "Agricultural Supplies",
+    "price": 1108.00004,
+    "inventory": 6000,
+    "inventoryLevel": "MAX",
+    "boxSizesInScu": [8, 16, 24, 32],
+    "batchId": "checkmate-buy-1",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "Checkmate",
+    "transactionType": "SELLS",
+    "commodity": "Carbon",
+    "price": 235.00000,
+    "inventory": 24000,
+    "inventoryLevel": "MAX",
+    "boxSizesInScu": [8, 16, 24, 32],
+    "batchId": "checkmate-buy-1",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "Checkmate",
+    "transactionType": "SELLS",
+    "commodity": "Distilled Spirits",
+    "price": 1427.00004,
+    "inventory": 6000,
+    "inventoryLevel": "MAX",
+    "boxSizesInScu": [8, 16, 24, 32],
+    "batchId": "checkmate-buy-1",
+    "timestamp": 1768675164.6528624
+  }
+]

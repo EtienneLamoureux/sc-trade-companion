@@ -1,0 +1,35 @@
+[
+	{
+		"location": "Levski",
+		"transactionType": "SELLS",
+		"commodity": "Construction Materials",
+		"price": 8251.99985,
+		"inventory": 90,
+		"inventoryLevel": "LOW",
+		"boxSizesInScu": [1, 2, 4, 8],
+		"batchId": "8b9e0f8d9c2c7a1e1cfeaa9b8b1b0e8f0f4fbd71c3cfcaf94d2c4a0cfa9bce32",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "Levski",
+		"transactionType": "SELLS",
+		"commodity": "Iron",
+		"price": 1396.00002,
+		"inventory": 18000,
+		"inventoryLevel": "MAX",
+		"boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+		"batchId": "8b9e0f8d9c2c7a1e1cfeaa9b8b1b0e8f0f4fbd71c3cfcaf94d2c4a0cfa9bce32",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "Levski",
+		"transactionType": "SELLS",
+		"commodity": "Corundum",
+		"price": 1365.00000,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"boxSizesInScu": [],
+		"batchId": "8b9e0f8d9c2c7a1e1cfeaa9b8b1b0e8f0f4fbd71c3cfcaf94d2c4a0cfa9bce32",
+		"timestamp": 1768675164.6528624
+	}
+]

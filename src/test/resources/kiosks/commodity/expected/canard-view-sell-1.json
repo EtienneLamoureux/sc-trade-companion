@@ -1,0 +1,35 @@
+[
+	{
+		"location": "Canard View",
+		"transactionType": "BUYS",
+		"commodity": "Stileron",
+		"price": 82844.00177,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"boxSizesInScu": [1, 2, 4, 8, 16],
+		"batchId": "f4c3d2b1a0e9d8c7b6a5f4e3d2c1b0a9988776655443322110ffeeddccbbaa",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "Canard View",
+		"transactionType": "BUYS",
+		"commodity": "Taranite",
+		"price": 20497.99919,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"boxSizesInScu": [1, 2, 4, 8],
+		"batchId": "f4c3d2b1a0e9d8c7b6a5f4e3d2c1b0a9988776655443322110ffeeddccbbaa",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "Canard View",
+		"transactionType": "BUYS",
+		"commodity": "Quantanium",
+		"price": 94377.99835,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"boxSizesInScu": [1, 2, 4, 8, 16],
+		"batchId": "f4c3d2b1a0e9d8c7b6a5f4e3d2c1b0a9988776655443322110ffeeddccbbaa",
+		"timestamp": 1768675164.6528624
+	}
+]

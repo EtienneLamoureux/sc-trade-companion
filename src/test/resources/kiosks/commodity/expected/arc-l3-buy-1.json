@@ -1,0 +1,46 @@
+[
+  {
+    "location": "ARC-L3 Modern Express Station",
+    "transactionType": "BUYS",
+    "commodity": "Scrap",
+    "price": 1416.00002,
+    "inventory": 2100,
+    "inventoryLevel": "MAX",
+    "boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+    "batchId": "f91b6d84c6c9e5a7d4b2a9e8f3c1d0e6b5a4c2f9e8d7c1a0b3e5f4d2c9",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "ARC-L3 Modern Express Station",
+    "transactionType": "BUYS",
+    "commodity": "Waste",
+    "price": 11.0,
+    "inventory": 75,
+    "inventoryLevel": "MAX",
+    "boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+    "batchId": "f91b6d84c6c9e5a7d4b2a9e8f3c1d0e6b5a4c2f9e8d7c1a0b3e5f4d2c9",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "ARC-L3 Modern Express Station",
+    "transactionType": "BUYS",
+    "commodity": "Astatine",
+    "price": 1200.00004,
+    "inventory": 2100,
+    "inventoryLevel": "MAX",
+    "boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+    "batchId": "f91b6d84c6c9e5a7d4b2a9e8f3c1d0e6b5a4c2f9e8d7c1a0b3e5f4d2c9",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "ARC-L3 Modern Express Station",
+    "transactionType": "BUYS",
+    "commodity": "Gold",
+    "price": 5720.00023,
+    "inventory": 123,
+    "inventoryLevel": "LOW",
+    "boxSizesInScu": [1, 2, 4, 8, 16],
+    "batchId": "f91b6d84c6c9e5a7d4b2a9e8f3c1d0e6b5a4c2f9e8d7c1a0b3e5f4d2c9",
+    "timestamp": 1768675164.6528624
+  }
+]

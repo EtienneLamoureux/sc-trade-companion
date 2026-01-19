@@ -1,0 +1,46 @@
+[
+	{
+		"location": "Levski",
+		"transactionType": "BUYS",
+		"commodity": "Aphorite",
+		"price": 170000.0,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+		"batchId": "9e2b3a6f5c8d1a4b7e0f6c2d9a8b4f3e5d1c7a0b9e6d5c2a4f8b3d7e",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "Levski",
+		"transactionType": "BUYS",
+		"commodity": "Argon",
+		"price": 34.0,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+		"batchId": "9e2b3a6f5c8d1a4b7e0f6c2d9a8b4f3e5d1c7a0b9e6d5c2a4f8b3d7e",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "Levski",
+		"transactionType": "BUYS",
+		"commodity": "Astatine",
+		"price": 1610.00001,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+		"batchId": "9e2b3a6f5c8d1a4b7e0f6c2d9a8b4f3e5d1c7a0b9e6d5c2a4f8b3d7e",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "Levski",
+		"transactionType": "BUYS",
+		"commodity": "Atlasium",
+		"price": 87607.000225,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+		"batchId": "9e2b3a6f5c8d1a4b7e0f6c2d9a8b4f3e5d1c7a0b9e6d5c2a4f8b3d7e",
+		"timestamp": 1768675164.6528624
+	}
+]

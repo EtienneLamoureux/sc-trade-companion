@@ -1,0 +1,46 @@
+[
+  {
+    "location": "Levski",
+    "transactionType": "SELLS",
+    "commodity": "Agricium",
+    "price": 2019.99998,
+    "inventory": 1575,
+    "inventoryLevel": "MAX",
+    "boxSizesInScu": [1, 2, 4, 8, 16],
+    "batchId": "levski-buy-1",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "Levski",
+    "transactionType": "SELLS",
+    "commodity": "Beryl",
+    "price": 2019.00005,
+    "inventory": 263,
+    "inventoryLevel": "LOW",
+    "boxSizesInScu": [1, 2, 4, 8, 16],
+    "batchId": "levski-buy-1",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "Levski",
+    "transactionType": "SELLS",
+    "commodity": "Construction Materials",
+    "price": 6077.00014,
+    "inventory": 284,
+    "inventoryLevel": "MEDIUM",
+    "boxSizesInScu": [1, 2, 4, 8],
+    "batchId": "levski-buy-1",
+    "timestamp": 1768675164.6528624
+  },
+  {
+    "location": "Levski",
+    "transactionType": "SELLS",
+    "commodity": "Iron",
+    "price": 263.00000,
+    "inventory": 18000,
+    "inventoryLevel": "MAX",
+    "boxSizesInScu": [1, 2, 4, 8, 16, 24, 32],
+    "batchId": "levski-buy-1",
+    "timestamp": 1768675164.6528624
+  }
+]
