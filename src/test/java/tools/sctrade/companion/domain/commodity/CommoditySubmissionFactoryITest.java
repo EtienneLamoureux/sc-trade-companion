@@ -39,7 +39,7 @@ import tools.sctrade.companion.utils.ResourceUtil;
 
 @ExtendWith(MockitoExtension.class)
 class CommoditySubmissionFactoryITest {
-  private static final double CURRENT_ACCURACY = 25.6;
+  private static final double CURRENT_ACCURACY = 35.0;
 
   private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactoryITest.class);
 
