@@ -20,7 +20,7 @@ import tools.sctrade.companion.utils.StringUtil;
  */
 public class RawCommodityListing {
   private static final Pattern RIGHT_PATTERN =
-      Pattern.compile("([0-9\\.]+) ?scu\\R.[^0-9]?([0-9\\.km]+)\\/", Pattern.CASE_INSENSITIVE);
+      Pattern.compile("([0-9\\.]+) ?scu\\R.[^0-9]?([ils 0-9\\.km]+)\\/", Pattern.CASE_INSENSITIVE);
   private static final Set<Integer> BOX_SIZES_IN_SCU = Set.of(1, 2, 4, 8, 16, 24, 32);
 
   private final Logger logger = LoggerFactory.getLogger(RawCommodityListing.class);
@@ -141,6 +141,7 @@ public class RawCommodityListing {
       Matcher matcher = RIGHT_PATTERN.matcher(rightText);
       matcher.find();
       String match = matcher.group(2).toLowerCase(Locale.ROOT);
+      match = match.replace(" ", "").replace("i", "1").replace("l", "1").replace("s", "5");
       boolean isMillions = match.endsWith("m");
       boolean isThousands = match.endsWith("k");
       match = match.replace("m", "").replace("k", "");
