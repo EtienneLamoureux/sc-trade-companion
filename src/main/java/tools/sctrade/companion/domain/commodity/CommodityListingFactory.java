@@ -140,11 +140,12 @@ public class CommodityListingFactory {
     Rectangle shopInventoryRectangle = shopInventoryFragment.getBoundingBox();
     double minX =
         shopInventoryRectangle.getMinX() + (2 * shopInventoryFragment.getCharacterWidth());
+    double minY = shopInventoryRectangle.getMinY() + (3 * shopInventoryRectangle.getHeight());
 
     var words = result.getLines().stream().flatMap(n -> n.getFragments().stream())
         .flatMap(n -> n.getWordsInReadingOrder().stream())
         .filter(n -> n.getBoundingBox().getMinX() > minX)
-        .filter(n -> n.getBoundingBox().getMinY() > shopInventoryRectangle.getMinY()).toList();
+        .filter(n -> n.getBoundingBox().getMinY() > minY).toList();
 
     return new OcrResult(words);
   }
