@@ -1,8 +1,10 @@
 # SC Trade Companion
 ## 1.3.1
 ### Other
+- Improve text recognition
 - Sort logs by latest on top by default
 - Add clear [Code 9] error for missing or outdated .NET
+- Provide better contribution tools, now with a fully-fledged test harness
 
 ## 1.3.0
 ### Features
