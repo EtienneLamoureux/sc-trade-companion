@@ -14,4 +14,13 @@ public class ImageProcessingException extends RuntimeException {
   public ImageProcessingException(Exception e) {
     super(e);
   }
+
+  /**
+   * Creates a new instance of the ImageProcessingException class.
+   *
+   * @param e The runtime exception that caused the error
+   */
+  public ImageProcessingException(RuntimeException e) {
+    super(e);
+  }
 }

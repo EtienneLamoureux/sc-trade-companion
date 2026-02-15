@@ -25,6 +25,7 @@ import org.imgscalr.Scalr.Mode;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
@@ -424,5 +425,70 @@ public class ImageUtil {
     File imageFile = new File(path.toString());
     String format = path.toString().substring(path.toString().lastIndexOf(".") + 1);
     ImageIO.write(image, format, imageFile);
+  }
+
+  /**
+   * Calculate the Euclidean distance between two points.
+   *
+   * @param p1 The first point.
+   * @param p2 The second point.
+   * @return The distance between the two points.
+   */
+  public static double distance(Point p1, Point p2) {
+    double dx = p1.x - p2.x;
+    double dy = p1.y - p2.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  /**
+   * Order four corners in the following order: top-left, top-right, bottom-right, bottom-left.
+   *
+   * @param corners The four corners to order.
+   * @return The ordered corners.
+   */
+  public static Point[] orderCorners(Point[] corners) {
+    if (corners.length != 4) {
+      throw new IllegalArgumentException("Expected 4 corners, got " + corners.length);
+    }
+
+    // Calculate sums and differences for each point
+    double[] sums = new double[4];
+    double[] diffs = new double[4];
+    for (int i = 0; i < 4; i++) {
+      sums[i] = corners[i].x + corners[i].y;
+      diffs[i] = corners[i].y - corners[i].x;
+    }
+
+    // Find indices for each corner
+    int tlIdx = 0, trIdx = 0, brIdx = 0, blIdx = 0;
+    double minSum = sums[0], maxSum = sums[0];
+    double minDiff = diffs[0], maxDiff = diffs[0];
+
+    for (int i = 1; i < 4; i++) {
+      if (sums[i] < minSum) {
+        minSum = sums[i];
+        tlIdx = i;
+      }
+      if (sums[i] > maxSum) {
+        maxSum = sums[i];
+        brIdx = i;
+      }
+      if (diffs[i] < minDiff) {
+        minDiff = diffs[i];
+        trIdx = i;
+      }
+      if (diffs[i] > maxDiff) {
+        maxDiff = diffs[i];
+        blIdx = i;
+      }
+    }
+
+    Point[] ordered = new Point[4];
+    ordered[0] = corners[tlIdx]; // Top-left
+    ordered[1] = corners[trIdx]; // Top-right
+    ordered[2] = corners[brIdx]; // Bottom-right
+    ordered[3] = corners[blIdx]; // Bottom-left
+
+    return ordered;
   }
 }
