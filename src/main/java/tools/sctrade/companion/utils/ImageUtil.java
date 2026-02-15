@@ -482,7 +482,13 @@ public class ImageUtil {
       List<DMatch> matchList = matches.toList();
       matchList.sort((a, b) -> Float.compare(a.distance, b.distance));
       int numGoodMatches = (int) (matchList.size() * 0.1);
+      numGoodMatches = Math.max(numGoodMatches, 4); // Minimum 4 matches required for homography
       matchList = matchList.subList(0, Math.min(numGoodMatches, matchList.size()));
+
+      if (matchList.size() < 4) {
+        throw new ImageProcessingException(
+            new IllegalArgumentException("Insufficient matches found for homography computation"));
+      }
 
       // Extract matched points
       List<Point> points1 = new ArrayList<>();
@@ -500,11 +506,37 @@ public class ImageUtil {
       // Find homography
       Mat homography = Calib3d.findHomography(matPoints2, matPoints1, Calib3d.RANSAC);
 
+      if (homography.empty()) {
+        throw new ImageProcessingException(
+            new IllegalStateException("Failed to compute homography matrix"));
+      }
+
       // Warp image
       Mat aligned = new Mat();
       Imgproc.warpPerspective(imgMat, aligned, homography, new Size(refMat.cols(), refMat.rows()));
 
-      return toBufferedImage(aligned);
+      BufferedImage result = toBufferedImage(aligned);
+
+      // Release OpenCV resources
+      for (Mat channel : refChannels) {
+        channel.release();
+      }
+      for (Mat channel : imgChannels) {
+        channel.release();
+      }
+      keypoints1.release();
+      keypoints2.release();
+      descriptors1.release();
+      descriptors2.release();
+      matches.release();
+      matPoints1.release();
+      matPoints2.release();
+      homography.release();
+      aligned.release();
+      refMat.release();
+      imgMat.release();
+
+      return result;
     } catch (IOException e) {
       throw new ImageProcessingException(e);
     }

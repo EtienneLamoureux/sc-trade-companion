@@ -4,8 +4,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.imageio.ImageIO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.exceptions.ImageProcessingException;
 import tools.sctrade.companion.utils.ImageUtil;
@@ -16,7 +14,6 @@ import tools.sctrade.companion.utils.ImageUtil;
  * reference template, then applies a perspective transformation to align the image.
  */
 public class AlignToTemplate implements ImageManipulation {
-  private static final Logger logger = LoggerFactory.getLogger(AlignToTemplate.class);
   private static final String TEMPLATE_PATH = "/images/middle_template.jpg";
   private final BufferedImage template;
 
@@ -46,7 +43,6 @@ public class AlignToTemplate implements ImageManipulation {
   private BufferedImage loadTemplate(String resourcePath) {
     try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
       if (is == null) {
-        logger.warn("Template image not found at {}, alignment will fail if used", resourcePath);
         throw new ImageProcessingException(
             new IOException("Template image not found at " + resourcePath));
       }
