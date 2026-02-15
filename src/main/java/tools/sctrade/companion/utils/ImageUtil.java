@@ -470,8 +470,9 @@ public class ImageUtil {
       Mat descriptors1 = new Mat();
       Mat descriptors2 = new Mat();
 
-      orb.detectAndCompute(refBlue, new Mat(), keypoints1, descriptors1);
-      orb.detectAndCompute(imgBlue, new Mat(), keypoints2, descriptors2);
+      Mat emptyMask = new Mat();
+      orb.detectAndCompute(refBlue, emptyMask, keypoints1, descriptors1);
+      orb.detectAndCompute(imgBlue, emptyMask, keypoints2, descriptors2);
 
       // Match features
       DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
@@ -524,6 +525,7 @@ public class ImageUtil {
       for (Mat channel : imgChannels) {
         channel.release();
       }
+      emptyMask.release();
       keypoints1.release();
       keypoints2.release();
       descriptors1.release();
