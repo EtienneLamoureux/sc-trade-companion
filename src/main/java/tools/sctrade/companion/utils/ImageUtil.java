@@ -41,6 +41,10 @@ import tools.sctrade.companion.exceptions.RectangleOutOfBoundsException;
 public class ImageUtil {
   private static final Logger logger = LoggerFactory.getLogger(ImageUtil.class);
 
+  // Constants for perspective correction
+  private static final double MIN_CONTOUR_AREA = 1000.0;
+  private static final double APPROX_POLY_EPSILON_FACTOR = 0.02;
+
   private ImageUtil() {}
 
   /**
@@ -439,14 +443,14 @@ public class ImageUtil {
 
     for (MatOfPoint contour : contours) {
       double area = Imgproc.contourArea(contour);
-      if (area < 1000) { // Skip small contours
+      if (area < MIN_CONTOUR_AREA) { // Skip small contours
         continue;
       }
 
       MatOfPoint2f contour2f = new MatOfPoint2f(contour.toArray());
       double perimeter = Imgproc.arcLength(contour2f, true);
       MatOfPoint2f approx = new MatOfPoint2f();
-      Imgproc.approxPolyDP(contour2f, approx, 0.02 * perimeter, true);
+      Imgproc.approxPolyDP(contour2f, approx, APPROX_POLY_EPSILON_FACTOR * perimeter, true);
 
       // Check if it's a quadrilateral and larger than previous
       if (approx.total() == 4 && area > maxArea) {

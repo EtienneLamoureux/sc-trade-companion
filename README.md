@@ -38,7 +38,7 @@ Desktop companion application for Star Citizen.
 1. Close the application (make sure you close it in the system tray)
 
 ### Best practices
-1. Align your character **as close and as straight** to the screen as possible
+1. Align your character **as close and as straight** to the screen as possible (the application includes automatic perspective correction for skewed screens)
 1. Turn off hints (Options > Game settings > Show Hints, Control Hints)
 1. Turn off global chat (<kbd>F12</kbd> by default)
 1. If you use `r_DisplayInfo`, make sure the text doesn’t intrude on the screen
