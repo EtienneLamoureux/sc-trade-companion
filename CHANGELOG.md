@@ -1,4 +1,13 @@
 # SC Trade Companion
+## Unreleased
+### Features
+- Add automatic perspective correction for skewed kiosk screens
+- Add largest rectangle detection and crop to remove black borders
+- Improve image processing pipeline with homography support
+
+### Other
+- Extract image processing constants for better maintainability
+
 ## 1.3.1
 ### Other
 - Improve text recognition

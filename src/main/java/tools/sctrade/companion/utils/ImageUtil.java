@@ -381,8 +381,8 @@ public class ImageUtil {
   }
 
   /**
-   * Detects the largest quadrilateral contour in an image and applies perspective correction.
-   * This is useful for correcting skewed or tilted rectangular objects like screens or documents.
+   * Detects the largest quadrilateral contour in an image and applies perspective correction. This
+   * is useful for correcting skewed or tilted rectangular objects like screens or documents.
    *
    * @param image The image to apply perspective correction to.
    * @return The perspective-corrected image, or the original image if no suitable quadrilateral is
@@ -476,16 +476,16 @@ public class ImageUtil {
     Point[] orderedPoints = orderPoints(points);
 
     // Calculate the width and height of the new image
-    double widthA =
-        Math.hypot(orderedPoints[2].x - orderedPoints[3].x, orderedPoints[2].y - orderedPoints[3].y);
-    double widthB =
-        Math.hypot(orderedPoints[1].x - orderedPoints[0].x, orderedPoints[1].y - orderedPoints[0].y);
+    double widthA = Math.hypot(orderedPoints[2].x - orderedPoints[3].x,
+        orderedPoints[2].y - orderedPoints[3].y);
+    double widthB = Math.hypot(orderedPoints[1].x - orderedPoints[0].x,
+        orderedPoints[1].y - orderedPoints[0].y);
     int maxWidth = (int) Math.max(widthA, widthB);
 
-    double heightA =
-        Math.hypot(orderedPoints[1].x - orderedPoints[2].x, orderedPoints[1].y - orderedPoints[2].y);
-    double heightB =
-        Math.hypot(orderedPoints[0].x - orderedPoints[3].x, orderedPoints[0].y - orderedPoints[3].y);
+    double heightA = Math.hypot(orderedPoints[1].x - orderedPoints[2].x,
+        orderedPoints[1].y - orderedPoints[2].y);
+    double heightB = Math.hypot(orderedPoints[0].x - orderedPoints[3].x,
+        orderedPoints[0].y - orderedPoints[3].y);
     int maxHeight = (int) Math.max(heightA, heightB);
 
     // Define destination points for the transform
