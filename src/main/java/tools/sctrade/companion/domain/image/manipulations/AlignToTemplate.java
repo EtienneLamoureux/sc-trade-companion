@@ -14,7 +14,7 @@ import tools.sctrade.companion.utils.ImageUtil;
  * reference template, then applies a perspective transformation to align the image.
  */
 public class AlignToTemplate implements ImageManipulation {
-  private static final String TEMPLATE_PATH = "/images/middle_template.jpg";
+  private static final String TEMPLATE_PATH = "/images/ocr/commodity_kiosk_template.jpg";
   private final BufferedImage template;
 
   /**

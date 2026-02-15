@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -23,9 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.image.ImageManipulation;
-import tools.sctrade.companion.domain.image.manipulations.ConvertToEqualizedGreyscale;
-import tools.sctrade.companion.domain.image.manipulations.InvertColors;
-import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
+import tools.sctrade.companion.domain.image.manipulations.AlignToTemplate;
+import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
 import tools.sctrade.companion.domain.notification.ConsoleNotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
@@ -38,7 +36,7 @@ import tools.sctrade.companion.utils.JsonUtil;
 import tools.sctrade.companion.utils.ProcessRunner;
 import tools.sctrade.companion.utils.ResourceUtil;
 
-@Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
+// @Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
 @ExtendWith(MockitoExtension.class)
 class CommoditySubmissionFactoryITest {
   private static final double CURRENT_ACCURACY = 35.0;
@@ -71,8 +69,8 @@ class CommoditySubmissionFactoryITest {
     setupMocks();
 
     diskImageWriter = new DiskImageWriter(settings);
-    List<ImageManipulation> imageManipulations =
-        List.of(new UpscaleTo4k(), new InvertColors(), new ConvertToEqualizedGreyscale());
+    List<ImageManipulation> imageManipulations = List.of(new WriteToDisk(diskImageWriter),
+        new AlignToTemplate()/* , new InvertColors(), new ConvertToEqualizedGreyscale() */);
     ocr = new WindowsOcr(imageManipulations, diskImageWriter, processRunner,
         new NotificationService(new ConsoleNotificationRepository()));
 
@@ -204,7 +202,7 @@ class CommoditySubmissionFactoryITest {
   }
 
   private void setupMocks() {
-    // when(settings.get(Setting.OUTPUT_TRANSIENT_IMAGES)).thenReturn(true);
+    when(settings.get(Setting.OUTPUT_TRANSIENT_IMAGES)).thenReturn(true);
     when(settings.get(Setting.OUTPUT_SCREENSHOTS)).thenReturn(true);
     when(settings.get(Setting.MY_IMAGES_PATH))
         .thenReturn(Paths.get(".", "test-images").normalize().toAbsolutePath());
