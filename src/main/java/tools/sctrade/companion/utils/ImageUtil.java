@@ -25,6 +25,8 @@ import org.imgscalr.Scalr.Mode;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Size;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
@@ -369,6 +371,235 @@ public class ImageUtil {
 
       return contours.parallelStream().map(n -> Imgproc.boundingRect(n))
           .map(n -> new Rectangle(n.x, n.y, n.width, n.height)).collect(Collectors.toList());
+    } catch (IOException e) {
+      throw new ImageProcessingException(e);
+    }
+  }
+
+  /**
+   * Detects the largest quadrilateral contour in an image and applies perspective correction.
+   * This is useful for correcting skewed or tilted rectangular objects like screens or documents.
+   *
+   * @param image The image to apply perspective correction to.
+   * @return The perspective-corrected image, or the original image if no suitable quadrilateral is
+   *         found.
+   * @see <a href=
+   *      "https://docs.opencv.org/4.x/da/d6e/tutorial_py_geometric_transformations.html">Documentation</a>
+   */
+  public static BufferedImage applyPerspectiveCorrection(BufferedImage image) {
+    OpenCV.loadShared();
+
+    try {
+      Mat original = toMat(image);
+      Mat gray = new Mat();
+      Mat edges = new Mat();
+
+      // Convert to grayscale
+      if (original.channels() > 1) {
+        Imgproc.cvtColor(original, gray, Imgproc.COLOR_BGR2GRAY);
+      } else {
+        gray = original.clone();
+      }
+
+      // Apply Gaussian blur and Canny edge detection
+      Imgproc.GaussianBlur(gray, gray, new Size(5, 5), 0);
+      Imgproc.Canny(gray, edges, 50, 150);
+
+      // Find contours
+      List<MatOfPoint> contours = new ArrayList<>();
+      Mat hierarchy = new Mat();
+      Imgproc.findContours(edges, contours, hierarchy, Imgproc.RETR_LIST,
+          Imgproc.CHAIN_APPROX_SIMPLE);
+
+      // Find the largest quadrilateral contour
+      MatOfPoint2f largestQuad = findLargestQuadrilateral(contours);
+
+      if (largestQuad != null) {
+        // Apply perspective transform
+        Mat transformed = applyPerspectiveTransform(original, largestQuad);
+        return toBufferedImage(transformed);
+      }
+
+      // If no quadrilateral found, return original image
+      return image;
+    } catch (IOException e) {
+      throw new ImageProcessingException(e);
+    }
+  }
+
+  /**
+   * Finds the largest quadrilateral contour from a list of contours.
+   *
+   * @param contours The list of contours to search.
+   * @return The largest quadrilateral contour, or null if none found.
+   */
+  private static MatOfPoint2f findLargestQuadrilateral(List<MatOfPoint> contours) {
+    double maxArea = 0;
+    MatOfPoint2f largestQuad = null;
+
+    for (MatOfPoint contour : contours) {
+      double area = Imgproc.contourArea(contour);
+      if (area < 1000) { // Skip small contours
+        continue;
+      }
+
+      MatOfPoint2f contour2f = new MatOfPoint2f(contour.toArray());
+      double perimeter = Imgproc.arcLength(contour2f, true);
+      MatOfPoint2f approx = new MatOfPoint2f();
+      Imgproc.approxPolyDP(contour2f, approx, 0.02 * perimeter, true);
+
+      // Check if it's a quadrilateral and larger than previous
+      if (approx.total() == 4 && area > maxArea) {
+        maxArea = area;
+        largestQuad = approx;
+      }
+    }
+
+    return largestQuad;
+  }
+
+  /**
+   * Applies a perspective transform to straighten a quadrilateral region in an image.
+   *
+   * @param original The original image.
+   * @param quad The quadrilateral corners to transform.
+   * @return The perspective-transformed image.
+   */
+  private static Mat applyPerspectiveTransform(Mat original, MatOfPoint2f quad) {
+    Point[] points = quad.toArray();
+
+    // Order points: top-left, top-right, bottom-right, bottom-left
+    Point[] orderedPoints = orderPoints(points);
+
+    // Calculate the width and height of the new image
+    double widthA =
+        Math.hypot(orderedPoints[2].x - orderedPoints[3].x, orderedPoints[2].y - orderedPoints[3].y);
+    double widthB =
+        Math.hypot(orderedPoints[1].x - orderedPoints[0].x, orderedPoints[1].y - orderedPoints[0].y);
+    int maxWidth = (int) Math.max(widthA, widthB);
+
+    double heightA =
+        Math.hypot(orderedPoints[1].x - orderedPoints[2].x, orderedPoints[1].y - orderedPoints[2].y);
+    double heightB =
+        Math.hypot(orderedPoints[0].x - orderedPoints[3].x, orderedPoints[0].y - orderedPoints[3].y);
+    int maxHeight = (int) Math.max(heightA, heightB);
+
+    // Define destination points for the transform
+    MatOfPoint2f src = new MatOfPoint2f(orderedPoints);
+    MatOfPoint2f dst = new MatOfPoint2f(new Point(0, 0), new Point(maxWidth - 1, 0),
+        new Point(maxWidth - 1, maxHeight - 1), new Point(0, maxHeight - 1));
+
+    // Get perspective transform matrix and apply it
+    Mat perspectiveTransform = Imgproc.getPerspectiveTransform(src, dst);
+    Mat warped = new Mat();
+    Imgproc.warpPerspective(original, warped, perspectiveTransform, new Size(maxWidth, maxHeight));
+
+    return warped;
+  }
+
+  /**
+   * Orders four points in a consistent order: top-left, top-right, bottom-right, bottom-left.
+   *
+   * @param points The four points to order.
+   * @return The ordered points array.
+   */
+  private static Point[] orderPoints(Point[] points) {
+    Point[] ordered = new Point[4];
+
+    // Sum and difference to find corners
+    double[] sums = new double[4];
+    double[] diffs = new double[4];
+    for (int i = 0; i < 4; i++) {
+      sums[i] = points[i].x + points[i].y;
+      diffs[i] = points[i].y - points[i].x;
+    }
+
+    // Top-left has smallest sum, bottom-right has largest sum
+    int topLeftIdx = 0;
+    int bottomRightIdx = 0;
+    for (int i = 1; i < 4; i++) {
+      if (sums[i] < sums[topLeftIdx]) {
+        topLeftIdx = i;
+      }
+      if (sums[i] > sums[bottomRightIdx]) {
+        bottomRightIdx = i;
+      }
+    }
+    ordered[0] = points[topLeftIdx];
+    ordered[2] = points[bottomRightIdx];
+
+    // Top-right has smallest diff, bottom-left has largest diff
+    int topRightIdx = 0;
+    int bottomLeftIdx = 0;
+    for (int i = 0; i < 4; i++) {
+      if (i == topLeftIdx || i == bottomRightIdx) {
+        continue;
+      }
+      if (topRightIdx == topLeftIdx || topRightIdx == bottomRightIdx
+          || diffs[i] < diffs[topRightIdx]) {
+        topRightIdx = i;
+      }
+      if (bottomLeftIdx == topLeftIdx || bottomLeftIdx == bottomRightIdx
+          || diffs[i] > diffs[bottomLeftIdx]) {
+        bottomLeftIdx = i;
+      }
+    }
+    ordered[1] = points[topRightIdx];
+    ordered[3] = points[bottomLeftIdx];
+
+    return ordered;
+  }
+
+  /**
+   * Finds and crops to the largest rectangle in an image. This is useful after perspective
+   * correction to remove any black borders.
+   *
+   * @param image The image to find and crop the largest rectangle from.
+   * @return The cropped image containing the largest rectangle.
+   */
+  public static BufferedImage cropToLargestRectangle(BufferedImage image) {
+    OpenCV.loadShared();
+
+    try {
+      Mat original = toMat(image);
+      Mat gray = new Mat();
+
+      // Convert to grayscale
+      if (original.channels() > 1) {
+        Imgproc.cvtColor(original, gray, Imgproc.COLOR_BGR2GRAY);
+      } else {
+        gray = original.clone();
+      }
+
+      // Threshold to find non-black regions
+      Mat thresh = new Mat();
+      Imgproc.threshold(gray, thresh, 1, 255, Imgproc.THRESH_BINARY);
+
+      // Find contours
+      List<MatOfPoint> contours = new ArrayList<>();
+      Mat hierarchy = new Mat();
+      Imgproc.findContours(thresh, contours, hierarchy, Imgproc.RETR_EXTERNAL,
+          Imgproc.CHAIN_APPROX_SIMPLE);
+
+      // Find the largest contour
+      double maxArea = 0;
+      org.opencv.core.Rect largestRect = null;
+      for (MatOfPoint contour : contours) {
+        org.opencv.core.Rect rect = Imgproc.boundingRect(contour);
+        double area = rect.area();
+        if (area > maxArea) {
+          maxArea = area;
+          largestRect = rect;
+        }
+      }
+
+      // Crop to the largest rectangle if found
+      if (largestRect != null && largestRect.width > 0 && largestRect.height > 0) {
+        Mat cropped = new Mat(original, largestRect);
+        return toBufferedImage(cropped);
+      }
+
+      return image;
     } catch (IOException e) {
       throw new ImageProcessingException(e);
     }

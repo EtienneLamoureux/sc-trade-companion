@@ -1,0 +1,32 @@
+package tools.sctrade.companion.domain.image.manipulations;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import org.junit.jupiter.api.Test;
+
+class LargestRectangleCropTest {
+  @Test
+  void givenImageWhenManipulatingThenReturnCroppedImage() {
+    LargestRectangleCrop manipulation = new LargestRectangleCrop();
+
+    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+    Graphics2D g2d = image.createGraphics();
+    g2d.setColor(Color.BLACK);
+    g2d.fillRect(0, 0, 100, 100);
+    g2d.setColor(Color.WHITE);
+    g2d.fillRect(20, 20, 60, 60);
+    g2d.dispose();
+
+    BufferedImage result = manipulation.manipulate(image);
+
+    assertNotNull(result);
+    assertTrue(result.getWidth() > 0);
+    assertTrue(result.getHeight() > 0);
+    assertTrue(result.getWidth() <= image.getWidth());
+    assertTrue(result.getHeight() <= image.getHeight());
+  }
+}
