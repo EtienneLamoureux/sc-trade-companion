@@ -22,10 +22,19 @@ import nu.pattern.OpenCV;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Mode;
+import org.opencv.calib3d.Calib3d;
+import org.opencv.core.Core;
+import org.opencv.core.DMatch;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
+import org.opencv.core.MatOfDMatch;
+import org.opencv.core.MatOfKeyPoint;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Size;
+import org.opencv.features2d.DescriptorMatcher;
+import org.opencv.features2d.ORB;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.slf4j.Logger;
@@ -424,5 +433,80 @@ public class ImageUtil {
     File imageFile = new File(path.toString());
     String format = path.toString().substring(path.toString().lastIndexOf(".") + 1);
     ImageIO.write(image, format, imageFile);
+  }
+
+  /**
+   * Aligns an image to a reference image using homography transformation. Uses ORB features
+   * detected on the blue channel for alignment, matching the approach in the provided Python code.
+   *
+   * @param imageToAlign The image to be aligned.
+   * @param referenceImage The reference image to align to.
+   * @return The aligned image, warped to match the reference.
+   * @throws ImageProcessingException if the alignment fails.
+   */
+  public static BufferedImage alignToReference(BufferedImage imageToAlign,
+      BufferedImage referenceImage) {
+    OpenCV.loadShared();
+
+    try {
+      Mat refMat = toMat(referenceImage);
+      Mat imgMat = toMat(imageToAlign);
+
+      // Split into channels and extract blue channel (index 0)
+      List<Mat> refChannels = new ArrayList<>();
+      List<Mat> imgChannels = new ArrayList<>();
+      Core.split(refMat, refChannels);
+      Core.split(imgMat, imgChannels);
+
+      Mat refBlue = refChannels.get(0);
+      Mat imgBlue = imgChannels.get(0);
+
+      // Detect ORB features and compute descriptors
+      int maxFeatures = 500;
+      ORB orb = ORB.create(maxFeatures);
+
+      MatOfKeyPoint keypoints1 = new MatOfKeyPoint();
+      MatOfKeyPoint keypoints2 = new MatOfKeyPoint();
+      Mat descriptors1 = new Mat();
+      Mat descriptors2 = new Mat();
+
+      orb.detectAndCompute(refBlue, new Mat(), keypoints1, descriptors1);
+      orb.detectAndCompute(imgBlue, new Mat(), keypoints2, descriptors2);
+
+      // Match features
+      DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
+      MatOfDMatch matches = new MatOfDMatch();
+      matcher.match(descriptors1, descriptors2, matches);
+
+      // Sort and filter matches - keep best 10%
+      List<DMatch> matchList = matches.toList();
+      matchList.sort((a, b) -> Float.compare(a.distance, b.distance));
+      int numGoodMatches = (int) (matchList.size() * 0.1);
+      matchList = matchList.subList(0, Math.min(numGoodMatches, matchList.size()));
+
+      // Extract matched points
+      List<Point> points1 = new ArrayList<>();
+      List<Point> points2 = new ArrayList<>();
+      for (DMatch match : matchList) {
+        points1.add(keypoints1.toList().get(match.queryIdx).pt);
+        points2.add(keypoints2.toList().get(match.trainIdx).pt);
+      }
+
+      MatOfPoint2f matPoints1 = new MatOfPoint2f();
+      MatOfPoint2f matPoints2 = new MatOfPoint2f();
+      matPoints1.fromList(points1);
+      matPoints2.fromList(points2);
+
+      // Find homography
+      Mat homography = Calib3d.findHomography(matPoints2, matPoints1, Calib3d.RANSAC);
+
+      // Warp image
+      Mat aligned = new Mat();
+      Imgproc.warpPerspective(imgMat, aligned, homography, new Size(refMat.cols(), refMat.rows()));
+
+      return toBufferedImage(aligned);
+    } catch (IOException e) {
+      throw new ImageProcessingException(e);
+    }
   }
 }
