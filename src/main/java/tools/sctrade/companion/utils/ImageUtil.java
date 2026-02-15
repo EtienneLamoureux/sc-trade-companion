@@ -448,13 +448,26 @@ public class ImageUtil {
       BufferedImage referenceImage) {
     OpenCV.loadShared();
 
+    Mat refMat = null;
+    Mat imgMat = null;
+    List<Mat> refChannels = new ArrayList<>();
+    List<Mat> imgChannels = new ArrayList<>();
+    Mat emptyMask = null;
+    MatOfKeyPoint keypoints1 = null;
+    MatOfKeyPoint keypoints2 = null;
+    Mat descriptors1 = null;
+    Mat descriptors2 = null;
+    MatOfDMatch matches = null;
+    MatOfPoint2f matPoints1 = null;
+    MatOfPoint2f matPoints2 = null;
+    Mat homography = null;
+    Mat aligned = null;
+
     try {
-      Mat refMat = toMat(referenceImage);
-      Mat imgMat = toMat(imageToAlign);
+      refMat = toMat(referenceImage);
+      imgMat = toMat(imageToAlign);
 
       // Split into channels and extract blue channel (index 0)
-      List<Mat> refChannels = new ArrayList<>();
-      List<Mat> imgChannels = new ArrayList<>();
       Core.split(refMat, refChannels);
       Core.split(imgMat, imgChannels);
 
@@ -465,18 +478,18 @@ public class ImageUtil {
       int maxFeatures = 500;
       ORB orb = ORB.create(maxFeatures);
 
-      MatOfKeyPoint keypoints1 = new MatOfKeyPoint();
-      MatOfKeyPoint keypoints2 = new MatOfKeyPoint();
-      Mat descriptors1 = new Mat();
-      Mat descriptors2 = new Mat();
+      keypoints1 = new MatOfKeyPoint();
+      keypoints2 = new MatOfKeyPoint();
+      descriptors1 = new Mat();
+      descriptors2 = new Mat();
 
-      Mat emptyMask = new Mat();
+      emptyMask = new Mat();
       orb.detectAndCompute(refBlue, emptyMask, keypoints1, descriptors1);
       orb.detectAndCompute(imgBlue, emptyMask, keypoints2, descriptors2);
 
       // Match features
       DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
-      MatOfDMatch matches = new MatOfDMatch();
+      matches = new MatOfDMatch();
       matcher.match(descriptors1, descriptors2, matches);
 
       // Sort and filter matches - keep best 10%
@@ -499,13 +512,13 @@ public class ImageUtil {
         points2.add(keypoints2.toList().get(match.trainIdx).pt);
       }
 
-      MatOfPoint2f matPoints1 = new MatOfPoint2f();
-      MatOfPoint2f matPoints2 = new MatOfPoint2f();
+      matPoints1 = new MatOfPoint2f();
+      matPoints2 = new MatOfPoint2f();
       matPoints1.fromList(points1);
       matPoints2.fromList(points2);
 
       // Find homography
-      Mat homography = Calib3d.findHomography(matPoints2, matPoints1, Calib3d.RANSAC);
+      homography = Calib3d.findHomography(matPoints2, matPoints1, Calib3d.RANSAC);
 
       if (homography.empty()) {
         throw new ImageProcessingException(
@@ -513,34 +526,60 @@ public class ImageUtil {
       }
 
       // Warp image
-      Mat aligned = new Mat();
+      aligned = new Mat();
       Imgproc.warpPerspective(imgMat, aligned, homography, new Size(refMat.cols(), refMat.rows()));
 
-      BufferedImage result = toBufferedImage(aligned);
-
-      // Release OpenCV resources
-      for (Mat channel : refChannels) {
-        channel.release();
-      }
-      for (Mat channel : imgChannels) {
-        channel.release();
-      }
-      emptyMask.release();
-      keypoints1.release();
-      keypoints2.release();
-      descriptors1.release();
-      descriptors2.release();
-      matches.release();
-      matPoints1.release();
-      matPoints2.release();
-      homography.release();
-      aligned.release();
-      refMat.release();
-      imgMat.release();
-
-      return result;
+      return toBufferedImage(aligned);
     } catch (IOException e) {
       throw new ImageProcessingException(e);
+    } finally {
+      // Release OpenCV resources - always executed
+      for (Mat channel : refChannels) {
+        if (channel != null) {
+          channel.release();
+        }
+      }
+      for (Mat channel : imgChannels) {
+        if (channel != null) {
+          channel.release();
+        }
+      }
+      if (emptyMask != null) {
+        emptyMask.release();
+      }
+      if (keypoints1 != null) {
+        keypoints1.release();
+      }
+      if (keypoints2 != null) {
+        keypoints2.release();
+      }
+      if (descriptors1 != null) {
+        descriptors1.release();
+      }
+      if (descriptors2 != null) {
+        descriptors2.release();
+      }
+      if (matches != null) {
+        matches.release();
+      }
+      if (matPoints1 != null) {
+        matPoints1.release();
+      }
+      if (matPoints2 != null) {
+        matPoints2.release();
+      }
+      if (homography != null) {
+        homography.release();
+      }
+      if (aligned != null) {
+        aligned.release();
+      }
+      if (refMat != null) {
+        refMat.release();
+      }
+      if (imgMat != null) {
+        imgMat.release();
+      }
     }
   }
 }
