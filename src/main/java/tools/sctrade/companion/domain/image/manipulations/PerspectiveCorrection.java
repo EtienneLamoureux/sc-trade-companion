@@ -12,6 +12,6 @@ import tools.sctrade.companion.utils.ImageUtil;
 public class PerspectiveCorrection implements ImageManipulation {
   @Override
   public BufferedImage manipulate(BufferedImage image) {
-    return ImageUtil.applyPerspectiveCorrection(image);
+    return ImageUtil.applyPerspectiveCorrection(image).image();
   }
 }

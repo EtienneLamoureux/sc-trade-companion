@@ -2,16 +2,18 @@ package tools.sctrade.companion.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import org.junit.jupiter.api.Test;
+import tools.sctrade.companion.utils.ImageUtil.PerspectiveCorrectionResult;
 
 class ImageUtilPerspectiveTest {
   @Test
-  void givenSimpleImageWhenApplyingPerspectiveCorrectionThenReturnImage() {
+  void givenSimpleImageWhenApplyingPerspectiveCorrectionThenReturnResult() {
     // Create a simple test image
     BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
     Graphics2D g2d = image.createGraphics();
@@ -21,15 +23,16 @@ class ImageUtilPerspectiveTest {
     g2d.drawRect(10, 10, 80, 80);
     g2d.dispose();
 
-    BufferedImage result = ImageUtil.applyPerspectiveCorrection(image);
+    PerspectiveCorrectionResult result = ImageUtil.applyPerspectiveCorrection(image);
 
     assertNotNull(result);
-    assertTrue(result.getWidth() > 0);
-    assertTrue(result.getHeight() > 0);
+    assertNotNull(result.image());
+    assertTrue(result.image().getWidth() > 0);
+    assertTrue(result.image().getHeight() > 0);
   }
 
   @Test
-  void givenImageWithoutQuadrilateralWhenApplyingPerspectiveCorrectionThenReturnOriginal() {
+  void givenImageWithoutQuadrilateralWhenApplyingPerspectiveCorrectionThenReturnOriginalWithNullRect() {
     // Create a simple image without clear quadrilateral
     BufferedImage image = new BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB);
     Graphics2D g2d = image.createGraphics();
@@ -37,11 +40,13 @@ class ImageUtilPerspectiveTest {
     g2d.fillRect(0, 0, 50, 50);
     g2d.dispose();
 
-    BufferedImage result = ImageUtil.applyPerspectiveCorrection(image);
+    PerspectiveCorrectionResult result = ImageUtil.applyPerspectiveCorrection(image);
 
     assertNotNull(result);
-    assertEquals(50, result.getWidth());
-    assertEquals(50, result.getHeight());
+    assertNotNull(result.image());
+    assertNull(result.rectangle());
+    assertEquals(50, result.image().getWidth());
+    assertEquals(50, result.image().getHeight());
   }
 
   @Test

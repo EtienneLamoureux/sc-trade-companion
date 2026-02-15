@@ -45,6 +45,26 @@ public class ImageUtil {
   private static final double MIN_CONTOUR_AREA = 1000.0;
   private static final double APPROX_POLY_EPSILON_FACTOR = 0.02;
 
+  /**
+   * Record containing the result of perspective correction.
+   *
+   * @param image The perspective-corrected image.
+   * @param rectangle The rectangle used for the perspective transform, or null if no transform was
+   *        applied.
+   */
+  public record PerspectiveCorrectionResult(BufferedImage image, Rectangle rectangle) {
+  }
+
+  /**
+   * Record containing the result of a perspective transform operation.
+   *
+   * @param transformed The perspective-transformed Mat.
+   * @param width The width of the transformed image.
+   * @param height The height of the transformed image.
+   */
+  private record PerspectiveTransformResult(Mat transformed, int width, int height) {
+  }
+
   private ImageUtil() {}
 
   /**
@@ -384,13 +404,17 @@ public class ImageUtil {
    * Detects the largest quadrilateral contour in an image and applies perspective correction. This
    * is useful for correcting skewed or tilted rectangular objects like screens or documents.
    *
+   * <p>
+   * Note: Grayscale conversion and Gaussian blur are only applied for edge detection, not for the
+   * actual perspective transform which uses the original image.
+   *
    * @param image The image to apply perspective correction to.
-   * @return The perspective-corrected image, or the original image if no suitable quadrilateral is
-   *         found.
+   * @return A PerspectiveCorrectionResult containing the transformed image and rectangle, or the
+   *         original image with null rectangle if no suitable quadrilateral is found.
    * @see <a href=
    *      "https://docs.opencv.org/4.x/da/d6e/tutorial_py_geometric_transformations.html">Documentation</a>
    */
-  public static BufferedImage applyPerspectiveCorrection(BufferedImage image) {
+  public static PerspectiveCorrectionResult applyPerspectiveCorrection(BufferedImage image) {
     OpenCV.loadShared();
 
     try {
@@ -398,14 +422,15 @@ public class ImageUtil {
       Mat gray = new Mat();
       Mat edges = new Mat();
 
-      // Convert to grayscale
+      // Convert to grayscale only for edge detection (required by Canny)
       if (original.channels() > 1) {
         Imgproc.cvtColor(original, gray, Imgproc.COLOR_BGR2GRAY);
       } else {
         gray = original.clone();
       }
 
-      // Apply Gaussian blur and Canny edge detection
+      // Apply Gaussian blur (recommended for Canny edge detection to reduce noise)
+      // and Canny edge detection
       Imgproc.GaussianBlur(gray, gray, new Size(5, 5), 0);
       Imgproc.Canny(gray, edges, 50, 150);
 
@@ -419,13 +444,15 @@ public class ImageUtil {
       MatOfPoint2f largestQuad = findLargestQuadrilateral(contours);
 
       if (largestQuad != null) {
-        // Apply perspective transform
-        Mat transformed = applyPerspectiveTransform(original, largestQuad);
-        return toBufferedImage(transformed);
+        // Apply perspective transform on the ORIGINAL color image
+        PerspectiveTransformResult result = applyPerspectiveTransform(original, largestQuad);
+        // Convert the transformed dimensions to a Rectangle
+        Rectangle rect = new Rectangle(0, 0, result.width(), result.height());
+        return new PerspectiveCorrectionResult(toBufferedImage(result.transformed()), rect);
       }
 
-      // If no quadrilateral found, return original image
-      return image;
+      // If no quadrilateral found, return original image with null rectangle
+      return new PerspectiveCorrectionResult(image, null);
     } catch (IOException e) {
       throw new ImageProcessingException(e);
     }
@@ -467,9 +494,10 @@ public class ImageUtil {
    *
    * @param original The original image.
    * @param quad The quadrilateral corners to transform.
-   * @return The perspective-transformed image.
+   * @return A PerspectiveTransformResult containing the transformed image and its dimensions.
    */
-  private static Mat applyPerspectiveTransform(Mat original, MatOfPoint2f quad) {
+  private static PerspectiveTransformResult applyPerspectiveTransform(Mat original,
+      MatOfPoint2f quad) {
     Point[] points = quad.toArray();
 
     // Order points: top-left, top-right, bottom-right, bottom-left
@@ -498,7 +526,7 @@ public class ImageUtil {
     Mat warped = new Mat();
     Imgproc.warpPerspective(original, warped, perspectiveTransform, new Size(maxWidth, maxHeight));
 
-    return warped;
+    return new PerspectiveTransformResult(warped, maxWidth, maxHeight);
   }
 
   /**
@@ -555,20 +583,27 @@ public class ImageUtil {
   }
 
   /**
-   * Finds and crops to the largest rectangle in an image. This is useful after perspective
-   * correction to remove any black borders.
+   * Crops an image to a specified rectangle. If no rectangle is provided, finds and crops to the
+   * largest rectangle in the image by detecting non-black regions.
    *
-   * @param image The image to find and crop the largest rectangle from.
-   * @return The cropped image containing the largest rectangle.
+   * @param image The image to crop.
+   * @param rectangle The rectangle to crop to, or null to auto-detect the largest rectangle.
+   * @return The cropped image.
    */
-  public static BufferedImage cropToLargestRectangle(BufferedImage image) {
+  public static BufferedImage cropToLargestRectangle(BufferedImage image, Rectangle rectangle) {
+    // If a rectangle is provided, use it directly
+    if (rectangle != null) {
+      return crop(image, rectangle);
+    }
+
+    // Otherwise, detect the largest rectangle by finding non-black regions
     OpenCV.loadShared();
 
     try {
       Mat original = toMat(image);
       Mat gray = new Mat();
 
-      // Convert to grayscale
+      // Convert to grayscale (required for thresholding)
       if (original.channels() > 1) {
         Imgproc.cvtColor(original, gray, Imgproc.COLOR_BGR2GRAY);
       } else {
@@ -607,6 +642,17 @@ public class ImageUtil {
     } catch (IOException e) {
       throw new ImageProcessingException(e);
     }
+  }
+
+  /**
+   * Finds and crops to the largest rectangle in an image. This is useful after perspective
+   * correction to remove any black borders.
+   *
+   * @param image The image to find and crop the largest rectangle from.
+   * @return The cropped image containing the largest rectangle.
+   */
+  public static BufferedImage cropToLargestRectangle(BufferedImage image) {
+    return cropToLargestRectangle(image, null);
   }
 
   /**
