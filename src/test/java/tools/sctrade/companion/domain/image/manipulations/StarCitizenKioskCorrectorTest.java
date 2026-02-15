@@ -73,9 +73,8 @@ class StarCitizenKioskCorrectorTest {
     Mat testImage = new Mat(200, 300, org.opencv.core.CvType.CV_8UC3);
 
     // Create valid corners for perspective transform
-    Point[] corners =
-        new Point[] {new Point(50, 50), new Point(250, 50), new Point(250, 150), new Point(50,
-            150)};
+    Point[] corners = new Point[] {new Point(50, 50), new Point(250, 50), new Point(250, 150),
+        new Point(50, 150)};
 
     Mat warped = corrector.warpPerspective(testImage, corners);
 
@@ -92,8 +91,8 @@ class StarCitizenKioskCorrectorTest {
     Mat testImage = new Mat(100, 100, org.opencv.core.CvType.CV_8UC3);
     Point[] corners = new Point[] {new Point(0, 0), new Point(1, 1)};
 
-    assertThrows(IllegalArgumentException.class, () -> corrector.warpPerspective(testImage,
-        corners));
+    assertThrows(IllegalArgumentException.class,
+        () -> corrector.warpPerspective(testImage, corners));
 
     testImage.release();
   }

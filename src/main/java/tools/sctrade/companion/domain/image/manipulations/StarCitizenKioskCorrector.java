@@ -26,6 +26,7 @@ public class StarCitizenKioskCorrector {
   private static final double MIN_AREA_RATIO = 0.15;
   private static final double MIN_ASPECT_RATIO = 1.4;
   private static final double MAX_ASPECT_RATIO = 1.9;
+  // Ensures the detected kiosk is vertically oriented (not too wide/flat)
   private static final double MIN_HEIGHT_TO_WIDTH_RATIO = 0.75;
   private static final double TARGET_ASPECT_RATIO = 16.0 / 9.0;
 
