@@ -192,6 +192,8 @@ public class SettingsTab extends JPanel {
       captureButton.setText(LocalizationUtil.get("buttonListeningForKey"));
       captureButton.setEnabled(false);
 
+      keybindField.requestFocusInWindow();
+
       // Create a temporary key listener to capture the next key press
       NativeKeyListener captureListener = new NativeKeyListener() {
         @Override
