@@ -48,9 +48,9 @@ public class SettingsTab extends JPanel {
     setLayout(new GridBagLayout());
 
     buildUsernameField(userService);
+    buildPrintscreenKeybindField(settings);
     buildStarCitizenLivePathField(gameLogService);
     buildStarCitizenMonitorComboBox(settings);
-    buildPrintscreenKeybindField(settings);
     buildTextRow(LocalizationUtil.get("labelMyData"),
         settings.get(Setting.MY_DATA_PATH).toString());
     buildTextRow(LocalizationUtil.get("labelMyImages"),
