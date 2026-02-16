@@ -34,53 +34,10 @@ public class KeyListener implements NativeKeyListener {
   @Override
   public void nativeKeyPressed(NativeKeyEvent e) {
     logger.trace("Key pressed: {}", NativeKeyEvent.getKeyText(e.getKeyCode()));
+    int keybind = settingRepository.get(Setting.PRINTSCREEN_KEYBIND, NativeKeyEvent.VC_F3);
 
-    int configuredKeyCode = getConfiguredKeyCode();
-    if (e.getKeyCode() == configuredKeyCode) {
+    if (e.getKeyCode() == keybind) {
       runnables.parallelStream().forEach(n -> n.run());
-    }
-  }
-
-  private int getConfiguredKeyCode() {
-    try {
-      String keybindValue = settingRepository.get(Setting.PRINTSCREEN_KEYBIND, "F3");
-      return parseKeyCode(keybindValue);
-    } catch (Exception ex) {
-      logger.warn("Could not read keybind setting, defaulting to F3", ex);
-      return NativeKeyEvent.VC_F3;
-    }
-  }
-
-  private int parseKeyCode(String keyName) {
-    // Map key name to NativeKeyEvent key code
-    switch (keyName.toUpperCase()) {
-      case "F1":
-        return NativeKeyEvent.VC_F1;
-      case "F2":
-        return NativeKeyEvent.VC_F2;
-      case "F3":
-        return NativeKeyEvent.VC_F3;
-      case "F4":
-        return NativeKeyEvent.VC_F4;
-      case "F5":
-        return NativeKeyEvent.VC_F5;
-      case "F6":
-        return NativeKeyEvent.VC_F6;
-      case "F7":
-        return NativeKeyEvent.VC_F7;
-      case "F8":
-        return NativeKeyEvent.VC_F8;
-      case "F9":
-        return NativeKeyEvent.VC_F9;
-      case "F10":
-        return NativeKeyEvent.VC_F10;
-      case "F11":
-        return NativeKeyEvent.VC_F11;
-      case "F12":
-        return NativeKeyEvent.VC_F12;
-      default:
-        logger.warn("Unknown key name: {}, defaulting to F3", keyName);
-        return NativeKeyEvent.VC_F3;
     }
   }
 

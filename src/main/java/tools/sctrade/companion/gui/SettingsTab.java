@@ -167,7 +167,8 @@ public class SettingsTab extends JPanel {
     displayConstraints.fill = GridBagConstraints.HORIZONTAL;
     displayConstraints.ipadx = 10;
 
-    String currentKeybind = settings.get(Setting.PRINTSCREEN_KEYBIND, "F3");
+    String currentKeybind =
+        NativeKeyEvent.getKeyText(settings.get(Setting.PRINTSCREEN_KEYBIND, NativeKeyEvent.VC_F3));
     JTextField keybindField = new JTextField(currentKeybind);
     keybindField.setColumns(10);
     keybindField.setEditable(false);
@@ -195,15 +196,13 @@ public class SettingsTab extends JPanel {
       NativeKeyListener captureListener = new NativeKeyListener() {
         @Override
         public void nativeKeyPressed(NativeKeyEvent event) {
-          String keyName = getKeyName(event.getKeyCode());
-          // Process any key press (supported or not) to complete the capture
-          if (keyName != null) {
-            // Update UI on the Event Dispatch Thread for valid keys
-            javax.swing.SwingUtilities.invokeLater(() -> {
-              keybindField.setText(keyName);
-              settings.set(Setting.PRINTSCREEN_KEYBIND, keyName);
-            });
-          }
+          int keyCode = event.getKeyCode();
+
+          // Update UI on the Event Dispatch Thread for valid keys
+          javax.swing.SwingUtilities.invokeLater(() -> {
+            keybindField.setText(NativeKeyEvent.getKeyText(keyCode));
+            settings.set(Setting.PRINTSCREEN_KEYBIND, keyCode);
+          });
 
           // Cleanup - remove listener and reset button state regardless of key validity
           // Note: GlobalScreen.removeNativeKeyListener is thread-safe and can be called
@@ -238,38 +237,6 @@ public class SettingsTab extends JPanel {
     tooltip.putClientProperty("FlatLaf.styleClass", "small");
     tooltip.setEnabled(false);
     buildLabel(rowIndex.getAndIncrement(), " ");
-  }
-
-  private String getKeyName(int keyCode) {
-    // Map supported key codes to their string names
-    switch (keyCode) {
-      case NativeKeyEvent.VC_F1:
-        return "F1";
-      case NativeKeyEvent.VC_F2:
-        return "F2";
-      case NativeKeyEvent.VC_F3:
-        return "F3";
-      case NativeKeyEvent.VC_F4:
-        return "F4";
-      case NativeKeyEvent.VC_F5:
-        return "F5";
-      case NativeKeyEvent.VC_F6:
-        return "F6";
-      case NativeKeyEvent.VC_F7:
-        return "F7";
-      case NativeKeyEvent.VC_F8:
-        return "F8";
-      case NativeKeyEvent.VC_F9:
-        return "F9";
-      case NativeKeyEvent.VC_F10:
-        return "F10";
-      case NativeKeyEvent.VC_F11:
-        return "F11";
-      case NativeKeyEvent.VC_F12:
-        return "F12";
-      default:
-        return null;
-    }
   }
 
   private void buildTextRow(String label, String value) {
