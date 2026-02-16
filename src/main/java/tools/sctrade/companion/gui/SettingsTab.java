@@ -197,16 +197,24 @@ public class SettingsTab extends JPanel {
         public void nativeKeyPressed(NativeKeyEvent event) {
           String keyName = getKeyName(event.getKeyCode());
           if (keyName != null) {
-            keybindField.setText(keyName);
-            settings.set(Setting.PRINTSCREEN_KEYBIND, keyName);
+            // Update UI on the Event Dispatch Thread
+            javax.swing.SwingUtilities.invokeLater(() -> {
+              keybindField.setText(keyName);
+              settings.set(Setting.PRINTSCREEN_KEYBIND, keyName);
+            });
 
-            // Remove this temporary listener
-            GlobalScreen.removeNativeKeyListener(this);
-            keybindCaptureListener = null;
+            // Cleanup - remove listener and reset button state
+            try {
+              GlobalScreen.removeNativeKeyListener(this);
+            } finally {
+              keybindCaptureListener = null;
 
-            // Reset button state
-            captureButton.setText(LocalizationUtil.get("buttonCaptureKeybind"));
-            captureButton.setEnabled(true);
+              // Reset button state on the Event Dispatch Thread
+              javax.swing.SwingUtilities.invokeLater(() -> {
+                captureButton.setText(LocalizationUtil.get("buttonCaptureKeybind"));
+                captureButton.setEnabled(true);
+              });
+            }
           }
         }
 
