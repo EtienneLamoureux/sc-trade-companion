@@ -5,12 +5,16 @@ import java.awt.GridBagLayout;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Vector;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.jnativehook.GlobalScreen;
+import org.jnativehook.keyboard.NativeKeyEvent;
+import org.jnativehook.keyboard.NativeKeyListener;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
@@ -28,6 +32,7 @@ public class SettingsTab extends JPanel {
   private static final long serialVersionUID = -3532718267415423680L;
 
   private IncrementingInt rowIndex;
+  private NativeKeyListener keybindCaptureListener;
 
   /**
    * Creates a new instance of the settings tab.
@@ -46,6 +51,7 @@ public class SettingsTab extends JPanel {
     buildUsernameField(userService);
     buildStarCitizenLivePathField(gameLogService);
     buildStarCitizenMonitorComboBox(settings);
+    buildPrintscreenKeybindField(settings);
     buildTextRow(LocalizationUtil.get("labelMyData"),
         settings.get(Setting.MY_DATA_PATH).toString());
     buildTextRow(LocalizationUtil.get("labelMyImages"),
@@ -140,6 +146,121 @@ public class SettingsTab extends JPanel {
       String value = (String) comboBox.getSelectedItem();
       settings.set(Setting.STAR_CITIZEN_MONITOR, value);
     });
+  }
+
+  private void buildPrintscreenKeybindField(SettingRepository settings) {
+    var keybindLabel = buildLabel(rowIndex.get(), LocalizationUtil.get("labelPrintscreenKeybind"));
+
+    // Create a panel to hold both the display field and the button
+    GridBagConstraints gridBagConstraints = new GridBagConstraints();
+    gridBagConstraints.gridx = 1;
+    gridBagConstraints.gridy = rowIndex.getAndIncrement();
+    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+
+    JPanel keybindPanel = new JPanel();
+    keybindPanel.setLayout(new GridBagLayout());
+
+    // Display field
+    GridBagConstraints displayConstraints = new GridBagConstraints();
+    displayConstraints.gridx = 0;
+    displayConstraints.gridy = 0;
+    displayConstraints.weightx = 1.0;
+    displayConstraints.fill = GridBagConstraints.HORIZONTAL;
+    displayConstraints.ipadx = 10;
+
+    String currentKeybind = settings.get(Setting.PRINTSCREEN_KEYBIND, "F3");
+    JTextField keybindField = new JTextField(currentKeybind);
+    keybindField.setColumns(10);
+    keybindField.setEditable(false);
+    keybindPanel.add(keybindField, displayConstraints);
+
+    // Button to capture keybind
+    GridBagConstraints buttonConstraints = new GridBagConstraints();
+    buttonConstraints.gridx = 1;
+    buttonConstraints.gridy = 0;
+    buttonConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+
+    JButton captureButton = new JButton(LocalizationUtil.get("buttonCaptureKeybind"));
+    keybindPanel.add(captureButton, buttonConstraints);
+
+    add(keybindPanel, gridBagConstraints);
+    keybindLabel.setLabelFor(keybindPanel);
+
+    // Add action listener for the capture button
+    captureButton.addActionListener(e -> {
+      captureButton.setText(LocalizationUtil.get("buttonListeningForKey"));
+      captureButton.setEnabled(false);
+
+      // Create a temporary key listener to capture the next key press
+      keybindCaptureListener = new NativeKeyListener() {
+        @Override
+        public void nativeKeyPressed(NativeKeyEvent event) {
+          String keyName = getKeyName(event.getKeyCode());
+          if (keyName != null) {
+            keybindField.setText(keyName);
+            settings.set(Setting.PRINTSCREEN_KEYBIND, keyName);
+
+            // Remove this temporary listener
+            GlobalScreen.removeNativeKeyListener(this);
+            keybindCaptureListener = null;
+
+            // Reset button state
+            captureButton.setText(LocalizationUtil.get("buttonCaptureKeybind"));
+            captureButton.setEnabled(true);
+          }
+        }
+
+        @Override
+        public void nativeKeyReleased(NativeKeyEvent event) {
+          // Not used
+        }
+
+        @Override
+        public void nativeKeyTyped(NativeKeyEvent event) {
+          // Not used
+        }
+      };
+
+      GlobalScreen.addNativeKeyListener(keybindCaptureListener);
+    });
+
+    var tooltip =
+        buildLabel(rowIndex.getAndIncrement(), LocalizationUtil.get("tooltipPrintscreenKeybind"));
+    tooltip.putClientProperty("FlatLaf.styleClass", "small");
+    tooltip.setEnabled(false);
+    buildLabel(rowIndex.getAndIncrement(), " ");
+  }
+
+  private String getKeyName(int keyCode) {
+    // Map supported key codes to their string names
+    switch (keyCode) {
+      case NativeKeyEvent.VC_F1:
+        return "F1";
+      case NativeKeyEvent.VC_F2:
+        return "F2";
+      case NativeKeyEvent.VC_F3:
+        return "F3";
+      case NativeKeyEvent.VC_F4:
+        return "F4";
+      case NativeKeyEvent.VC_F5:
+        return "F5";
+      case NativeKeyEvent.VC_F6:
+        return "F6";
+      case NativeKeyEvent.VC_F7:
+        return "F7";
+      case NativeKeyEvent.VC_F8:
+        return "F8";
+      case NativeKeyEvent.VC_F9:
+        return "F9";
+      case NativeKeyEvent.VC_F10:
+        return "F10";
+      case NativeKeyEvent.VC_F11:
+        return "F11";
+      case NativeKeyEvent.VC_F12:
+        return "F12";
+      default:
+        return null;
+    }
   }
 
   private void buildTextRow(String label, String value) {

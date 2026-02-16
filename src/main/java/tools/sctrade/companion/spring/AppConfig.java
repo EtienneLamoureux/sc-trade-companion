@@ -201,8 +201,9 @@ public class AppConfig {
   }
 
   @Bean("KeyListener")
-  public KeyListener buildNativeKeyListener(@Qualifier("ScreenPrinter") Runnable screenPrinter) {
-    return new KeyListener(Arrays.asList(screenPrinter));
+  public KeyListener buildNativeKeyListener(@Qualifier("ScreenPrinter") Runnable screenPrinter,
+      SettingRepository settingRepository) {
+    return new KeyListener(Arrays.asList(screenPrinter), settingRepository);
   }
 
   private String getVersion() {
