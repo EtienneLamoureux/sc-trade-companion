@@ -23,7 +23,9 @@ import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.manipulations.AlignToTemplate;
-import tools.sctrade.companion.domain.image.manipulations.WriteToDisk;
+import tools.sctrade.companion.domain.image.manipulations.ConvertToEqualizedGreyscale;
+import tools.sctrade.companion.domain.image.manipulations.InvertColors;
+import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
 import tools.sctrade.companion.domain.notification.ConsoleNotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
@@ -69,8 +71,8 @@ class CommoditySubmissionFactoryITest {
     setupMocks();
 
     diskImageWriter = new DiskImageWriter(settings);
-    List<ImageManipulation> imageManipulations = List.of(new WriteToDisk(diskImageWriter),
-        new AlignToTemplate()/* , new InvertColors(), new ConvertToEqualizedGreyscale() */);
+    List<ImageManipulation> imageManipulations = List.of(new AlignToTemplate(), new UpscaleTo4k(),
+        new InvertColors(), new ConvertToEqualizedGreyscale());
     ocr = new WindowsOcr(imageManipulations, diskImageWriter, processRunner,
         new NotificationService(new ConsoleNotificationRepository()));
 
@@ -83,9 +85,10 @@ class CommoditySubmissionFactoryITest {
       throws IOException {
     var testCasesByColorPalette = Map.of("uee blue",
         List.of("arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1", "pyro-gateway-sell-1",
-            "seraphim-station-buy-1", "seraphim-station-sell-1"),
+            "seraphim-station-buy-1", "seraphim-station-sell-1", "rayari-anvik-buy-1"),
         "pyro orange", List.of("canard-view-buy-1", "canard-view-sell-1", "checkmate-buy-1"),
-        "levski grey", List.of("levski-buy-1", "levski-buy-2", "levski-sell-1"));
+        "levski grey", List.of("levski-buy-1", "levski-buy-2", "levski-sell-1"), "lorville gold",
+        List.of("lorville-sell-1"));
 
     var scores = new ArrayList<Double>();
 
@@ -110,7 +113,8 @@ class CommoditySubmissionFactoryITest {
   @ParameterizedTest(name = "{0}")
   @ValueSource(strings = {"arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1", "pyro-gateway-sell-1",
       "seraphim-station-buy-1", "seraphim-station-sell-1", "canard-view-buy-1",
-      "canard-view-sell-1", "checkmate-buy-1", "levski-buy-1", "levski-buy-2", "levski-sell-1"})
+      "canard-view-sell-1", "checkmate-buy-1", "levski-buy-1", "levski-buy-2", "levski-sell-1",
+      "rayari-anvik-buy-1", "lorville-sell-1"})
   void givenTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase) throws IOException {
     calulateScore(testCase);
   }
