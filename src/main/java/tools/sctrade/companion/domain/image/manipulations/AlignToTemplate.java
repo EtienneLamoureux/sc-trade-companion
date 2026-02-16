@@ -14,7 +14,12 @@ import tools.sctrade.companion.utils.ImageUtil;
  * reference template, then applies a perspective transformation to align the image.
  */
 public class AlignToTemplate implements ImageManipulation {
+<<<<<<< HEAD
   private static final String TEMPLATE_PATH = "/images/ocr/commodity_kiosk_template.jpg";
+=======
+  private static final String TEMPLATE_PATH = "/images/middle_template.jpg";
+  private static final BufferedImage DEFAULT_TEMPLATE = loadTemplate(TEMPLATE_PATH);
+>>>>>>> 5b3f2f6 (Address code review feedback: improve docs and add safety checks)
   private final BufferedImage template;
   private final double minSimilarityThreshold;
 
@@ -24,7 +29,7 @@ public class AlignToTemplate implements ImageManipulation {
    * @throws ImageProcessingException if the template cannot be loaded.
    */
   public AlignToTemplate() {
-    this(loadTemplate(TEMPLATE_PATH), 0.0);
+    this(DEFAULT_TEMPLATE, 0.0);
   }
 
   /**

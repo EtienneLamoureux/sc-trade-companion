@@ -616,12 +616,12 @@ public class ImageUtil {
   }
 
   /**
-   * Checks if one image contains another by computing a similarity score based on feature matching.
-   * Uses ORB features on the blue channel, similar to the homography alignment approach. A higher
-   * score indicates better similarity/containment.
+   * Computes a similarity score between two images based on feature matching. Uses ORB features on
+   * the blue channel, similar to the homography alignment approach. This can be used to validate
+   * that a perspective-corrected image hasn't been unduly distorted.
    *
-   * @param sourceImage The image that potentially contains the target.
-   * @param targetImage The image to search for within the source.
+   * @param sourceImage The first image to compare.
+   * @param targetImage The second image to compare.
    * @return A similarity score between 0.0 and 1.0, where higher values indicate better similarity.
    *         Returns 0.0 if insufficient features are found.
    */
@@ -695,6 +695,9 @@ public class ImageUtil {
 
       // Normalize the score: ratio of good matches to total possible matches
       int minKeypoints = Math.min(keypoints1.toList().size(), keypoints2.toList().size());
+      if (minKeypoints == 0) {
+        return 0.0;
+      }
       double similarityScore = (double) numGoodMatches / minKeypoints;
 
       // Clamp between 0 and 1
