@@ -9,6 +9,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -415,6 +416,24 @@ public class ImageUtil {
   }
 
   /**
+   * Reads an image from a resource path.
+   *
+   * @param resourcePath The path to the resource, starting with a slash (e.g.
+   *        "/images/example.jpg").
+   * @return The image read from the resource.
+   */
+  public static BufferedImage readFromResource(String resourcePath) {
+    try (InputStream is = ImageUtil.class.getResourceAsStream(resourcePath)) {
+      if (is == null) {
+        throw new ImageProcessingException(new IOException("Resource not found: " + resourcePath));
+      }
+      return ImageIO.read(is);
+    } catch (IOException e) {
+      throw new ImageProcessingException(e);
+    }
+  }
+
+  /**
    * Writes an image to disk, logging any exceptions that occur. Never throws an exception.
    *
    * @param image The image to write
@@ -437,7 +456,7 @@ public class ImageUtil {
 
   /**
    * Aligns an image to a reference image using homography transformation. Uses ORB features
-   * detected on the blue channel for alignment, matching the approach in the provided Python code.
+   * detected on the blue channel for alignment.
    *
    * @param imageToAlign The image to be aligned.
    * @param referenceImage The reference image to align to.
@@ -458,9 +477,10 @@ public class ImageUtil {
    * @param referenceImage The reference image to align to.
    * @param minSimilarityThreshold Minimum similarity score (0.0 to 1.0) required for the alignment
    *        to be considered valid. If the aligned image's similarity to the reference is below this
-   *        threshold, returns null. Use 0.0 to skip validation and always return the aligned image.
-   * @return The aligned image if validation passes, or null if the alignment quality is below the
-   *         threshold.
+   *        threshold, returns the original image. Use 0.0 to skip validation and always return the
+   *        aligned image.
+   * @return The aligned image if validation passes, or the original image if the alignment quality
+   *         is below the threshold.
    * @throws ImageProcessingException if the alignment fails.
    */
   public static BufferedImage alignToReferenceWithValidation(BufferedImage imageToAlign,

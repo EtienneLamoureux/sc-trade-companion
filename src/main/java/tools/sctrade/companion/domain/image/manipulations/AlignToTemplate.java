@@ -1,11 +1,7 @@
 package tools.sctrade.companion.domain.image.manipulations;
 
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import javax.imageio.ImageIO;
 import tools.sctrade.companion.domain.image.ImageManipulation;
-import tools.sctrade.companion.exceptions.ImageProcessingException;
 import tools.sctrade.companion.utils.ImageUtil;
 
 /**
@@ -15,26 +11,16 @@ import tools.sctrade.companion.utils.ImageUtil;
  */
 public class AlignToTemplate implements ImageManipulation {
   private static final String TEMPLATE_PATH = "/images/ocr/commodity_kiosk_template.jpg";
-  private static final BufferedImage DEFAULT_TEMPLATE = loadTemplate(TEMPLATE_PATH);
+  private static final double MIN_SIMILARITY_TRESHOLD = 0.12;
+
   private final BufferedImage template;
   private final double minSimilarityThreshold;
 
   /**
-   * Creates a new AlignToTemplate manipulation with the default template and no validation.
-   *
-   * @throws ImageProcessingException if the template cannot be loaded.
+   * Creates a new AlignToTemplate manipulation using the default template and validation threshold.
    */
   public AlignToTemplate() {
-    this(DEFAULT_TEMPLATE, 0.12);
-  }
-
-  /**
-   * Creates a new AlignToTemplate manipulation with a custom template and no validation.
-   *
-   * @param templateImage The template image to align to.
-   */
-  public AlignToTemplate(BufferedImage templateImage) {
-    this(templateImage, 0.12);
+    this(TEMPLATE_PATH, MIN_SIMILARITY_TRESHOLD);
   }
 
   /**
@@ -45,25 +31,13 @@ public class AlignToTemplate implements ImageManipulation {
    *        considered valid. If the aligned image's similarity to the template is below this
    *        threshold, returns null. Use 0.0 to skip validation.
    */
-  public AlignToTemplate(BufferedImage templateImage, double minSimilarityThreshold) {
-    this.template = templateImage;
+  public AlignToTemplate(String templateImage, double minSimilarityThreshold) {
+    this.template = ImageUtil.readFromResource(templateImage);
     this.minSimilarityThreshold = minSimilarityThreshold;
   }
 
   @Override
   public BufferedImage manipulate(BufferedImage image) {
     return ImageUtil.alignToReferenceWithValidation(image, template, minSimilarityThreshold);
-  }
-
-  private static BufferedImage loadTemplate(String resourcePath) {
-    try (InputStream is = AlignToTemplate.class.getResourceAsStream(resourcePath)) {
-      if (is == null) {
-        throw new ImageProcessingException(
-            new IOException("Template image not found at " + resourcePath));
-      }
-      return ImageIO.read(is);
-    } catch (IOException e) {
-      throw new ImageProcessingException(e);
-    }
   }
 }
