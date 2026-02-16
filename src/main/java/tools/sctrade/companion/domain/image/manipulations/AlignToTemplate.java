@@ -16,32 +16,46 @@ import tools.sctrade.companion.utils.ImageUtil;
 public class AlignToTemplate implements ImageManipulation {
   private static final String TEMPLATE_PATH = "/images/ocr/commodity_kiosk_template.jpg";
   private final BufferedImage template;
+  private final double minSimilarityThreshold;
 
   /**
-   * Creates a new AlignToTemplate manipulation with the default template.
+   * Creates a new AlignToTemplate manipulation with the default template and no validation.
    *
    * @throws ImageProcessingException if the template cannot be loaded.
    */
   public AlignToTemplate() {
-    this.template = loadTemplate(TEMPLATE_PATH);
+    this(loadTemplate(TEMPLATE_PATH), 0.0);
   }
 
   /**
-   * Creates a new AlignToTemplate manipulation with a custom template.
+   * Creates a new AlignToTemplate manipulation with a custom template and no validation.
    *
    * @param templateImage The template image to align to.
    */
   public AlignToTemplate(BufferedImage templateImage) {
+    this(templateImage, 0.0);
+  }
+
+  /**
+   * Creates a new AlignToTemplate manipulation with a custom template and validation threshold.
+   *
+   * @param templateImage The template image to align to.
+   * @param minSimilarityThreshold Minimum similarity score (0.0 to 1.0) for the alignment to be
+   *        considered valid. If the aligned image's similarity to the template is below this
+   *        threshold, returns null. Use 0.0 to skip validation.
+   */
+  public AlignToTemplate(BufferedImage templateImage, double minSimilarityThreshold) {
     this.template = templateImage;
+    this.minSimilarityThreshold = minSimilarityThreshold;
   }
 
   @Override
   public BufferedImage manipulate(BufferedImage image) {
-    return ImageUtil.alignToReference(image, template);
+    return ImageUtil.alignToReferenceWithValidation(image, template, minSimilarityThreshold);
   }
 
-  private BufferedImage loadTemplate(String resourcePath) {
-    try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
+  private static BufferedImage loadTemplate(String resourcePath) {
+    try (InputStream is = AlignToTemplate.class.getResourceAsStream(resourcePath)) {
       if (is == null) {
         throw new ImageProcessingException(
             new IOException("Template image not found at " + resourcePath));

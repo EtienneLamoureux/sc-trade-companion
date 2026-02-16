@@ -446,6 +446,25 @@ public class ImageUtil {
    */
   public static BufferedImage alignToReference(BufferedImage imageToAlign,
       BufferedImage referenceImage) {
+    return alignToReferenceWithValidation(imageToAlign, referenceImage, 0.0);
+  }
+
+  /**
+   * Aligns an image to a reference image using homography transformation with validation. Uses ORB
+   * features detected on the blue channel for alignment. After alignment, validates that the result
+   * is similar enough to the reference by computing a similarity score.
+   *
+   * @param imageToAlign The image to be aligned.
+   * @param referenceImage The reference image to align to.
+   * @param minSimilarityThreshold Minimum similarity score (0.0 to 1.0) required for the alignment
+   *        to be considered valid. If the aligned image's similarity to the reference is below this
+   *        threshold, returns null. Use 0.0 to skip validation and always return the aligned image.
+   * @return The aligned image if validation passes, or null if the alignment quality is below the
+   *         threshold.
+   * @throws ImageProcessingException if the alignment fails.
+   */
+  public static BufferedImage alignToReferenceWithValidation(BufferedImage imageToAlign,
+      BufferedImage referenceImage, double minSimilarityThreshold) {
     OpenCV.loadShared();
 
     Mat refMat = null;
@@ -529,7 +548,20 @@ public class ImageUtil {
       aligned = new Mat();
       Imgproc.warpPerspective(imgMat, aligned, homography, new Size(refMat.cols(), refMat.rows()));
 
-      return toBufferedImage(aligned);
+      BufferedImage result = toBufferedImage(aligned);
+
+      // Validate alignment quality if threshold is specified
+      if (minSimilarityThreshold > 0.0) {
+        double similarity = calculateImageSimilarity(result, referenceImage);
+        if (similarity < minSimilarityThreshold) {
+          logger.warn("Alignment quality below threshold: {} < {}", similarity,
+              minSimilarityThreshold);
+          return null;
+        }
+        logger.debug("Alignment quality: {}", similarity);
+      }
+
+      return result;
     } catch (IOException e) {
       throw new ImageProcessingException(e);
     } finally {
@@ -579,6 +611,132 @@ public class ImageUtil {
       }
       if (imgMat != null) {
         imgMat.release();
+      }
+    }
+  }
+
+  /**
+   * Checks if one image contains another by computing a similarity score based on feature matching.
+   * Uses ORB features on the blue channel, similar to the homography alignment approach. A higher
+   * score indicates better similarity/containment.
+   *
+   * @param sourceImage The image that potentially contains the target.
+   * @param targetImage The image to search for within the source.
+   * @return A similarity score between 0.0 and 1.0, where higher values indicate better similarity.
+   *         Returns 0.0 if insufficient features are found.
+   */
+  public static double calculateImageSimilarity(BufferedImage sourceImage,
+      BufferedImage targetImage) {
+    OpenCV.loadShared();
+
+    Mat sourceMat = null;
+    Mat targetMat = null;
+    List<Mat> sourceChannels = new ArrayList<>();
+    List<Mat> targetChannels = new ArrayList<>();
+    Mat emptyMask = null;
+    MatOfKeyPoint keypoints1 = null;
+    MatOfKeyPoint keypoints2 = null;
+    Mat descriptors1 = null;
+    Mat descriptors2 = null;
+    MatOfDMatch matches = null;
+
+    try {
+      sourceMat = toMat(sourceImage);
+      targetMat = toMat(targetImage);
+
+      // Split into channels and extract blue channel (index 0)
+      Core.split(sourceMat, sourceChannels);
+      Core.split(targetMat, targetChannels);
+
+      Mat sourceBlue = sourceChannels.get(0);
+      Mat targetBlue = targetChannels.get(0);
+
+      // Detect ORB features and compute descriptors
+      int maxFeatures = 500;
+      ORB orb = ORB.create(maxFeatures);
+
+      keypoints1 = new MatOfKeyPoint();
+      keypoints2 = new MatOfKeyPoint();
+      descriptors1 = new Mat();
+      descriptors2 = new Mat();
+
+      emptyMask = new Mat();
+      orb.detectAndCompute(sourceBlue, emptyMask, keypoints1, descriptors1);
+      orb.detectAndCompute(targetBlue, emptyMask, keypoints2, descriptors2);
+
+      // Check if we have enough features
+      if (keypoints1.toList().isEmpty() || keypoints2.toList().isEmpty()) {
+        return 0.0;
+      }
+
+      // Match features
+      DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE_HAMMING);
+      matches = new MatOfDMatch();
+      matcher.match(descriptors1, descriptors2, matches);
+
+      List<DMatch> matchList = matches.toList();
+      if (matchList.isEmpty()) {
+        return 0.0;
+      }
+
+      // Sort matches by distance (lower is better)
+      matchList.sort((a, b) -> Float.compare(a.distance, b.distance));
+
+      // Calculate similarity score based on good matches
+      // Good matches are those with distance below a threshold
+      int numGoodMatches = 0;
+      float maxDistance = 50.0f; // Threshold for considering a match "good"
+
+      for (DMatch match : matchList) {
+        if (match.distance < maxDistance) {
+          numGoodMatches++;
+        }
+      }
+
+      // Normalize the score: ratio of good matches to total possible matches
+      int minKeypoints = Math.min(keypoints1.toList().size(), keypoints2.toList().size());
+      double similarityScore = (double) numGoodMatches / minKeypoints;
+
+      // Clamp between 0 and 1
+      return Math.min(1.0, Math.max(0.0, similarityScore));
+    } catch (IOException e) {
+      logger.warn("Failed to calculate image similarity", e);
+      return 0.0;
+    } finally {
+      // Release OpenCV resources - always executed
+      for (Mat channel : sourceChannels) {
+        if (channel != null) {
+          channel.release();
+        }
+      }
+      for (Mat channel : targetChannels) {
+        if (channel != null) {
+          channel.release();
+        }
+      }
+      if (emptyMask != null) {
+        emptyMask.release();
+      }
+      if (keypoints1 != null) {
+        keypoints1.release();
+      }
+      if (keypoints2 != null) {
+        keypoints2.release();
+      }
+      if (descriptors1 != null) {
+        descriptors1.release();
+      }
+      if (descriptors2 != null) {
+        descriptors2.release();
+      }
+      if (matches != null) {
+        matches.release();
+      }
+      if (sourceMat != null) {
+        sourceMat.release();
+      }
+      if (targetMat != null) {
+        targetMat.release();
       }
     }
   }
