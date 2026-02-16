@@ -27,6 +27,7 @@ import tools.sctrade.companion.domain.gamelog.lineprocessors.LoadShopInventoryDa
 import tools.sctrade.companion.domain.gamelog.lineprocessors.OldLogLineProcessor;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
+import tools.sctrade.companion.domain.image.manipulations.AlignToTemplate;
 import tools.sctrade.companion.domain.image.manipulations.ConvertToEqualizedGreyscale;
 import tools.sctrade.companion.domain.image.manipulations.InvertColors;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
@@ -166,7 +167,8 @@ public class AppConfig {
       NotificationService notificationService, CommodityLocationReader commodityLocationReader,
       CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter) {
     Ocr ocr = new WindowsOcr(
-        List.of(new UpscaleTo4k(), new InvertColors(), new ConvertToEqualizedGreyscale()),
+        List.of(new AlignToTemplate(), new UpscaleTo4k(), new InvertColors(),
+            new ConvertToEqualizedGreyscale()),
         diskImageWriter, new ProcessRunner(), notificationService);
 
     return new CommoditySubmissionFactory(userService, notificationService, commodityLocationReader,
