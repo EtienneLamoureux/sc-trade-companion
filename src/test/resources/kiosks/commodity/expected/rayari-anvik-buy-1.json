@@ -1,0 +1,46 @@
+[
+	{
+		"location": "Rayari Anvik Research Outpost",
+		"transactionType": "SELLS",
+		"commodity": "Agricultural supplies",
+		"price": 264.0,
+		"inventory": 100,
+		"inventoryLevel": "MAX",
+		"boxSizesInScu": [4, 8, 16],
+		"batchId": "5a3f9f7b6b3f0b4e8e9d2f0e8a9b3f6a5e2c4d7a8b9e0c1d2e3f4a5b6c7",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "Rayari Anvik Research Outpost",
+		"transactionType": "SELLS",
+		"commodity": "Distilled spirits",
+		"price": 422.0,
+		"inventory": 81,
+		"inventoryLevel": "VERY_HIGH",
+		"boxSizesInScu": [4, 8, 16],
+		"batchId": "5a3f9f7b6b3f0b4e8e9d2f0e8a9b3f6a5e2c4d7a8b9e0c1d2e3f4a5b6c7",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "Rayari Anvik Research Outpost",
+		"transactionType": "SELLS",
+		"commodity": "Fresh food",
+		"price": 17545.99952,
+		"inventory": 160,
+		"inventoryLevel": "VERY_HIGH",
+		"boxSizesInScu": [1, 2, 4, 8],
+		"batchId": "5a3f9f7b6b3f0b4e8e9d2f0e8a9b3f6a5e2c4d7a8b9e0c1d2e3f4a5b6c7",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "Rayari Anvik Research Outpost",
+		"transactionType": "SELLS",
+		"commodity": "Bioplastic",
+		"price": 5762.00008,
+		"inventory": 486,
+		"inventoryLevel": "MAX",
+		"boxSizesInScu": [1, 2, 4, 8],
+		"batchId": "5a3f9f7b6b3f0b4e8e9d2f0e8a9b3f6a5e2c4d7a8b9e0c1d2e3f4a5b6c7",
+		"timestamp": 1768675164.6528624
+	}
+]
