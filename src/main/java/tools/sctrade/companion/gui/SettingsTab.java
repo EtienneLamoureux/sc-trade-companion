@@ -32,7 +32,6 @@ public class SettingsTab extends JPanel {
   private static final long serialVersionUID = -3532718267415423680L;
 
   private IncrementingInt rowIndex;
-  private NativeKeyListener keybindCaptureListener;
 
   /**
    * Creates a new instance of the settings tab.
@@ -188,11 +187,12 @@ public class SettingsTab extends JPanel {
 
     // Add action listener for the capture button
     captureButton.addActionListener(e -> {
+      // Disable button to prevent multiple clicks while listening
       captureButton.setText(LocalizationUtil.get("buttonListeningForKey"));
       captureButton.setEnabled(false);
 
       // Create a temporary key listener to capture the next key press
-      keybindCaptureListener = new NativeKeyListener() {
+      NativeKeyListener captureListener = new NativeKeyListener() {
         @Override
         public void nativeKeyPressed(NativeKeyEvent event) {
           String keyName = getKeyName(event.getKeyCode());
@@ -207,8 +207,6 @@ public class SettingsTab extends JPanel {
             try {
               GlobalScreen.removeNativeKeyListener(this);
             } finally {
-              keybindCaptureListener = null;
-
               // Reset button state on the Event Dispatch Thread
               javax.swing.SwingUtilities.invokeLater(() -> {
                 captureButton.setText(LocalizationUtil.get("buttonCaptureKeybind"));
@@ -229,7 +227,7 @@ public class SettingsTab extends JPanel {
         }
       };
 
-      GlobalScreen.addNativeKeyListener(keybindCaptureListener);
+      GlobalScreen.addNativeKeyListener(captureListener);
     });
 
     var tooltip =
