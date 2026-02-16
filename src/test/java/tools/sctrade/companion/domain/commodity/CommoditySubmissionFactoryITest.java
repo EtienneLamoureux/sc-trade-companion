@@ -206,7 +206,7 @@ class CommoditySubmissionFactoryITest {
   }
 
   private void setupMocks() {
-    when(settings.get(Setting.OUTPUT_TRANSIENT_IMAGES)).thenReturn(true);
+    // when(settings.get(Setting.OUTPUT_TRANSIENT_IMAGES)).thenReturn(true);
     when(settings.get(Setting.OUTPUT_SCREENSHOTS)).thenReturn(true);
     when(settings.get(Setting.MY_IMAGES_PATH))
         .thenReturn(Paths.get(".", "test-images").normalize().toAbsolutePath());
