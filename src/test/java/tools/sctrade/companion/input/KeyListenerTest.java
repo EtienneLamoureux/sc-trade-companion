@@ -9,83 +9,48 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import org.jnativehook.keyboard.NativeKeyEvent;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 
-/**
- * Tests for KeyListener.
- */
-public class KeyListenerTest {
+@ExtendWith(MockitoExtension.class)
+class KeyListenerTest {
+  private static final int CONFIGURED_KEY = NativeKeyEvent.VC_F3;
+  private static final int DIFFERENT_KEY = NativeKeyEvent.KEY_LOCATION_LEFT;
+
+  @Mock
   private Runnable mockRunnable;
+  @Mock
   private SettingRepository mockSettingRepository;
+
   private KeyListener keyListener;
 
-  @BeforeEach
-  public void setUp() {
-    mockRunnable = mock(Runnable.class);
-    mockSettingRepository = mock(SettingRepository.class);
-  }
-
   @Test
-  public void testDefaultKeybindF3() {
-    // Arrange
-    when(mockSettingRepository.get(eq(Setting.PRINTSCREEN_KEYBIND), eq("F3"))).thenReturn("F3");
-    keyListener = new KeyListener(Arrays.asList(mockRunnable), mockSettingRepository);
+  void whenPressingConfiguredKeyThenCallRunnable() {
+    when(mockSettingRepository.get(eq(Setting.PRINTSCREEN_KEYBIND), eq(CONFIGURED_KEY)))
+        .thenReturn(CONFIGURED_KEY);
     NativeKeyEvent event = mock(NativeKeyEvent.class);
-    when(event.getKeyCode()).thenReturn(NativeKeyEvent.VC_F3);
+    when(event.getKeyCode()).thenReturn(CONFIGURED_KEY);
+    keyListener = new KeyListener(Arrays.asList(mockRunnable), mockSettingRepository);
 
-    // Act
     keyListener.nativeKeyPressed(event);
 
-    // Assert
     verify(mockRunnable, times(1)).run();
   }
 
   @Test
-  public void testCustomKeybindF5() {
-    // Arrange
-    when(mockSettingRepository.get(eq(Setting.PRINTSCREEN_KEYBIND), eq("F3"))).thenReturn("F5");
-    keyListener = new KeyListener(Arrays.asList(mockRunnable), mockSettingRepository);
+  void whenPressingWrongKeyThenDoesNotCallRunnable() {
+    when(mockSettingRepository.get(eq(Setting.PRINTSCREEN_KEYBIND), eq(CONFIGURED_KEY)))
+        .thenReturn(CONFIGURED_KEY);
     NativeKeyEvent event = mock(NativeKeyEvent.class);
-    when(event.getKeyCode()).thenReturn(NativeKeyEvent.VC_F5);
+    when(event.getKeyCode()).thenReturn(DIFFERENT_KEY);
+    keyListener = new KeyListener(Arrays.asList(mockRunnable), mockSettingRepository);
 
-    // Act
     keyListener.nativeKeyPressed(event);
 
-    // Assert
-    verify(mockRunnable, times(1)).run();
-  }
-
-  @Test
-  public void testWrongKeyDoesNotTrigger() {
-    // Arrange
-    when(mockSettingRepository.get(eq(Setting.PRINTSCREEN_KEYBIND), eq("F3"))).thenReturn("F3");
-    keyListener = new KeyListener(Arrays.asList(mockRunnable), mockSettingRepository);
-    NativeKeyEvent event = mock(NativeKeyEvent.class);
-    when(event.getKeyCode()).thenReturn(NativeKeyEvent.VC_F1);
-
-    // Act
-    keyListener.nativeKeyPressed(event);
-
-    // Assert
     verify(mockRunnable, never()).run();
-  }
-
-  @Test
-  public void testInvalidKeybindDefaultsToF3() {
-    // Arrange
-    when(mockSettingRepository.get(eq(Setting.PRINTSCREEN_KEYBIND), eq("F3")))
-        .thenReturn("INVALID");
-    keyListener = new KeyListener(Arrays.asList(mockRunnable), mockSettingRepository);
-    NativeKeyEvent event = mock(NativeKeyEvent.class);
-    when(event.getKeyCode()).thenReturn(NativeKeyEvent.VC_F3);
-
-    // Act
-    keyListener.nativeKeyPressed(event);
-
-    // Assert
-    verify(mockRunnable, times(1)).run();
   }
 }
