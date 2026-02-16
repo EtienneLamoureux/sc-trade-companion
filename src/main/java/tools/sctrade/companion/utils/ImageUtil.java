@@ -556,7 +556,7 @@ public class ImageUtil {
         if (similarity < minSimilarityThreshold) {
           logger.warn("Alignment quality below threshold: {} < {}", similarity,
               minSimilarityThreshold);
-          return null;
+          return imageToAlign; // Return original image if alignment is poor
         }
         logger.debug("Alignment quality: {}", similarity);
       }
