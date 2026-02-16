@@ -206,6 +206,8 @@ public class SettingsTab extends JPanel {
           }
 
           // Cleanup - remove listener and reset button state regardless of key validity
+          // Note: GlobalScreen.removeNativeKeyListener is thread-safe and can be called
+          // from the native event thread
           try {
             GlobalScreen.removeNativeKeyListener(this);
           } finally {
