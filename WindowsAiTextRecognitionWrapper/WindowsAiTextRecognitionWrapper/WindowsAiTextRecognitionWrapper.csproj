@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WindowsSdkPackageVersion>10.0.26100.68</WindowsSdkPackageVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.AI.Imaging" Version="0.1.0-preview1" />
+    <PackageReference Include="Microsoft.Graphics.Imaging" Version="0.1.0-preview1" />
+  </ItemGroup>
+
+</Project>
