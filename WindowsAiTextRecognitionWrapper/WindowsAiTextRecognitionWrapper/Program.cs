@@ -1,5 +1,5 @@
-﻿using Microsoft.Graphics.Imaging;
-using Microsoft.Windows.AI.Imaging;
+﻿using Microsoft.Windows.AI.MachineLearning;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -83,4 +83,4 @@ static async Task<TextRecognizer> EnsureModelIsReady()
 
 // --- DTOs ---
 
-class Recognition
+public class Recognition
