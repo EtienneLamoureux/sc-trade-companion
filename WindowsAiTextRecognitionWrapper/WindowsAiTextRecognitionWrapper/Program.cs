@@ -83,4 +83,47 @@ static async Task<TextRecognizer> EnsureModelIsReady()
 
 // --- DTOs ---
 
-public class Recognition
+public class RecognitionResult
+{
+    [JsonPropertyName("fullText")]
+    public string FullText { get; set; } = string.Empty;
+
+    [JsonPropertyName("words")]
+    public List<WordResult> Words { get; set; } = new();
+}
+
+public class WordResult
+{
+    [JsonPropertyName("text")]
+    public string Text { get; set; } = string.Empty;
+
+    [JsonPropertyName("confidence")]
+    public float Confidence { get; set; }
+
+    [JsonPropertyName("boundingBox")]
+    public BoundingBoxResult BoundingBox { get; set; } = new();
+}
+
+public class BoundingBoxResult
+{
+    [JsonPropertyName("topLeft")]
+    public PointResult TopLeft { get; set; } = new();
+
+    [JsonPropertyName("topRight")]
+    public PointResult TopRight { get; set; } = new();
+
+    [JsonPropertyName("bottomRight")]
+    public PointResult BottomRight { get; set; } = new();
+
+    [JsonPropertyName("bottomLeft")]
+    public PointResult BottomLeft { get; set; } = new();
+}
+
+public class PointResult
+{
+    [JsonPropertyName("x")]
+    public float X { get; set; }
+
+    [JsonPropertyName("y")]
+    public float Y { get; set; }
+}
