@@ -1,129 +1,74 @@
-﻿using Microsoft.Windows.AI.MachineLearning;
-using System.Collections.Generic;
-using System.Text;
+﻿#nullable enable
+
+using System;
+using System.IO;
+using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+using Microsoft.Windows.AI.Imaging;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
 using Windows.Storage.Streams;
 
-if (args.Length == 0)
+class Program
 {
-    Console.Error.WriteLine("Usage: WindowsAiTextRecognitionWrapper <absolute-image-path>");
-    return 1;
-}
-
-string imagePath = args[0];
-
-if (!File.Exists(imagePath))
-{
-    Console.Error.WriteLine($"File not found: {imagePath}");
-    return 1;
-}
-
-SoftwareBitmap bitmap = await LoadBitmapAsync(imagePath);
-TextRecognizer textRecognizer = await EnsureModelIsReady();
-ImageBuffer imageBuffer = ImageBuffer.CreateBufferAttachedToBitmap(bitmap);
-RecognizedText recognizedText = textRecognizer.RecognizeTextFromImage(imageBuffer);
-
-var words = new List<WordResult>();
-
-foreach (var line in recognizedText.Lines)
-{
-    foreach (var word in line.Words)
+    static async Task<int> Main(string[] args)
     {
-        var bounds = word.BoundingBox;
-        words.Add(new WordResult
+        if (args.Length != 1 || !Path.IsPathRooted(args[0]))
         {
-            Text = word.Text,
-            Confidence = word.Confidence,
-            BoundingBox = new BoundingBoxResult
-            {
-                TopLeft     = new PointResult { X = bounds.TopLeft.X,     Y = bounds.TopLeft.Y },
-                TopRight    = new PointResult { X = bounds.TopRight.X,    Y = bounds.TopRight.Y },
-                BottomRight = new PointResult { X = bounds.BottomRight.X, Y = bounds.BottomRight.Y },
-                BottomLeft  = new PointResult { X = bounds.BottomLeft.X,  Y = bounds.BottomLeft.Y },
-            }
-        });
-    }
-}
-
-var result = new RecognitionResult
-{
-    FullText = recognizedText.Text,
-    Words = words
-};
-
-string json = JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
-Console.WriteLine(json);
-return 0;
-
-// --- Local functions ---
-
-static async Task<SoftwareBitmap> LoadBitmapAsync(string path)
-{
-    StorageFile file = await StorageFile.GetFileFromPathAsync(path);
-    using IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
-    BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
-    return await decoder.GetSoftwareBitmapAsync(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
-}
-
-static async Task<TextRecognizer> EnsureModelIsReady()
-{
-    if (TextRecognizer.GetReadyState() == AIFeatureReadyState.NotReady)
-    {
-        var loadResult = await TextRecognizer.EnsureReadyAsync();
-        if (loadResult.Status != AIFeatureReadyResultState.Success)
-        {
-            throw new Exception(loadResult.ExtendedError().Message);
+            Console.Error.WriteLine("Usage: OCRApp <absolute-image-path>");
+            return 1;
         }
+
+        ImageBuffer image = await LoadImageAsync(args[0]);
+
+        var recognizer = await TextRecognizer.CreateAsync();
+
+        var result = recognizer.RecognizeTextFromImage(image);
+
+        var json = new
+        {
+            FullText = string.Join("\n", result.Lines.Select(l => l.Text)),
+            Lines = result.Lines.Select(line => new
+            {
+                Text = line.Text,
+                BoundingBox = Rect(line.BoundingBox),
+                Words = line.Words.Select(word => new
+                {
+                    Text = word.Text,
+                    BoundingBox = Rect(word.BoundingBox),
+                    Confidence = word.MatchConfidence
+                })
+            })
+        };
+
+        Console.WriteLine(JsonSerializer.Serialize(
+            json,
+            new JsonSerializerOptions { WriteIndented = true }
+        ));
+
+        return 0;
     }
-    return await TextRecognizer.CreateAsync();
-}
 
-// --- DTOs ---
+    static async Task<ImageBuffer> LoadImageAsync(string path)
+    {
+        StorageFile file = await StorageFile.GetFileFromPathAsync(path);
+        using IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
 
-public class RecognitionResult
-{
-    [JsonPropertyName("fullText")]
-    public string FullText { get; set; } = string.Empty;
+        BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
+        SoftwareBitmap bitmap = await decoder.GetSoftwareBitmapAsync(
+            BitmapPixelFormat.Bgra8,
+            BitmapAlphaMode.Premultiplied
+        );
 
-    [JsonPropertyName("words")]
-    public List<WordResult> Words { get; set; } = new();
-}
+        return ImageBuffer.CreateCopyFromBitmap(bitmap);
+    }
 
-public class WordResult
-{
-    [JsonPropertyName("text")]
-    public string Text { get; set; } = string.Empty;
-
-    [JsonPropertyName("confidence")]
-    public float Confidence { get; set; }
-
-    [JsonPropertyName("boundingBox")]
-    public BoundingBoxResult BoundingBox { get; set; } = new();
-}
-
-public class BoundingBoxResult
-{
-    [JsonPropertyName("topLeft")]
-    public PointResult TopLeft { get; set; } = new();
-
-    [JsonPropertyName("topRight")]
-    public PointResult TopRight { get; set; } = new();
-
-    [JsonPropertyName("bottomRight")]
-    public PointResult BottomRight { get; set; } = new();
-
-    [JsonPropertyName("bottomLeft")]
-    public PointResult BottomLeft { get; set; } = new();
-}
-
-public class PointResult
-{
-    [JsonPropertyName("x")]
-    public float X { get; set; }
-
-    [JsonPropertyName("y")]
-    public float Y { get; set; }
+    static object Rect(Windows.Foundation.Rect r) => new
+    {
+        r.X,
+        r.Y,
+        r.Width,
+        r.Height
+    };
 }
