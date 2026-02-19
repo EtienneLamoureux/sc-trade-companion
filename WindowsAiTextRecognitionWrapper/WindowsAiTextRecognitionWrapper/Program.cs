@@ -5,66 +5,88 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.Windows.AI.Imaging;
+using Windows.Foundation;
 using Windows.Graphics.Imaging;
+using Windows.Media.Ocr;
 using Windows.Storage;
 using Windows.Storage.Streams;
 
-class Program
+internal class Program
 {
     static async Task<int> Main(string[] args)
     {
         if (args.Length != 1 || !Path.IsPathRooted(args[0]))
         {
-            Console.Error.WriteLine("Usage: OCRApp <absolute-image-path>");
+            Console.Error.WriteLine("Usage: WindowsMediaOcrWrapper <absolute-image-path>");
             return 1;
         }
 
-        ImageBuffer image = await LoadImageAsync(args[0]);
+        SoftwareBitmap bitmap = await LoadBitmapAsync(args[0]);
 
-        var recognizer = await TextRecognizer.CreateAsync();
-
-        var result = recognizer.RecognizeTextFromImage(image);
-
-        var json = new
+        OcrEngine engine = OcrEngine.TryCreateFromUserProfileLanguages();
+        if (engine == null)
         {
-            FullText = string.Join("\n", result.Lines.Select(l => l.Text)),
-            Lines = result.Lines.Select(line => new
+            Console.Error.WriteLine("OCR engine not available on this system.");
+            return 2;
+        }
+
+        OcrResult result = await engine.RecognizeAsync(bitmap);
+
+        var output = new
+        {
+            FullText = result.Text,
+            Lines = result.Lines.Select(line =>
             {
-                Text = line.Text,
-                BoundingBox = Rect(line.BoundingBox),
-                Words = line.Words.Select(word => new
+                var words = line.Words.Select(w => new
                 {
-                    Text = word.Text,
-                    BoundingBox = Rect(word.BoundingBox),
-                    Confidence = word.MatchConfidence
-                })
+                    Text = w.Text,
+                    BoundingBox = Rect(w.BoundingRect)
+                }).ToArray();
+
+                return new
+                {
+                    Text = line.Text,
+                    BoundingBox = Rect(ComputeLineRect(line.Words)),
+                    Words = words
+                };
             })
         };
 
         Console.WriteLine(JsonSerializer.Serialize(
-            json,
+            output,
             new JsonSerializerOptions { WriteIndented = true }
         ));
 
         return 0;
     }
 
-    static async Task<ImageBuffer> LoadImageAsync(string path)
+    private static async Task<SoftwareBitmap> LoadBitmapAsync(string path)
     {
         StorageFile file = await StorageFile.GetFileFromPathAsync(path);
         using IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
 
         BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
-        SoftwareBitmap bitmap = await decoder.GetSoftwareBitmapAsync(
+        return await decoder.GetSoftwareBitmapAsync(
             BitmapPixelFormat.Bgra8,
             BitmapAlphaMode.Premultiplied
         );
-
-        return ImageBuffer.CreateCopyFromBitmap(bitmap);
     }
 
-    static object Rect(Windows.Foundation.Rect r) => new
+    private static Rect ComputeLineRect(
+        System.Collections.Generic.IReadOnlyList<OcrWord> words)
+    {
+        if (words.Count == 0)
+            return new Rect();
+
+        double x1 = words.Min(w => w.BoundingRect.X);
+        double y1 = words.Min(w => w.BoundingRect.Y);
+        double x2 = words.Max(w => w.BoundingRect.X + w.BoundingRect.Width);
+        double y2 = words.Max(w => w.BoundingRect.Y + w.BoundingRect.Height);
+
+        return new Rect(x1, y1, x2 - x1, y2 - y1);
+    }
+
+    private static object Rect(Rect r) => new
     {
         r.X,
         r.Y,
