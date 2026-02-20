@@ -2,16 +2,22 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-
-    <!-- Single-file settings -->
-    <PublishSingleFile>true</PublishSingleFile>
-    <SelfContained>false</SelfContained>
-    <PublishTrimmed>false</PublishTrimmed>
-
-    <!-- Faster startup -->
-    <InvariantGlobalization>true</InvariantGlobalization>
+    <TargetFramework>net6.0</TargetFramework>
+    <PlatformTarget>x64</PlatformTarget>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Ensure native files are copied -->
+    <None Include="oneocr.dll" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="oneocr.onemodel" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="onnxruntime.dll" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="opencv_world460.dll" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
 </Project>
