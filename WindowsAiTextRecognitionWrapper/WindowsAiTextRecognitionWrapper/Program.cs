@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 #region Native structs
 
@@ -83,6 +86,46 @@ static class OneOcr
 
 #endregion
 
+#region DTOs
+
+class BoundingBox
+{
+    [JsonPropertyName("left")]
+    public int Left { get; set; }
+    [JsonPropertyName("top")]
+    public int Top { get; set; }
+    [JsonPropertyName("right")]
+    public int Right { get; set; }
+    [JsonPropertyName("bottom")]
+    public int Bottom { get; set; }
+}
+
+class OcrWordDto
+{
+    [JsonPropertyName("text")]
+    public string Text { get; set; }
+    [JsonPropertyName("boundingBox")]
+    public BoundingBox BoundingBox { get; set; }
+}
+
+class OcrLineDto
+{
+    [JsonPropertyName("text")]
+    public string Text { get; set; }
+    [JsonPropertyName("boundingBox")]
+    public BoundingBox BoundingBox { get; set; }
+    [JsonPropertyName("words")]
+    public List<OcrWordDto> Words { get; set; } = new List<OcrWordDto>();
+}
+
+class OcrResultDto
+{
+    [JsonPropertyName("lines")]
+    public List<OcrLineDto> Lines { get; set; } = new List<OcrLineDto>();
+}
+
+#endregion
+
 class Program
 {
     static void Main(string[] args)
@@ -126,7 +169,7 @@ class Program
 
     static byte[] StringToAnsiBytes(string s)
     {
-        // null-terminated ANSI bytes, matching const char* in C++
+        // null-terminated ANSI bytes, matching const char* in C++ 
         var bytes = System.Text.Encoding.Default.GetBytes(s);
         var result = new byte[bytes.Length + 1];
         Buffer.BlockCopy(bytes, 0, result, 0, bytes.Length);
@@ -163,7 +206,7 @@ class Program
             res = OneOcr.CreateOcrPipeline(modelPtr, keyPtr, ctx, out pipeline);
             if (res != 0) { Console.Error.WriteLine($"CreateOcrPipeline failed: {res}"); return; }
 
-            Console.WriteLine("OCR model loaded...");
+            Console.Error.WriteLine("OCR model loaded...");
 
             res = OneOcr.CreateOcrProcessOptions(out opt);
             if (res != 0) { Console.Error.WriteLine($"CreateOcrProcessOptions failed: {res}"); return; }
@@ -180,10 +223,12 @@ class Program
             keyHandle.Free();
         }
 
-        Console.WriteLine("Running ocr pipeline...");
+        Console.Error.WriteLine("Running ocr pipeline...");
 
         OneOcr.GetOcrLineCount(instance, out long lines);
-        Console.WriteLine($"Recognize {lines} lines");
+        Console.Error.WriteLine($"Recognize {lines} lines");
+
+        var resultDto = new OcrResultDto();
 
         for (long i = 0; i < lines; i++)
         {
@@ -195,8 +240,11 @@ class Program
 
             OneOcr.GetOcrLineBoundingBox(line, out OcrBoundingBox box);
 
-            Console.WriteLine(
-                $"{i:D2}: [{box.left},{box.top},{box.right},{box.bottom}] {text}");
+            var lineDto = new OcrLineDto
+            {
+                Text = text,
+                BoundingBox = new BoundingBox { Left = box.left, Top = box.top, Right = box.right, Bottom = box.bottom }
+            };
 
             OneOcr.GetOcrLineWordCount(line, out long wc);
             for (long j = 0; j < wc; j++)
@@ -206,9 +254,18 @@ class Program
                 OneOcr.GetOcrWordBoundingBox(word, out OcrBoundingBox wbox);
 
                 string wtext = Marshal.PtrToStringAnsi(wptr);
-                Console.WriteLine(
-                    $"    [{wbox.left},{wbox.top},{wbox.right},{wbox.bottom}] {wtext}");
+                
+                lineDto.Words.Add(new OcrWordDto
+                {
+                    Text = wtext,
+                    BoundingBox = new BoundingBox { Left = wbox.left, Top = wbox.top, Right = wbox.right, Bottom = wbox.bottom }
+                });
             }
+
+            resultDto.Lines.Add(lineDto);
         }
+
+        string jsonOutput = JsonSerializer.Serialize(resultDto, new JsonSerializerOptions { WriteIndented = true });
+        Console.WriteLine(jsonOutput);
     }
 }
