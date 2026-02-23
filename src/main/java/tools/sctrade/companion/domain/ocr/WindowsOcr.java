@@ -38,7 +38,7 @@ public class WindowsOcr extends Ocr {
     var imagePath = diskImageWriter.write(image, ImageType.SCREENSHOT).orElseThrow()
         .toAbsolutePath().toString();
 
-    var command = List.of("bin/windowsocr/windows-ocr-wrapper.exe", imagePath);
+    var command = List.of("bin/oneocr-wrapper/OneOcrWrapper.exe", imagePath);
     var output = processRunner.runNoFail(command);
 
     var locatedWords = parseOutput(output);
@@ -55,9 +55,9 @@ public class WindowsOcr extends Ocr {
     }
 
     try {
-      var words = JsonUtil.parseList(json, WindowsOcrLocatedWord.class);
+      var result = JsonUtil.parse(json, WindowsOcrResult.class);
 
-      return words.stream().map(n -> toLocatedWord(n)).toList();
+      return result.lines().stream().map(n -> toLocatedWord(n)).toList();
     } catch (Exception e) {
       logger.error("Could not parse Windows OCR output", e);
 
@@ -69,14 +69,23 @@ public class WindowsOcr extends Ocr {
     }
   }
 
-  private LocatedWord toLocatedWord(WindowsOcrLocatedWord wordData) {
-    var rectangle = new Rectangle((int) wordData.X, (int) wordData.Y, (int) wordData.Width,
-        (int) wordData.Height);
+  private LocatedWord toLocatedWord(WindowsOcrLocatedLine line) {
+    var rectangle = new Rectangle(line.boundingBox().x(), line.boundingBox().y(),
+        line.boundingBox().width(), line.boundingBox().height());
 
-    return new LocatedWord(wordData.Text.toLowerCase(), rectangle);
+    return new LocatedWord(line.text().toLowerCase(), rectangle);
   }
 
-  private static record WindowsOcrLocatedWord(String Text, double X, double Y, double Width,
-      double Height) {
+  private static record WindowsOcrResult(List<WindowsOcrLocatedLine> lines) {
+  }
+
+  private static record WindowsOcrLocatedLine(String text, BoundingBox boundingBox,
+      List<WindowsOcrLocatedWord> words) {
+  }
+
+  private static record WindowsOcrLocatedWord(String text, BoundingBox boundingBox) {
+  }
+
+  private static record BoundingBox(int x, int y, int width, int height) {
   }
 }

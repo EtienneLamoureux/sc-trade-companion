@@ -20,6 +20,15 @@ public class JsonUtil {
     objectMapper.registerModule(new JavaTimeModule());
   }
 
+  public static <T> T parse(String json, Class<T> clazz) {
+    try {
+      return objectMapper.readValue(json, clazz);
+    } catch (JsonProcessingException e) {
+      logger.error("Could not parse json: " + json, e);
+      throw new JsonParsingException(e);
+    }
+  }
+
   public static <T> List<T> parseList(String json, Class<T> clazz) {
     try {
       JavaType javaType = objectMapper.getTypeFactory().constructCollectionType(List.class, clazz);

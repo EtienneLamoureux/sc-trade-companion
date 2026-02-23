@@ -1,6 +1,7 @@
 package tools.sctrade.companion.utils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -16,6 +17,8 @@ public class ProcessRunner {
 
   public List<String> runNoFail(List<String> command) {
     ProcessBuilder processBuilder = new ProcessBuilder(command);
+    File directory = new File(command.get(0).substring(0, command.get(0).lastIndexOf("/")));
+    processBuilder.directory(directory);
     processBuilder.redirectErrorStream(true);
 
     try {
