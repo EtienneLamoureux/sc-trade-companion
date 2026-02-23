@@ -1,4 +1,15 @@
 # SC Trade Companion
+## 1.4.0
+### Features
+- Add ability to change hotkey
+- Change OCR engine
+  - Improve OCR success rate, including on non-stanton kiosks
+  - Improve text recognition
+  - Improve parsed-price accuracy
+  - Improve available box sizes detection
+  - Remove the .NET dependency
+- Handle slight kiosk misalignment through perspective correction
+
 ## 1.3.1
 ### Other
 - Improve text recognition
