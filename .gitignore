@@ -19,7 +19,7 @@ build/
 .settings
 .springBeans
 .sts4-cache
-bin/
+bin/*
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 obj/
@@ -48,3 +48,10 @@ out/
 
 ### Git ###
 *.orig
+
+### OCR wrapper ###
+!bin/oneocr-wrapper/
+oneocr.dll
+oneocr.onemodel
+onnxruntime.dll
+opencv_world460.dll
