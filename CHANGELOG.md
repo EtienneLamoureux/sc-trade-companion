@@ -1,4 +1,9 @@
 # SC Trade Companion
+## 1.4.1
+### Bugs
+- Clarify the .NET dependency in the logs tab when the host system requires an update
+- Fix an issue when pressing the bound key without releasing for a long time
+
 ## 1.4.0
 ### Features
 - Add ability to change hotkey
@@ -7,7 +12,6 @@
   - Improve text recognition
   - Improve parsed-price accuracy
   - Improve available box sizes detection
-  - Remove the .NET dependency
 - Handle slight kiosk misalignment through perspective correction
 
 ## 1.3.1
