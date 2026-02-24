@@ -36,7 +36,7 @@ class KeyListenerTest {
     when(event.getKeyCode()).thenReturn(CONFIGURED_KEY);
     keyListener = new KeyListener(Arrays.asList(mockRunnable), mockSettingRepository);
 
-    keyListener.nativeKeyPressed(event);
+    keyListener.nativeKeyReleased(event);
 
     verify(mockRunnable, times(1)).run();
   }
@@ -49,7 +49,7 @@ class KeyListenerTest {
     when(event.getKeyCode()).thenReturn(DIFFERENT_KEY);
     keyListener = new KeyListener(Arrays.asList(mockRunnable), mockSettingRepository);
 
-    keyListener.nativeKeyPressed(event);
+    keyListener.nativeKeyReleased(event);
 
     verify(mockRunnable, never()).run();
   }

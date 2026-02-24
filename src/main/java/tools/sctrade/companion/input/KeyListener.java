@@ -33,21 +33,21 @@ public class KeyListener implements NativeKeyListener {
 
   @Override
   public void nativeKeyPressed(NativeKeyEvent e) {
+    // Deliberately empty
+  }
+
+  @Override
+  public void nativeKeyTyped(NativeKeyEvent e) {
+    // Deliberately empty
+  }
+
+  @Override
+  public void nativeKeyReleased(NativeKeyEvent e) {
     logger.trace("Key pressed: {}", NativeKeyEvent.getKeyText(e.getKeyCode()));
     int keybind = settingRepository.get(Setting.PRINTSCREEN_KEYBIND, NativeKeyEvent.VC_F3);
 
     if (e.getKeyCode() == keybind) {
       runnables.parallelStream().forEach(n -> n.run());
     }
-  }
-
-  @Override
-  public void nativeKeyTyped(NativeKeyEvent nativeEvent) {
-    // Deliberately empty
-  }
-
-  @Override
-  public void nativeKeyReleased(NativeKeyEvent nativeEvent) {
-    // Deliberately empty
   }
 }
