@@ -11,9 +11,12 @@ import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.JsonUtil;
+import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.ProcessRunner;
 
 public class WindowsOcr extends Ocr {
+  private static final String DOT_NET = ".NET";
+
   private final Logger logger = LoggerFactory.getLogger(WindowsOcr.class);
 
   private final DiskImageWriter diskImageWriter;
@@ -57,6 +60,10 @@ public class WindowsOcr extends Ocr {
       return result.lines().stream().map(n -> toLocatedWord(n)).toList();
     } catch (Exception e) {
       logger.error("Could not parse Windows OCR output", e);
+
+      if (json.contains(DOT_NET)) {
+        notificationService.error(LocalizationUtil.get("errorMissingDotNet"));
+      }
 
       return Collections.emptyList();
     }
