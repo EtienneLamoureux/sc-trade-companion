@@ -9,13 +9,20 @@ import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
+import tools.sctrade.companion.domain.image.ImageType;
+import tools.sctrade.companion.output.DiskImageWriter;
 
 /**
  * A straight forward re-implementation of the following c# code in java using JNA ```c# using
@@ -291,9 +298,12 @@ public class OneOcr extends Ocr {
 
   private final OneOcrLib lib;
   private final Pointer pipeline;
+  private final DiskImageWriter diskImageWriter;
 
-  public OneOcr(List<ImageManipulation> preprocessingManipulations) {
+  public OneOcr(List<ImageManipulation> preprocessingManipulations,
+      DiskImageWriter diskImageWriter) {
     super(preprocessingManipulations);
+    this.diskImageWriter = diskImageWriter;
 
     // Tell Windows to look in the wrapper dir when resolving DLL dependencies.
     Kernel32 kernel32 = Native.load("kernel32", Kernel32.class);
@@ -313,25 +323,18 @@ public class OneOcr extends Ocr {
 
   @Override
   protected OcrResult process(BufferedImage image) {
-    int width = image.getWidth();
-    int height = image.getHeight();
+    // Write to disk so that the image goes through the same encoding/decoding path
+    // as the C# wrapper, then reload it without ICC profile application to get the
+    // same raw pixel values that System.Drawing.Bitmap produces.
+    var imagePath = diskImageWriter.write(image, ImageType.SCREENSHOT).orElseThrow();
+    BufferedImage reloaded = readIgnoringIccProfile(imagePath.toFile());
 
-    // Convert to a standard TYPE_INT_ARGB without any colour space transform,
-    // then read the raw raster — bypassing getRGB()'s colour model conversion.
-    BufferedImage argb;
-    if (image.getType() == BufferedImage.TYPE_INT_ARGB) {
-      argb = image;
-    } else {
-      argb = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-      // Use Graphics2D with no colour conversion hint
-      java.awt.Graphics2D g = argb.createGraphics();
-      g.setRenderingHint(java.awt.RenderingHints.KEY_COLOR_RENDERING,
-          java.awt.RenderingHints.VALUE_COLOR_RENDER_SPEED);
-      g.drawImage(image, 0, 0, null);
-      g.dispose();
-    }
+    int width = reloaded.getWidth();
+    int height = reloaded.getHeight();
 
-    int[] pixels = ((java.awt.image.DataBufferInt) argb.getRaster().getDataBuffer()).getData();
+    int[] pixels = new int[width * height];
+    reloaded.getRGB(0, 0, width, height, pixels, 0, width);
+
     Memory pixelMem = new Memory((long) pixels.length * Integer.BYTES);
     pixelMem.write(0, pixels, 0, pixels.length);
 
@@ -345,6 +348,27 @@ public class OneOcr extends Ocr {
 
     var words = runOcr(img);
     return new OcrResult(words);
+  }
+
+  private static BufferedImage readIgnoringIccProfile(File file) {
+    try (ImageInputStream iis = ImageIO.createImageInputStream(file)) {
+      var readers = ImageIO.getImageReaders(iis);
+
+      if (!readers.hasNext()) {
+        throw new RuntimeException("No ImageReader found for file: " + file);
+      }
+
+      ImageReader reader = readers.next();
+
+      try {
+        reader.setInput(iis, true, true); // ignoreMetadata=true skips ICC profile
+        return reader.read(0, reader.getDefaultReadParam());
+      } finally {
+        reader.dispose();
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to read image: " + file, e);
+    }
   }
 
   // -------------------------------------------------------------------------

@@ -163,7 +163,7 @@ public class AppConfig {
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
       NotificationService notificationService, CommodityLocationReader commodityLocationReader,
       CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter) {
-    Ocr ocr = new OneOcr(List.of(new AlignToTemplate()));
+    Ocr ocr = new OneOcr(List.of(new AlignToTemplate()), diskImageWriter);
 
     return new CommoditySubmissionFactory(userService, notificationService, commodityLocationReader,
         commodityListingFactory, ocr);
