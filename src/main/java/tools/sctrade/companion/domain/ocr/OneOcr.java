@@ -9,7 +9,6 @@ import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,8 +18,7 @@ import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 
 /**
- * A straight forward re-implementation of the following c# code in java using JNA
- * ```c# using
+ * A straight forward re-implementation of the following c# code in java using JNA ```c# using
  * System; using System.Collections.Generic; using System.Drawing; using System.Drawing.Imaging;
  * using System.Runtime.InteropServices; using System.Text.Json; using
  * System.Text.Json.Serialization;
@@ -224,7 +222,8 @@ public class OneOcr extends Ocr {
 
     long OcrProcessOptionsSetMaxRecognitionLineCount(Pointer opt, long count);
 
-    long RunOcrPipeline(Pointer pipeline, Img.ByReference img, Pointer opt, PointerByReference instance);
+    long RunOcrPipeline(Pointer pipeline, Img.ByReference img, Pointer opt,
+        PointerByReference instance);
 
     long GetOcrLineCount(Pointer instance, LongByReference count);
 
@@ -248,8 +247,8 @@ public class OneOcr extends Ocr {
   // -------------------------------------------------------------------------
 
   /**
-   * [StructLayout(LayoutKind.Sequential, Pack = 1)]
-   * struct Img { int T; int Col; int Row; int Unk; long Step; long DataPtr; }
+   * [StructLayout(LayoutKind.Sequential, Pack = 1)] struct Img { int T; int Col; int Row; int Unk;
+   * long Step; long DataPtr; }
    */
   public static class Img extends Structure {
     public int t;
@@ -264,7 +263,8 @@ public class OneOcr extends Ocr {
       return List.of("t", "col", "row", "unk", "step", "dataPtr");
     }
 
-    public static class ByReference extends Img implements Structure.ByReference {}
+    public static class ByReference extends Img implements Structure.ByReference {
+    }
   }
 
   /**
@@ -313,13 +313,25 @@ public class OneOcr extends Ocr {
 
   @Override
   protected OcrResult process(BufferedImage image) {
-    // Get raw ARGB pixels via getRGB — this is a direct, lossless pixel copy that matches the C#
-    // Bitmap.Clone(..., Format32bppArgb) approach. On little-endian x86, each int (0xAARRGGBB)
-    // is laid out in memory as B,G,R,A — identical to GDI+'s Format32bppArgb.
-    // getRGB bypasses any color space conversion, unlike drawImage or ColorConvertOp.
     int width = image.getWidth();
     int height = image.getHeight();
-    int[] pixels = image.getRGB(0, 0, width, height, null, 0, width);
+
+    // Convert to a standard TYPE_INT_ARGB without any colour space transform,
+    // then read the raw raster — bypassing getRGB()'s colour model conversion.
+    BufferedImage argb;
+    if (image.getType() == BufferedImage.TYPE_INT_ARGB) {
+      argb = image;
+    } else {
+      argb = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+      // Use Graphics2D with no colour conversion hint
+      java.awt.Graphics2D g = argb.createGraphics();
+      g.setRenderingHint(java.awt.RenderingHints.KEY_COLOR_RENDERING,
+          java.awt.RenderingHints.VALUE_COLOR_RENDER_SPEED);
+      g.drawImage(image, 0, 0, null);
+      g.dispose();
+    }
+
+    int[] pixels = ((java.awt.image.DataBufferInt) argb.getRaster().getDataBuffer()).getData();
     Memory pixelMem = new Memory((long) pixels.length * Integer.BYTES);
     pixelMem.write(0, pixels, 0, pixels.length);
 
