@@ -1,6 +1,7 @@
 package tools.sctrade.companion.domain.ocr;
 
 import com.sun.jna.Library;
+import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
@@ -9,6 +10,7 @@ import com.sun.jna.ptr.PointerByReference;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -197,8 +199,10 @@ import tools.sctrade.companion.domain.image.ImageManipulation;
  * ```
  */
 public class OneOcr extends Ocr {
-  private static final String DLL_PATH = "bin/oneocr-wrapper/oneocr";
-  private static final String MODEL_PATH = "bin/oneocr-wrapper/oneocr.onemodel";
+  private static final String WRAPPER_DIR =
+      Paths.get("bin/oneocr-wrapper").toAbsolutePath().toString();
+  private static final String DLL_PATH = WRAPPER_DIR + "/oneocr";
+  private static final String MODEL_PATH = WRAPPER_DIR + "/oneocr.onemodel";
   private static final String MODEL_KEY = "kj)TGtrK>f]b[Piow.gU+nC@s\"\"\"\"\"\"4";
   private static final long MAX_LINES = 1000;
 
@@ -220,7 +224,7 @@ public class OneOcr extends Ocr {
 
     long OcrProcessOptionsSetMaxRecognitionLineCount(Pointer opt, long count);
 
-    long RunOcrPipeline(Pointer pipeline, Img img, Pointer opt, PointerByReference instance);
+    long RunOcrPipeline(Pointer pipeline, Img.ByReference img, Pointer opt, PointerByReference instance);
 
     long GetOcrLineCount(Pointer instance, LongByReference count);
 
@@ -259,6 +263,8 @@ public class OneOcr extends Ocr {
     protected List<String> getFieldOrder() {
       return List.of("t", "col", "row", "unk", "step", "dataPtr");
     }
+
+    public static class ByReference extends Img implements Structure.ByReference {}
   }
 
   /**
@@ -273,6 +279,12 @@ public class OneOcr extends Ocr {
     }
   }
 
+  // Used to add the wrapper directory to the Windows DLL search path so that
+  // oneocr.dll can resolve its siblings (onnxruntime.dll, opencv_world460.dll, …).
+  private interface Kernel32 extends Library {
+    boolean SetDllDirectoryA(String path);
+  }
+
   // -------------------------------------------------------------------------
   // Lifecycle
   // -------------------------------------------------------------------------
@@ -283,8 +295,16 @@ public class OneOcr extends Ocr {
   public OneOcr(List<ImageManipulation> preprocessingManipulations) {
     super(preprocessingManipulations);
 
-    lib = Native.load(DLL_PATH, OneOcrLib.class);
-    pipeline = createPipeline();
+    // Tell Windows to look in the wrapper dir when resolving DLL dependencies.
+    Kernel32 kernel32 = Native.load("kernel32", Kernel32.class);
+    kernel32.SetDllDirectoryA(WRAPPER_DIR);
+
+    try {
+      lib = Native.load(DLL_PATH, OneOcrLib.class);
+      pipeline = createPipeline();
+    } finally {
+      kernel32.SetDllDirectoryA(null);
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -300,24 +320,19 @@ public class OneOcr extends Ocr {
     bgra.getGraphics().drawImage(image, 0, 0, null);
 
     byte[] pixels = ((DataBufferByte) bgra.getRaster().getDataBuffer()).getData();
-    Pointer pixelPointer = new Pointer(Native.malloc(pixels.length));
+    Memory pixelMem = new Memory(pixels.length);
+    pixelMem.write(0, pixels, 0, pixels.length);
 
-    try {
-      pixelPointer.write(0, pixels, 0, pixels.length);
+    Img.ByReference img = new Img.ByReference();
+    img.t = 3;
+    img.col = bgra.getWidth();
+    img.row = bgra.getHeight();
+    img.unk = 0;
+    img.step = (long) bgra.getWidth() * 4;
+    img.dataPtr = Pointer.nativeValue(pixelMem);
 
-      Img img = new Img();
-      img.t = 3;
-      img.col = bgra.getWidth();
-      img.row = bgra.getHeight();
-      img.unk = 0;
-      img.step = (long) bgra.getWidth() * 4;
-      img.dataPtr = Pointer.nativeValue(pixelPointer);
-
-      var words = runOcr(img);
-      return new OcrResult(words);
-    } finally {
-      Native.free(Pointer.nativeValue(pixelPointer));
-    }
+    var words = runOcr(img);
+    return new OcrResult(words);
   }
 
   // -------------------------------------------------------------------------
@@ -335,23 +350,18 @@ public class OneOcr extends Ocr {
     byte[] modelBytes = toNullTerminatedAnsi(MODEL_PATH);
     byte[] keyBytes = toNullTerminatedAnsi(MODEL_KEY);
 
-    Pointer modelPtr = new Pointer(Native.malloc(modelBytes.length));
-    Pointer keyPtr = new Pointer(Native.malloc(keyBytes.length));
+    // Memory keeps the native buffer alive and valid for the duration of the call
+    Memory modelMem = new Memory(modelBytes.length);
+    Memory keyMem = new Memory(keyBytes.length);
+    modelMem.write(0, modelBytes, 0, modelBytes.length);
+    keyMem.write(0, keyBytes, 0, keyBytes.length);
 
-    try {
-      modelPtr.write(0, modelBytes, 0, modelBytes.length);
-      keyPtr.write(0, keyBytes, 0, keyBytes.length);
-
-      var pipelineRef = new PointerByReference();
-      check("CreateOcrPipeline", lib.CreateOcrPipeline(modelPtr, keyPtr, ctx, pipelineRef));
-      return pipelineRef.getValue();
-    } finally {
-      Native.free(Pointer.nativeValue(modelPtr));
-      Native.free(Pointer.nativeValue(keyPtr));
-    }
+    var pipelineRef = new PointerByReference();
+    check("CreateOcrPipeline", lib.CreateOcrPipeline(modelMem, keyMem, ctx, pipelineRef));
+    return pipelineRef.getValue();
   }
 
-  private List<LocatedWord> runOcr(Img img) {
+  private List<LocatedWord> runOcr(Img.ByReference img) {
     var optRef = new PointerByReference();
     check("CreateOcrProcessOptions", lib.CreateOcrProcessOptions(optRef));
     Pointer opt = optRef.getValue();
