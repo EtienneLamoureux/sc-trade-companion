@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,16 +26,14 @@ import tools.sctrade.companion.domain.image.manipulations.AlignToTemplate;
 import tools.sctrade.companion.domain.notification.ConsoleNotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
-import tools.sctrade.companion.domain.ocr.WindowsOcr;
+import tools.sctrade.companion.domain.ocr.OneOcr;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
-import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.JsonUtil;
-import tools.sctrade.companion.utils.ProcessRunner;
 import tools.sctrade.companion.utils.ResourceUtil;
 
-@Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
+// @Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
 @ExtendWith(MockitoExtension.class)
 class CommoditySubmissionFactoryITest {
   private static final double CURRENT_ACCURACY = 60.0;
@@ -47,9 +44,6 @@ class CommoditySubmissionFactoryITest {
   private UserService userService;
   @Mock
   private SettingRepository settings;
-
-  private DiskImageWriter diskImageWriter;
-  private ProcessRunner processRunner = new ProcessRunner();
 
   private LocationRepository locationRepository = new TestLocationRepository();
   private CommodityRepository commodityRepository = new TestCommodityRepository();
@@ -68,10 +62,8 @@ class CommoditySubmissionFactoryITest {
   void setUp() {
     setupMocks();
 
-    diskImageWriter = new DiskImageWriter(settings);
     List<ImageManipulation> imageManipulations = List.of(new AlignToTemplate());
-    ocr = new WindowsOcr(imageManipulations, diskImageWriter, processRunner,
-        new NotificationService(new ConsoleNotificationRepository()));
+    ocr = new OneOcr(imageManipulations);
 
     submissionFactory = new CommoditySubmissionFactory(userService, notificationService,
         commodityLocationReader, commodityListingFactory, ocr);

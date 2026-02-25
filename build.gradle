@@ -33,6 +33,10 @@ dependencies {
 	// Computer vision
 	implementation 'org.openpnp:opencv:4.9.0-0'
 	
+	// JNA (native interop for oneocr.dll)
+	implementation 'net.java.dev.jna:jna:5.15.0'
+	implementation 'net.java.dev.jna:jna-platform:5.15.0'
+
 	// Utils
 	implementation 'org.imgscalr:imgscalr-lib:4.2'
 	implementation 'org.apache.commons:commons-math3:3.6.1'
