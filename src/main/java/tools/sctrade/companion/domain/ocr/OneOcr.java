@@ -9,7 +9,7 @@ import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
+
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -313,22 +313,22 @@ public class OneOcr extends Ocr {
 
   @Override
   protected OcrResult process(BufferedImage image) {
-    // Convert image to BGRA (TYPE_4BYTE_ABGR is stored as B,G,R,A in memory — matches
-    // Format32bppArgb for the native side)
-    BufferedImage bgra =
-        new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_4BYTE_ABGR);
-    bgra.getGraphics().drawImage(image, 0, 0, null);
-
-    byte[] pixels = ((DataBufferByte) bgra.getRaster().getDataBuffer()).getData();
-    Memory pixelMem = new Memory(pixels.length);
+    // Get raw ARGB pixels via getRGB — this is a direct, lossless pixel copy that matches the C#
+    // Bitmap.Clone(..., Format32bppArgb) approach. On little-endian x86, each int (0xAARRGGBB)
+    // is laid out in memory as B,G,R,A — identical to GDI+'s Format32bppArgb.
+    // getRGB bypasses any color space conversion, unlike drawImage or ColorConvertOp.
+    int width = image.getWidth();
+    int height = image.getHeight();
+    int[] pixels = image.getRGB(0, 0, width, height, null, 0, width);
+    Memory pixelMem = new Memory((long) pixels.length * Integer.BYTES);
     pixelMem.write(0, pixels, 0, pixels.length);
 
     Img.ByReference img = new Img.ByReference();
     img.t = 3;
-    img.col = bgra.getWidth();
-    img.row = bgra.getHeight();
+    img.col = width;
+    img.row = height;
     img.unk = 0;
-    img.step = (long) bgra.getWidth() * 4;
+    img.step = (long) width * 4;
     img.dataPtr = Pointer.nativeValue(pixelMem);
 
     var words = runOcr(img);
