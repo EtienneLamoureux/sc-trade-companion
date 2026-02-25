@@ -78,6 +78,7 @@ public class CommodityListingFactory {
     try {
       logger.debug("Reading listings...");
       listingsResult = removeNonListingWords(listingsResult);
+      listingsResult = removePureGibberishWords(listingsResult);
       var rawListings = buildRawListings(listingsResult);
       logger.debug("Read {} listings", rawListings.size());
 
@@ -146,6 +147,14 @@ public class CommodityListingFactory {
         .flatMap(n -> n.getWordsInReadingOrder().stream())
         .filter(n -> n.getBoundingBox().getMinX() > minX)
         .filter(n -> n.getBoundingBox().getMinY() > minY).toList();
+
+    return new OcrResult(words);
+  }
+
+  private OcrResult removePureGibberishWords(OcrResult result) {
+    var words = result.getLines().stream().flatMap(n -> n.getFragments().stream())
+        .flatMap(n -> n.getWordsInReadingOrder().stream())
+        .filter(n -> n.getText().matches(".*[a-zA-Z0-9].*")).toList();
 
     return new OcrResult(words);
   }
