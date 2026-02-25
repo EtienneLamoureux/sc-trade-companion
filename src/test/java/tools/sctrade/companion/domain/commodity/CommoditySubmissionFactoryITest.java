@@ -1,11 +1,9 @@
 package tools.sctrade.companion.domain.commodity;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -27,7 +25,6 @@ import tools.sctrade.companion.domain.notification.ConsoleNotificationRepository
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OneOcr;
-import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.utils.JsonUtil;
@@ -196,8 +193,8 @@ class CommoditySubmissionFactoryITest {
 
   private void setupMocks() {
     // when(settings.get(Setting.OUTPUT_TRANSIENT_IMAGES)).thenReturn(true);
-    when(settings.get(Setting.OUTPUT_SCREENSHOTS)).thenReturn(true);
-    when(settings.get(Setting.MY_IMAGES_PATH))
-        .thenReturn(Paths.get(".", "test-images").normalize().toAbsolutePath());
+    // when(settings.get(Setting.OUTPUT_SCREENSHOTS)).thenReturn(true);
+    // when(settings.get(Setting.MY_IMAGES_PATH))
+    // .thenReturn(Paths.get(".", "test-images").normalize().toAbsolutePath());
   }
 }

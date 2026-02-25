@@ -25,10 +25,12 @@ public class OneOcr extends Ocr {
   // region Native structs
 
   /**
-   * Mirrors the native {@code Img} struct (Pack=1).
+   * Mirrors the native {@code Img} struct (Pack=1). Use ByReference when passing to native code.
    */
   @Structure.FieldOrder({"t", "col", "row", "unk", "step", "dataPtr"})
   public static class Img extends Structure {
+    public static class ByReference extends Img implements Structure.ByReference {}
+
     public Img() {
       super(ALIGN_NONE);
     }
@@ -63,7 +65,8 @@ public class OneOcr extends Ocr {
   interface OneOcrLib extends Library {
     long CreateOcrInitOptions(PointerByReference ctx);
 
-    long OcrInitOptionsSetUseModelDelayLoad(Pointer ctx, byte flag);
+    // flag is passed as int to match native bool/uint8 ABI (passing byte corrupts the stack)
+    long OcrInitOptionsSetUseModelDelayLoad(Pointer ctx, int flag);
 
     long CreateOcrPipeline(Pointer modelPath, Pointer key, Pointer ctx,
         PointerByReference pipeline);
@@ -72,7 +75,9 @@ public class OneOcr extends Ocr {
 
     long OcrProcessOptionsSetMaxRecognitionLineCount(Pointer opt, long count);
 
-    long RunOcrPipeline(Pointer pipeline, Img img, Pointer opt, PointerByReference instance);
+    // img passed as pointer (mirrors C# "ref Img")
+    long RunOcrPipeline(Pointer pipeline, Img.ByReference img, Pointer opt,
+        PointerByReference instance);
 
     long GetOcrLineCount(Pointer instance, LongByReference count);
 
@@ -98,17 +103,72 @@ public class OneOcr extends Ocr {
   private static final String KEY = "kj)TGtrK>f]b[Piow.gU+nC@s\"\"\"\"\"\"4";
   private static final long MAX_LINE_COUNT = 1000L;
 
-  private final Logger logger = LoggerFactory.getLogger(OneOcr.class);
+  // Static singletons: oneocr.dll cannot be initialised more than once per process
+  private static OneOcrLib lib;
+  private static Pointer pipeline;
+  private static Pointer opt;
+  // Kept as static fields to prevent GC while native code holds raw pointers
+  private static Memory modelMem;
+  private static Memory keyMem;
 
-  private final OneOcrLib lib;
-  // Kept as fields to prevent GC while native code holds raw pointers
-  private final Memory modelMem = toAnsiMemory(MODEL_PATH);
-  private final Memory keyMem = toAnsiMemory(KEY);
+  private static synchronized void ensureInitialised() {
+    if (lib != null) {
+      return;
+    }
+    lib = Native.load(DLL_NAME, OneOcrLib.class);
+    modelMem = toAnsiMemory(MODEL_PATH);
+    keyMem = toAnsiMemory(KEY);
+    pipeline = initPipeline();
+    opt = initProcessOptions();
+  }
+
+  private final Logger logger = LoggerFactory.getLogger(OneOcr.class);
   private Memory pixelMemory;
 
   public OneOcr(List<ImageManipulation> preprocessingManipulations) {
     super(preprocessingManipulations);
-    this.lib = Native.load(DLL_NAME, OneOcrLib.class);
+    ensureInitialised();
+  }
+
+  private static Pointer initPipeline() {
+    PointerByReference ctxRef = new PointerByReference();
+    check(lib.CreateOcrInitOptions(ctxRef), "CreateOcrInitOptions");
+
+    check(lib.OcrInitOptionsSetUseModelDelayLoad(ctxRef.getValue(), 0),
+        "OcrInitOptionsSetUseModelDelayLoad");
+
+    // The DLL may need a moment to finish internal setup after the init options call;
+    // retry CreateOcrPipeline a few times with back-off before giving up.
+    PointerByReference pipelineRef = new PointerByReference();
+    int maxAttempts = 5;
+    for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        check(lib.CreateOcrPipeline(modelMem, keyMem, ctxRef.getValue(), pipelineRef),
+            "CreateOcrPipeline");
+        return pipelineRef.getValue();
+      } catch (Error | IllegalStateException e) {
+        if (attempt == maxAttempts) {
+          throw e;
+        }
+        try {
+          Thread.sleep(200L * attempt);
+        } catch (InterruptedException ie) {
+          Thread.currentThread().interrupt();
+          throw new IllegalStateException("Interrupted while waiting for oneocr.dll init", ie);
+        }
+      }
+    }
+    throw new IllegalStateException("CreateOcrPipeline failed after " + maxAttempts + " attempts");
+  }
+
+  private static Pointer initProcessOptions() {
+    PointerByReference optRef = new PointerByReference();
+    check(lib.CreateOcrProcessOptions(optRef), "CreateOcrProcessOptions");
+
+    check(lib.OcrProcessOptionsSetMaxRecognitionLineCount(optRef.getValue(), MAX_LINE_COUNT),
+        "OcrProcessOptionsSetMaxRecognitionLineCount");
+
+    return optRef.getValue();
   }
 
   @Override
@@ -124,7 +184,7 @@ public class OneOcr extends Ocr {
 
     // Pack pixels into a native memory buffer as 4-byte BGRA
     int stride = width * 4;
-    Memory pixelMemory = new Memory((long) height * stride);
+    pixelMemory = new Memory((long) height * stride);
     for (int y = 0; y < height; y++) {
       for (int x = 0; x < width; x++) {
         int argb = argbPixels[y * width + x];
@@ -140,13 +200,14 @@ public class OneOcr extends Ocr {
       }
     }
 
-    Img img = new Img();
+    Img.ByReference img = new Img.ByReference();
     img.t = 3;
     img.col = width;
     img.row = height;
     img.unk = 0;
     img.step = stride;
     img.dataPtr = Pointer.nativeValue(pixelMemory);
+    img.write();
 
     try {
       return runOcr(img);
@@ -156,45 +217,16 @@ public class OneOcr extends Ocr {
     }
   }
 
-  private OcrResult runOcr(Img img) {
-    long res;
-
-    PointerByReference ctxRef = new PointerByReference();
-    res = lib.CreateOcrInitOptions(ctxRef);
-    check(res, "CreateOcrInitOptions");
-
-    Pointer ctx = ctxRef.getValue();
-    res = lib.OcrInitOptionsSetUseModelDelayLoad(ctx, (byte) 0);
-    check(res, "OcrInitOptionsSetUseModelDelayLoad");
-
-    Memory modelMem = toAnsiMemory(MODEL_PATH);
-    Memory keyMem = toAnsiMemory(KEY);
-
-    PointerByReference pipelineRef = new PointerByReference();
-    res = lib.CreateOcrPipeline(modelMem, keyMem, ctx, pipelineRef);
-    check(res, "CreateOcrPipeline");
-
-    Pointer pipeline = pipelineRef.getValue();
-
-    PointerByReference optRef = new PointerByReference();
-    res = lib.CreateOcrProcessOptions(optRef);
-    check(res, "CreateOcrProcessOptions");
-
-    Pointer opt = optRef.getValue();
-    res = lib.OcrProcessOptionsSetMaxRecognitionLineCount(opt, MAX_LINE_COUNT);
-    check(res, "OcrProcessOptionsSetMaxRecognitionLineCount");
-
+  private OcrResult runOcr(Img.ByReference img) {
     PointerByReference instanceRef = new PointerByReference();
-    res = lib.RunOcrPipeline(pipeline, img, opt, instanceRef);
-    check(res, "RunOcrPipeline");
+    check(lib.RunOcrPipeline(pipeline, img, opt, instanceRef), "RunOcrPipeline");
 
     Pointer instance = instanceRef.getValue();
 
     LongByReference lineCountRef = new LongByReference();
     lib.GetOcrLineCount(instance, lineCountRef);
-    long lineCount = lineCountRef.getValue();
 
-    return buildOcrResult(instance, lineCount);
+    return buildOcrResult(instance, lineCountRef.getValue());
   }
 
   private OcrResult buildOcrResult(Pointer instance, long lineCount) {
