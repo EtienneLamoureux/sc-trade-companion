@@ -16,7 +16,6 @@ Desktop companion application for Star Citizen.
 - [Known issues](https://github.com/EtienneLamoureux/sc-trade-companion/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
 
 ## Installation
-1. Install or update .NET [through this official Microsoft link](https://aka.ms/dotnet-core-applaunch?framework=Microsoft.NETCore.App&framework_version=6.0.0&arch=x64&rid=win-x64&os=win10)
 1. Download the [latest release](https://github.com/EtienneLamoureux/sc-trade-companion/releases) `.exe` file, under the "Assets" section
 1. Extract the application wherever
 

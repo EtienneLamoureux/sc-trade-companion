@@ -1,4 +1,8 @@
 # SC Trade Companion
+## 1.4.2
+### Other
+- Fully remove the .NET dependency
+
 ## 1.4.1
 ### Bugs
 - Clarify the .NET dependency in the logs tab when the host system requires an update
