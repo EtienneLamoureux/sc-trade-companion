@@ -9,16 +9,14 @@ import com.sun.jna.ptr.LongByReference;
 import com.sun.jna.ptr.PointerByReference;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.stream.ImageInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
@@ -192,13 +190,12 @@ public class OneOcr extends Ocr {
         .orElseThrow(() -> new IllegalStateException(
             "Screenshot output is disabled; OneOcr requires the image to be written to disk"));
 
-    // Reload the image ignoring any embedded ICC profile, so that the raw pixel
-    // values are identical to those produced by System.Drawing.Bitmap.
-    BufferedImage reloaded = readIgnoringIccProfile(imagePath.toFile());
-    Img.ByReference img = toNativeImg(reloaded);
+    BufferedImage bgra = loadImageFromDisk(imagePath);
+    Img.ByReference img = toNativeImg(bgra);
+    List<LocatedWord> locatedWords = runOcr(img);
+    OcrResult ocrResult = new OcrResult(locatedWords);
 
-    List<LocatedWord> instance = runOcr(img);
-    return new OcrResult(instance);
+    return ocrResult;
   }
 
   // -------------------------------------------------------------------------
@@ -230,6 +227,24 @@ public class OneOcr extends Ocr {
   // OCR execution
   // -------------------------------------------------------------------------
 
+  private BufferedImage loadImageFromDisk(Path imagePath) {
+    BufferedImage loaded;
+    try {
+      loaded = ImageIO.read(imagePath.toFile());
+    } catch (IOException e) {
+      throw new IllegalStateException("Failed to read image: " + imagePath, e);
+    }
+
+    // Mirror the C# .Clone(..., Format32bppArgb) step: produce a 32bpp ARGB image
+    // whose backing int[] is laid out as BGRA bytes in native (little-endian) memory,
+    // exactly matching what GDI+ exposes through BitmapData.Scan0.
+    BufferedImage bgra =
+        new BufferedImage(loaded.getWidth(), loaded.getHeight(), BufferedImage.TYPE_INT_ARGB);
+    bgra.createGraphics().drawImage(loaded, 0, 0, null);
+
+    return bgra;
+  }
+
   private List<LocatedWord> runOcr(Img.ByReference img) {
     Pointer opt = createProcessOptions();
 
@@ -240,7 +255,7 @@ public class OneOcr extends Ocr {
     var lineCountRef = new LongByReference();
     lib.GetOcrLineCount(instance, lineCountRef);
 
-    return collectWords(instance, lineCountRef.getValue());
+    return toLocatedWords(instance, lineCountRef.getValue());
   }
 
   private Pointer createProcessOptions() {
@@ -250,10 +265,11 @@ public class OneOcr extends Ocr {
 
     check("OcrProcessOptionsSetMaxRecognitionLineCount",
         lib.OcrProcessOptionsSetMaxRecognitionLineCount(opt, MAX_RECOGNITION_LINES));
+
     return opt;
   }
 
-  private List<LocatedWord> collectWords(Pointer instance, long lineCount) {
+  private List<LocatedWord> toLocatedWords(Pointer instance, long lineCount) {
     var words = new ArrayList<LocatedWord>();
 
     for (long i = 0; i < lineCount; i++) {
@@ -265,13 +281,13 @@ public class OneOcr extends Ocr {
         continue;
       }
 
-      collectWordsFromLine(line, words);
+      toLocatedWords(line, words);
     }
 
     return Collections.unmodifiableList(words);
   }
 
-  private void collectWordsFromLine(Pointer line, List<LocatedWord> words) {
+  private void toLocatedWords(Pointer line, List<LocatedWord> words) {
     var wordCountRef = new LongByReference();
     lib.GetOcrLineWordCount(line, wordCountRef);
     long wordCount = wordCountRef.getValue();
@@ -285,11 +301,11 @@ public class OneOcr extends Ocr {
         continue;
       }
 
-      words.add(readWord(word));
+      words.add(toLocatedWord(word));
     }
   }
 
-  private LocatedWord readWord(Pointer word) {
+  private LocatedWord toLocatedWord(Pointer word) {
     var textRef = new PointerByReference();
     lib.GetOcrWordContent(word, textRef);
     String text = textRef.getValue().getString(0, StandardCharsets.UTF_8.name());
@@ -307,31 +323,17 @@ public class OneOcr extends Ocr {
   // -------------------------------------------------------------------------
 
   /**
-   * Reads an image file while suppressing ICC profile processing, ensuring that the returned pixel
-   * values are the raw bytes stored in the file rather than colour-managed values.
+   * Converts a {@link BufferedImage} to a native {@link Img} struct with BGRA pixel layout,
+   * matching the format expected by the native OCR pipeline. The pixel data is copied into a
+   * contiguous native buffer, and the returned {@code Img} struct points to this buffer. The caller
+   * must ensure that the native buffer remains valid for the duration of the OCR call (e.g. by
+   * keeping a reference to the returned struct and allowing the GC to clean up the native memory
+   * when no longer needed).
+   *
+   * @param image the input image, expected to be in ARGB format (e.g. loaded with
+   *        BufferedImage.TYPE_INT_ARGB)
+   * @return a native-compatible {@code Img} struct referencing the pixel data
    */
-  private static BufferedImage readIgnoringIccProfile(File file) {
-    try (ImageInputStream iis = ImageIO.createImageInputStream(file)) {
-      var readers = ImageIO.getImageReaders(iis);
-
-      if (!readers.hasNext()) {
-        throw new IllegalStateException("No ImageReader found for file: " + file);
-      }
-
-      ImageReader reader = readers.next();
-
-      try {
-        reader.setInput(iis, true, true); // ignoreMetadata=true suppresses ICC profile
-        return reader.read(0, reader.getDefaultReadParam());
-      } finally {
-        reader.dispose();
-      }
-    } catch (IOException e) {
-      throw new IllegalStateException("Failed to read image: " + file, e);
-    }
-  }
-
-  /** Copies the pixel data of {@code image} into a native {@link Img} struct. */
   private static Img.ByReference toNativeImg(BufferedImage image) {
     int width = image.getWidth();
     int height = image.getHeight();
