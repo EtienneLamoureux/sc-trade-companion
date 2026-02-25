@@ -11,6 +11,7 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,198 +26,32 @@ import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.output.DiskImageWriter;
 
 /**
- * A straight forward re-implementation of the following c# code in java using JNA ```c# using
- * System; using System.Collections.Generic; using System.Drawing; using System.Drawing.Imaging;
- * using System.Runtime.InteropServices; using System.Text.Json; using
- * System.Text.Json.Serialization;
- * 
- * #region Native structs
- * 
- * [StructLayout(LayoutKind.Sequential, Pack = 1)] struct Img { public int T; public int Col; public
- * int Row; public int Unk; public long Step; public long DataPtr; }
- * 
- * struct OcrBoundingBox { public float X1; public float Y1; public float X2; public float Y2;
- * public float X3; public float Y3; public float X4; public float Y4; }
- * 
- * #endregion
- * 
- * #region PInvoke
- * 
- * static class OneOcr { const string DLL = "oneocr.dll";
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * CreateOcrInitOptions(out IntPtr ctx);
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * OcrInitOptionsSetUseModelDelayLoad(IntPtr ctx, byte flag);
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * CreateOcrPipeline( IntPtr modelPath, IntPtr key, IntPtr ctx, out IntPtr pipeline);
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * CreateOcrProcessOptions(out IntPtr opt);
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * OcrProcessOptionsSetMaxRecognitionLineCount(IntPtr opt, long count);
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * RunOcrPipeline( IntPtr pipeline, ref Img img, IntPtr opt, out IntPtr instance);
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * GetOcrLineCount(IntPtr instance, out long count);
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * GetOcrLine(IntPtr instance, long index, out IntPtr line);
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * GetOcrLineContent(IntPtr line, out IntPtr textPtr);
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * GetOcrLineBoundingBox(IntPtr line, out IntPtr boxPtr);
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * GetOcrLineWordCount(IntPtr line, out long count);
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * GetOcrWord(IntPtr line, long index, out IntPtr word);
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * GetOcrWordContent(IntPtr word, out IntPtr textPtr);
- * 
- * [DllImport(DLL, CallingConvention = CallingConvention.Cdecl)] public static extern long
- * GetOcrWordBoundingBox(IntPtr word, out IntPtr boxPtr); }
- * 
- * #endregion
- * 
- * #region DTOs
- * 
- * class BoundingBox { public BoundingBox(OcrBoundingBox box) { X = box.X1; Y = box.Y1; Width =
- * box.X3 - X; Height = box.Y3 - Y; }
- * 
- * [JsonPropertyName("x")] public float X { get; } [JsonPropertyName("y")] public float Y { get; }
- * [JsonPropertyName("width")] public float Width { get; } [JsonPropertyName("height")] public float
- * Height { get; } }
- * 
- * class OcrWordDto { [JsonPropertyName("text")] public string Text { get; set; }
- * [JsonPropertyName("boundingBox")] public BoundingBox BoundingBox { get; set; } }
- * 
- * class OcrLineDto { [JsonPropertyName("text")] public string Text { get; set; }
- * [JsonPropertyName("boundingBox")] public BoundingBox BoundingBox { get; set; }
- * [JsonPropertyName("words")] public List<OcrWordDto> Words { get; set; } = new List<OcrWordDto>();
- * }
- * 
- * class OcrResultDto { [JsonPropertyName("lines")] public List<OcrLineDto> Lines { get; set; } =
- * new List<OcrLineDto>(); }
- * 
- * #endregion
- * 
- * class Program { static void Main(string[] args) { if (args.Length < 1) {
- * Console.WriteLine("Usage: OneOcrWrapper.exe <image.png|bmp|jpg> [--pretty-print]"); return; }
- * 
- * bool prettyPrint = args.Length > 1 && args[1] == "--pretty-print";
- * 
- * using Bitmap bmp = new Bitmap(args[0]); using Bitmap bgra = bmp.Clone(new Rectangle(0, 0,
- * bmp.Width, bmp.Height), PixelFormat.Format32bppArgb);
- * 
- * int width = bgra.Width; int height = bgra.Height;
- * 
- * BitmapData bmpData = bgra.LockBits( new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
- * PixelFormat.Format32bppArgb);
- * 
- * try { Img img = new Img { T = 3, Col = width, Row = height, Unk = 0, Step = bmpData.Stride,
- * DataPtr = bmpData.Scan0.ToInt64() };
- * 
- * var result = RunOcr(img); OutputJson(result, prettyPrint); } catch (Exception ex) {
- * Console.Error.WriteLine($"Error: {ex.Message}"); } finally { bgra.UnlockBits(bmpData); } }
- * 
- * static byte[] StringToAnsiBytes(string s) { // null-terminated ANSI bytes, matching const char*
- * in C++ var bytes = System.Text.Encoding.Default.GetBytes(s); var result = new byte[bytes.Length +
- * 1]; Buffer.BlockCopy(bytes, 0, result, 0, bytes.Length); return result; }
- * 
- * static void OutputJson(OcrResultDto resultDto, bool prettyPrint) { string jsonOutput =
- * JsonSerializer.Serialize(resultDto, new JsonSerializerOptions { WriteIndented = prettyPrint });
- * Console.WriteLine(jsonOutput); }
- * 
- * static OcrResultDto RunOcr(Img img) { IntPtr ctx, pipeline, opt, instance;
- * 
- * long res;
- * 
- * res = OneOcr.CreateOcrInitOptions(out ctx); if (res != 0) throw new
- * Exception($"CreateOcrInitOptions failed: {res}");
- * 
- * res = OneOcr.OcrInitOptionsSetUseModelDelayLoad(ctx, 0); if (res != 0) throw new
- * Exception($"OcrInitOptionsSetUseModelDelayLoad failed: {res}");
- * 
- * string model = "oneocr.onemodel"; string key = "kj)TGtrK>f]b[Piow.gU+nC@s\"\"\"\"\"\"4";
- * 
- * // Pin byte arrays so the native side gets stable const char* pointers byte[] modelBytes =
- * StringToAnsiBytes(model); byte[] keyBytes = StringToAnsiBytes(key);
- * 
- * GCHandle modelHandle = GCHandle.Alloc(modelBytes, GCHandleType.Pinned); GCHandle keyHandle =
- * GCHandle.Alloc(keyBytes, GCHandleType.Pinned);
- * 
- * try { IntPtr modelPtr = modelHandle.AddrOfPinnedObject(); IntPtr keyPtr =
- * keyHandle.AddrOfPinnedObject();
- * 
- * res = OneOcr.CreateOcrPipeline(modelPtr, keyPtr, ctx, out pipeline); if (res != 0) throw new
- * Exception($"CreateOcrPipeline failed: {res}");
- * 
- * res = OneOcr.CreateOcrProcessOptions(out opt); if (res != 0) throw new
- * Exception($"CreateOcrProcessOptions failed: {res}");
- * 
- * res = OneOcr.OcrProcessOptionsSetMaxRecognitionLineCount(opt, 1000); if (res != 0) throw new
- * Exception($"OcrProcessOptionsSetMaxRecognitionLineCount failed: {res}");
- * 
- * res = OneOcr.RunOcrPipeline(pipeline, ref img, opt, out instance); if (res != 0) throw new
- * Exception($"RunOcrPipeline failed: {res}"); } finally { modelHandle.Free(); keyHandle.Free(); }
- * 
- * OneOcr.GetOcrLineCount(instance, out long lines);
- * 
- * return CreateOcrResultDto(instance, lines); }
- * 
- * static OcrResultDto CreateOcrResultDto(IntPtr instance, long lines) { var resultDto = new
- * OcrResultDto();
- * 
- * for (long i = 0; i < lines; i++) { OneOcr.GetOcrLine(instance, i, out IntPtr line); if (line ==
- * IntPtr.Zero) continue;
- * 
- * OneOcr.GetOcrLineContent(line, out IntPtr textPtr); string text =
- * Marshal.PtrToStringAnsi(textPtr);
- * 
- * OneOcr.GetOcrLineBoundingBox(line, out IntPtr boxPtr); OcrBoundingBox box =
- * Marshal.PtrToStructure<OcrBoundingBox>(boxPtr);
- * 
- * var lineDto = new OcrLineDto { Text = text, BoundingBox = new BoundingBox(box) };
- * 
- * OneOcr.GetOcrLineWordCount(line, out long wc); for (long j = 0; j < wc; j++) {
- * OneOcr.GetOcrWord(line, j, out IntPtr word); OneOcr.GetOcrWordContent(word, out IntPtr wptr);
- * OneOcr.GetOcrWordBoundingBox(word, out IntPtr wboxPtr); OcrBoundingBox wbox =
- * Marshal.PtrToStructure<OcrBoundingBox>(wboxPtr);
- * 
- * string wtext = Marshal.PtrToStringAnsi(wptr);
- * 
- * lineDto.Words.Add(new OcrWordDto { Text = wtext, BoundingBox = new BoundingBox(wbox) }); }
- * 
- * resultDto.Lines.Add(lineDto); }
- * 
- * return resultDto; } }
- * 
- * ```
+ * OCR implementation backed by the native OneOCR library via JNA.
+ *
+ * The image is first written to disk as JPEG (matching the encoding path used by the C# wrapper)
+ * and then reloaded with ICC profile processing disabled, so that the raw pixel values fed to the
+ * native pipeline are identical to those produced by {@code System.Drawing.Bitmap}.
  */
 public class OneOcr extends Ocr {
+  private static final Logger logger = LoggerFactory.getLogger(OneOcr.class);
+
+  // -------------------------------------------------------------------------
+  // Constants
+  // -------------------------------------------------------------------------
   private static final String WRAPPER_DIR =
       Paths.get("bin/oneocr-wrapper").toAbsolutePath().toString();
   private static final String DLL_PATH = WRAPPER_DIR + "/oneocr";
   private static final String MODEL_PATH = WRAPPER_DIR + "/oneocr.onemodel";
+  private static final byte DISABLE_MODEL_DELAY_LOAD = 0;
+  private static final long MAX_RECOGNITION_LINES = 1000;
+  /** Decryption key for the bundled OneOCR model file. */
   private static final String MODEL_KEY = "kj)TGtrK>f]b[Piow.gU+nC@s\"\"\"\"\"\"4";
-  private static final long MAX_LINES = 1000;
-
-  private final Logger logger = LoggerFactory.getLogger(OneOcr.class);
 
   // -------------------------------------------------------------------------
-  // JNA interface
+  // JNA interfaces
   // -------------------------------------------------------------------------
 
+  /** JNA binding for the native {@code oneocr.dll}. */
   interface OneOcrLib extends Library {
     long CreateOcrInitOptions(PointerByReference ctx);
 
@@ -249,20 +84,39 @@ public class OneOcr extends Ocr {
     long GetOcrWordBoundingBox(Pointer word, PointerByReference boxPtr);
   }
 
+  /**
+   * JNA binding for the subset of {@code kernel32.dll} used to extend the DLL search path, so that
+   * {@code oneocr.dll} can resolve its siblings ({@code onnxruntime.dll},
+   * {@code opencv_world460.dll}, …).
+   */
+  private interface Kernel32 extends Library {
+    boolean SetDllDirectoryA(String path);
+  }
+
   // -------------------------------------------------------------------------
   // Native structs
   // -------------------------------------------------------------------------
 
   /**
-   * [StructLayout(LayoutKind.Sequential, Pack = 1)] struct Img { int T; int Col; int Row; int Unk;
-   * long Step; long DataPtr; }
+   * Mirrors the native {@code Img} struct passed to the OCR pipeline.
+   *
+   * <pre>
+   * [StructLayout(LayoutKind.Sequential, Pack = 1)]
+   * struct Img { int T; int Col; int Row; int Unk; long Step; long DataPtr; }
+   * </pre>
    */
   public static class Img extends Structure {
+    /** Image type identifier; {@code 3} denotes a 4-channel BGRA/ARGB image. */
     public int t;
+    /** Image width in pixels. */
     public int col;
+    /** Image height in pixels. */
     public int row;
+    /** Reserved / unused field; must be zero. */
     public int unk;
+    /** Row stride in bytes (typically {@code width * 4}). */
     public long step;
+    /** Raw pointer to the pixel data buffer. */
     public long dataPtr;
 
     @Override
@@ -275,7 +129,13 @@ public class OneOcr extends Ocr {
   }
 
   /**
+   * Mirrors the native {@code OcrBoundingBox} struct returned for each recognised word or line. The
+   * box is represented as four corners in clockwise order starting from the top-left: (x1,y1) →
+   * (x2,y2) → (x3,y3) → (x4,y4).
+   *
+   * <pre>
    * struct OcrBoundingBox { float X1, Y1, X2, Y2, X3, Y3, X4, Y4; }
+   * </pre>
    */
   public static class OcrBoundingBox extends Structure {
     public float x1, y1, x2, y2, x3, y3, x4, y4;
@@ -286,26 +146,30 @@ public class OneOcr extends Ocr {
     }
   }
 
-  // Used to add the wrapper directory to the Windows DLL search path so that
-  // oneocr.dll can resolve its siblings (onnxruntime.dll, opencv_world460.dll, …).
-  private interface Kernel32 extends Library {
-    boolean SetDllDirectoryA(String path);
-  }
-
   // -------------------------------------------------------------------------
-  // Lifecycle
+  // Instance state
   // -------------------------------------------------------------------------
 
   private final OneOcrLib lib;
   private final Pointer pipeline;
   private final DiskImageWriter diskImageWriter;
 
+  // -------------------------------------------------------------------------
+  // Constructor
+  // -------------------------------------------------------------------------
+
+  /**
+   * Loads the native OneOCR library and initialises the recognition pipeline.
+   *
+   * @param preprocessingManipulations image manipulations applied before OCR
+   * @param diskImageWriter used to persist the screenshot before passing it to the native library
+   */
   public OneOcr(List<ImageManipulation> preprocessingManipulations,
       DiskImageWriter diskImageWriter) {
     super(preprocessingManipulations);
     this.diskImageWriter = diskImageWriter;
 
-    // Tell Windows to look in the wrapper dir when resolving DLL dependencies.
+    // Extend the DLL search path so that oneocr.dll can find its sibling DLLs.
     Kernel32 kernel32 = Native.load("kernel32", Kernel32.class);
     kernel32.SetDllDirectoryA(WRAPPER_DIR);
 
@@ -313,6 +177,7 @@ public class OneOcr extends Ocr {
       lib = Native.load(DLL_PATH, OneOcrLib.class);
       pipeline = createPipeline();
     } finally {
+      // Always restore the original DLL search path.
       kernel32.SetDllDirectoryA(null);
     }
   }
@@ -323,87 +188,50 @@ public class OneOcr extends Ocr {
 
   @Override
   protected OcrResult process(BufferedImage image) {
-    // Write to disk so that the image goes through the same encoding/decoding path
-    // as the C# wrapper, then reload it without ICC profile application to get the
-    // same raw pixel values that System.Drawing.Bitmap produces.
-    var imagePath = diskImageWriter.write(image, ImageType.SCREENSHOT).orElseThrow();
+    var imagePath = diskImageWriter.write(image, ImageType.SCREENSHOT)
+        .orElseThrow(() -> new IllegalStateException(
+            "Screenshot output is disabled; OneOcr requires the image to be written to disk"));
+
+    // Reload the image ignoring any embedded ICC profile, so that the raw pixel
+    // values are identical to those produced by System.Drawing.Bitmap.
     BufferedImage reloaded = readIgnoringIccProfile(imagePath.toFile());
+    Img.ByReference img = toNativeImg(reloaded);
 
-    int width = reloaded.getWidth();
-    int height = reloaded.getHeight();
-
-    int[] pixels = new int[width * height];
-    reloaded.getRGB(0, 0, width, height, pixels, 0, width);
-
-    Memory pixelMem = new Memory((long) pixels.length * Integer.BYTES);
-    pixelMem.write(0, pixels, 0, pixels.length);
-
-    Img.ByReference img = new Img.ByReference();
-    img.t = 3;
-    img.col = width;
-    img.row = height;
-    img.unk = 0;
-    img.step = (long) width * 4;
-    img.dataPtr = Pointer.nativeValue(pixelMem);
-
-    var words = runOcr(img);
-    return new OcrResult(words);
-  }
-
-  private static BufferedImage readIgnoringIccProfile(File file) {
-    try (ImageInputStream iis = ImageIO.createImageInputStream(file)) {
-      var readers = ImageIO.getImageReaders(iis);
-
-      if (!readers.hasNext()) {
-        throw new RuntimeException("No ImageReader found for file: " + file);
-      }
-
-      ImageReader reader = readers.next();
-
-      try {
-        reader.setInput(iis, true, true); // ignoreMetadata=true skips ICC profile
-        return reader.read(0, reader.getDefaultReadParam());
-      } finally {
-        reader.dispose();
-      }
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to read image: " + file, e);
-    }
+    List<LocatedWord> instance = runOcr(img);
+    return new OcrResult(instance);
   }
 
   // -------------------------------------------------------------------------
-  // Private helpers
+  // Pipeline initialisation
   // -------------------------------------------------------------------------
 
   private Pointer createPipeline() {
-    var ctxRef = new PointerByReference();
-    check("CreateOcrInitOptions", lib.CreateOcrInitOptions(ctxRef));
-    Pointer ctx = ctxRef.getValue();
+    Pointer ctx = createInitOptions();
 
     check("OcrInitOptionsSetUseModelDelayLoad",
-        lib.OcrInitOptionsSetUseModelDelayLoad(ctx, (byte) 0));
+        lib.OcrInitOptionsSetUseModelDelayLoad(ctx, DISABLE_MODEL_DELAY_LOAD));
 
-    byte[] modelBytes = toNullTerminatedAnsi(MODEL_PATH);
-    byte[] keyBytes = toNullTerminatedAnsi(MODEL_KEY);
-
-    // Memory keeps the native buffer alive and valid for the duration of the call
-    Memory modelMem = new Memory(modelBytes.length);
-    Memory keyMem = new Memory(keyBytes.length);
-    modelMem.write(0, modelBytes, 0, modelBytes.length);
-    keyMem.write(0, keyBytes, 0, keyBytes.length);
+    // Memory instances keep the native buffers alive for the duration of the call.
+    Memory modelMem = toNativeString(MODEL_PATH);
+    Memory keyMem = toNativeString(MODEL_KEY);
 
     var pipelineRef = new PointerByReference();
     check("CreateOcrPipeline", lib.CreateOcrPipeline(modelMem, keyMem, ctx, pipelineRef));
     return pipelineRef.getValue();
   }
 
-  private List<LocatedWord> runOcr(Img.ByReference img) {
-    var optRef = new PointerByReference();
-    check("CreateOcrProcessOptions", lib.CreateOcrProcessOptions(optRef));
-    Pointer opt = optRef.getValue();
+  private Pointer createInitOptions() {
+    var ctxRef = new PointerByReference();
+    check("CreateOcrInitOptions", lib.CreateOcrInitOptions(ctxRef));
+    return ctxRef.getValue();
+  }
 
-    check("OcrProcessOptionsSetMaxRecognitionLineCount",
-        lib.OcrProcessOptionsSetMaxRecognitionLineCount(opt, MAX_LINES));
+  // -------------------------------------------------------------------------
+  // OCR execution
+  // -------------------------------------------------------------------------
+
+  private List<LocatedWord> runOcr(Img.ByReference img) {
+    Pointer opt = createProcessOptions();
 
     var instanceRef = new PointerByReference();
     check("RunOcrPipeline", lib.RunOcrPipeline(pipeline, img, opt, instanceRef));
@@ -411,9 +239,18 @@ public class OneOcr extends Ocr {
 
     var lineCountRef = new LongByReference();
     lib.GetOcrLineCount(instance, lineCountRef);
-    long lineCount = lineCountRef.getValue();
 
-    return collectWords(instance, lineCount);
+    return collectWords(instance, lineCountRef.getValue());
+  }
+
+  private Pointer createProcessOptions() {
+    var optRef = new PointerByReference();
+    check("CreateOcrProcessOptions", lib.CreateOcrProcessOptions(optRef));
+    Pointer opt = optRef.getValue();
+
+    check("OcrProcessOptionsSetMaxRecognitionLineCount",
+        lib.OcrProcessOptionsSetMaxRecognitionLineCount(opt, MAX_RECOGNITION_LINES));
+    return opt;
   }
 
   private List<LocatedWord> collectWords(Pointer instance, long lineCount) {
@@ -424,40 +261,101 @@ public class OneOcr extends Ocr {
       lib.GetOcrLine(instance, i, lineRef);
       Pointer line = lineRef.getValue();
 
-      if (line == null || Pointer.nativeValue(line) == 0) {
+      if (isNullPointer(line)) {
         continue;
       }
 
-      var wordCountRef = new LongByReference();
-      lib.GetOcrLineWordCount(line, wordCountRef);
-      long wordCount = wordCountRef.getValue();
-
-      for (long j = 0; j < wordCount; j++) {
-        var wordRef = new PointerByReference();
-        lib.GetOcrWord(line, j, wordRef);
-        Pointer word = wordRef.getValue();
-
-        if (word == null || Pointer.nativeValue(word) == 0) {
-          continue;
-        }
-
-        var textRef = new PointerByReference();
-        lib.GetOcrWordContent(word, textRef);
-        String text = textRef.getValue().getString(0, "UTF-8");
-
-        var boxRef = new PointerByReference();
-        lib.GetOcrWordBoundingBox(word, boxRef);
-        OcrBoundingBox box = Structure.newInstance(OcrBoundingBox.class, boxRef.getValue());
-        box.read();
-
-        Rectangle rect = toRectangle(box);
-        words.add(new LocatedWord(text.toLowerCase(), rect));
-      }
+      collectWordsFromLine(line, words);
     }
 
     return Collections.unmodifiableList(words);
   }
 
+  private void collectWordsFromLine(Pointer line, List<LocatedWord> words) {
+    var wordCountRef = new LongByReference();
+    lib.GetOcrLineWordCount(line, wordCountRef);
+    long wordCount = wordCountRef.getValue();
+
+    for (long j = 0; j < wordCount; j++) {
+      var wordRef = new PointerByReference();
+      lib.GetOcrWord(line, j, wordRef);
+      Pointer word = wordRef.getValue();
+
+      if (isNullPointer(word)) {
+        continue;
+      }
+
+      words.add(readWord(word));
+    }
+  }
+
+  private LocatedWord readWord(Pointer word) {
+    var textRef = new PointerByReference();
+    lib.GetOcrWordContent(word, textRef);
+    String text = textRef.getValue().getString(0, StandardCharsets.UTF_8.name());
+
+    var boxRef = new PointerByReference();
+    lib.GetOcrWordBoundingBox(word, boxRef);
+    OcrBoundingBox box = Structure.newInstance(OcrBoundingBox.class, boxRef.getValue());
+    box.read();
+
+    return new LocatedWord(text.toLowerCase(), toRectangle(box));
+  }
+
+  // -------------------------------------------------------------------------
+  // Static helpers
+  // -------------------------------------------------------------------------
+
+  /**
+   * Reads an image file while suppressing ICC profile processing, ensuring that the returned pixel
+   * values are the raw bytes stored in the file rather than colour-managed values.
+   */
+  private static BufferedImage readIgnoringIccProfile(File file) {
+    try (ImageInputStream iis = ImageIO.createImageInputStream(file)) {
+      var readers = ImageIO.getImageReaders(iis);
+
+      if (!readers.hasNext()) {
+        throw new IllegalStateException("No ImageReader found for file: " + file);
+      }
+
+      ImageReader reader = readers.next();
+
+      try {
+        reader.setInput(iis, true, true); // ignoreMetadata=true suppresses ICC profile
+        return reader.read(0, reader.getDefaultReadParam());
+      } finally {
+        reader.dispose();
+      }
+    } catch (IOException e) {
+      throw new IllegalStateException("Failed to read image: " + file, e);
+    }
+  }
+
+  /** Copies the pixel data of {@code image} into a native {@link Img} struct. */
+  private static Img.ByReference toNativeImg(BufferedImage image) {
+    int width = image.getWidth();
+    int height = image.getHeight();
+
+    int[] pixels = new int[width * height];
+    image.getRGB(0, 0, width, height, pixels, 0, width);
+
+    Memory pixelMem = new Memory((long) pixels.length * Integer.BYTES);
+    pixelMem.write(0, pixels, 0, pixels.length);
+
+    Img.ByReference img = new Img.ByReference();
+    img.t = 3; // 4-channel image type
+    img.col = width;
+    img.row = height;
+    img.unk = 0;
+    img.step = (long) width * Integer.BYTES;
+    img.dataPtr = Pointer.nativeValue(pixelMem);
+    return img;
+  }
+
+  /**
+   * Converts a quadrilateral {@link OcrBoundingBox} to an axis-aligned {@link Rectangle} using the
+   * top-left (x1,y1) and bottom-right (x3,y3) corners.
+   */
   private static Rectangle toRectangle(OcrBoundingBox box) {
     int x = Math.round(box.x1);
     int y = Math.round(box.y1);
@@ -466,16 +364,31 @@ public class OneOcr extends Ocr {
     return new Rectangle(x, y, width, height);
   }
 
-  private static byte[] toNullTerminatedAnsi(String s) {
-    byte[] encoded = s.getBytes(java.nio.charset.StandardCharsets.US_ASCII);
-    byte[] result = new byte[encoded.length + 1];
-    System.arraycopy(encoded, 0, result, 0, encoded.length);
-    return result;
+  /**
+   * Encodes {@code s} as ASCII and appends a null terminator into a native {@link Memory} buffer.
+   */
+  private static Memory toNativeString(String s) {
+    byte[] encoded = s.getBytes(StandardCharsets.US_ASCII);
+    Memory mem = new Memory(encoded.length + 1L); // +1 for null terminator
+    mem.write(0, encoded, 0, encoded.length);
+    mem.setByte(encoded.length, (byte) 0);
+    return mem;
   }
 
-  private static void check(String name, long result) {
+  /** Returns {@code true} if {@code ptr} is null or points to address zero. */
+  private static boolean isNullPointer(Pointer ptr) {
+    return ptr == null || Pointer.nativeValue(ptr) == 0;
+  }
+
+  /**
+   * Asserts that a native API call succeeded (return code {@code 0}).
+   *
+   * @throws IllegalStateException if {@code result} is non-zero
+   */
+  private static void check(String functionName, long result) {
     if (result != 0) {
-      throw new RuntimeException(name + " failed with code: " + result);
+      throw new IllegalStateException(
+          "Native call '" + functionName + "' failed with error code: " + result);
     }
   }
 }
