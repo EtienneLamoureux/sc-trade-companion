@@ -7,7 +7,7 @@ plugins {
 
 // JAR
 group = 'tools.sctrade'
-version = '1.4.1'
+version = '1.4.2'
 
 java {
 	sourceCompatibility = '21'
@@ -119,8 +119,8 @@ task copyJar(type: Copy, dependsOn: 'build') {
 	rename "${rootProject.name}-${version}.jar", "${rootProject.name}.jar"
 }
 
-task copyWindowsOcrWrapper(type: Copy) {
-	from "./bin/oneocr-wrapper"
+task copyOneOcrWrapper(type: Copy) {
+	from "./bin/oneocr"
 	into "$binariesDir/oneocr-wrapper"
 }
 
@@ -131,5 +131,5 @@ task copyStartScript(type: Copy) {
 	include "${rootProject.name}-admin.bat"
 }
 
-task dist(dependsOn: ['copyJar', 'copyWindowsOcrWrapper', 'copyStartScript', 'jlink']) {
+task dist(dependsOn: ['copyJar', 'copyOneOcrWrapper', 'copyStartScript', 'jlink']) {
 }

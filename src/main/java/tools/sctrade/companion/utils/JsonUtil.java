@@ -7,12 +7,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.sctrade.companion.domain.ocr.WindowsOcr;
 import tools.sctrade.companion.exceptions.JsonConversionException;
 import tools.sctrade.companion.exceptions.JsonParsingException;
 
 public class JsonUtil {
-  private static final Logger logger = LoggerFactory.getLogger(WindowsOcr.class);
+  private static final Logger logger = LoggerFactory.getLogger(JsonUtil.class);
   private static final ObjectMapper objectMapper;
 
   static {

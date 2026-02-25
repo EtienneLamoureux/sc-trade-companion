@@ -36,8 +36,7 @@ public class OneOcr extends Ocr {
   // -------------------------------------------------------------------------
   // Constants
   // -------------------------------------------------------------------------
-  private static final String WRAPPER_DIR =
-      Paths.get("bin/oneocr-wrapper").toAbsolutePath().toString();
+  private static final String WRAPPER_DIR = Paths.get("bin/oneocr").toAbsolutePath().toString();
   private static final String DLL_PATH = WRAPPER_DIR + "/oneocr";
   private static final String MODEL_PATH = WRAPPER_DIR + "/oneocr.onemodel";
   private static final byte DISABLE_MODEL_DELAY_LOAD = 0;

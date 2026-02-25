@@ -18,7 +18,7 @@ import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.notification.ConsoleNotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
-import tools.sctrade.companion.domain.ocr.WindowsOcr;
+import tools.sctrade.companion.domain.ocr.OneOcr;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.ProcessRunner;
@@ -46,8 +46,7 @@ class CommoditySubmissionFactoryComponentTest {
 
   @BeforeEach
   void setUp() {
-    ocr = new WindowsOcr(List.of(), diskImageWriter, processRunner,
-        new NotificationService(new ConsoleNotificationRepository()));
+    ocr = new OneOcr(List.of(), diskImageWriter);
     commodityLocationReader = new CommodityLocationReader(locationRepository);
     commodityListingFactory = new CommodityListingFactory(commodityRepository);
     notificationService = new NotificationService(new ConsoleNotificationRepository());

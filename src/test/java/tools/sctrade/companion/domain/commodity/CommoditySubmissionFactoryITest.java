@@ -1,13 +1,14 @@
 package tools.sctrade.companion.domain.commodity;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,15 +26,17 @@ import tools.sctrade.companion.domain.notification.ConsoleNotificationRepository
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OneOcr;
+import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
+import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.JsonUtil;
 import tools.sctrade.companion.utils.ResourceUtil;
 
 // @Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
 @ExtendWith(MockitoExtension.class)
 class CommoditySubmissionFactoryITest {
-  private static final double CURRENT_ACCURACY = 60.0;
+  private static final double CURRENT_ACCURACY = 69.0;
 
   private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactoryITest.class);
 
@@ -41,6 +44,8 @@ class CommoditySubmissionFactoryITest {
   private UserService userService;
   @Mock
   private SettingRepository settings;
+
+  private DiskImageWriter diskImageWriter;
 
   private LocationRepository locationRepository = new TestLocationRepository();
   private CommodityRepository commodityRepository = new TestCommodityRepository();
@@ -59,8 +64,9 @@ class CommoditySubmissionFactoryITest {
   void setUp() {
     setupMocks();
 
+    diskImageWriter = new DiskImageWriter(settings);
     List<ImageManipulation> imageManipulations = List.of(new AlignToTemplate());
-    ocr = new OneOcr(imageManipulations);
+    ocr = new OneOcr(imageManipulations, diskImageWriter);
 
     submissionFactory = new CommoditySubmissionFactory(userService, notificationService,
         commodityLocationReader, commodityListingFactory, ocr);
@@ -69,12 +75,15 @@ class CommoditySubmissionFactoryITest {
   @Test
   void givenTestCasesByColorPaletteWhenProcessingThenCalculateOverallAccuracyScore()
       throws IOException {
-    var testCasesByColorPalette = Map.of("uee blue",
+    var testCasesByColorPalette = new java.util.LinkedHashMap<String, List<String>>();
+    testCasesByColorPalette.put("uee blue",
         List.of("arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1", "pyro-gateway-sell-1",
-            "seraphim-station-buy-1", "seraphim-station-sell-1", "rayari-anvik-buy-1"),
-        "pyro orange", List.of("canard-view-buy-1", "canard-view-sell-1", "checkmate-buy-1"),
-        "levski grey", List.of("levski-buy-1", "levski-buy-2", "levski-sell-1"), "lorville gold",
-        List.of("lorville-sell-1"));
+            "seraphim-station-buy-1", "seraphim-station-sell-1", "rayari-anvik-buy-1"));
+    testCasesByColorPalette.put("pyro orange",
+        List.of("canard-view-buy-1", "canard-view-sell-1", "checkmate-buy-1"));
+    testCasesByColorPalette.put("levski grey",
+        List.of("levski-buy-1", "levski-buy-2", "levski-sell-1"));
+    testCasesByColorPalette.put("lorville gold", List.of("lorville-sell-1"));
 
     var scores = new ArrayList<Double>();
 
@@ -97,10 +106,12 @@ class CommoditySubmissionFactoryITest {
   }
 
   @ParameterizedTest(name = "{0}")
-  @ValueSource(strings = {"arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1", "pyro-gateway-sell-1",
-      "seraphim-station-buy-1", "seraphim-station-sell-1", "canard-view-buy-1",
-      "canard-view-sell-1", "checkmate-buy-1", "levski-buy-1", "levski-buy-2", "levski-sell-1",
-      "rayari-anvik-buy-1", "lorville-sell-1"})
+  @ValueSource(strings = {"rayari-anvik-buy-1"})
+  // @ValueSource(strings = {"arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1",
+  // "pyro-gateway-sell-1",
+  // "seraphim-station-buy-1", "seraphim-station-sell-1", "canard-view-buy-1",
+  // "canard-view-sell-1", "checkmate-buy-1", "levski-buy-1", "levski-buy-2", "levski-sell-1",
+  // "rayari-anvik-buy-1", "lorville-sell-1"})
   void givenTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase) throws IOException {
     calulateScore(testCase);
   }
@@ -193,8 +204,8 @@ class CommoditySubmissionFactoryITest {
 
   private void setupMocks() {
     // when(settings.get(Setting.OUTPUT_TRANSIENT_IMAGES)).thenReturn(true);
-    // when(settings.get(Setting.OUTPUT_SCREENSHOTS)).thenReturn(true);
-    // when(settings.get(Setting.MY_IMAGES_PATH))
-    // .thenReturn(Paths.get(".", "test-images").normalize().toAbsolutePath());
+    when(settings.get(Setting.OUTPUT_SCREENSHOTS)).thenReturn(true);
+    when(settings.get(Setting.MY_IMAGES_PATH))
+        .thenReturn(Paths.get(".", "test-images").normalize().toAbsolutePath());
   }
 }
