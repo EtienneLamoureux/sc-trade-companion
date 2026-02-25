@@ -1,6 +1,6 @@
 [
 	{
-		"location": "Loreville",
+		"location": "Lorville",
 		"transactionType": "BUYS",
 		"commodity": "Titanium",
 		"price": 449,
@@ -11,7 +11,7 @@
 		"timestamp": 1768675164.6528624
 	},
 	{
-		"location": "Loreville",
+		"location": "Lorville",
 		"transactionType": "BUYS",
 		"commodity": "Copper",
 		"price": 353,
@@ -22,7 +22,7 @@
 		"timestamp": 1768675164.6528624
 	},
 	{
-		"location": "Loreville",
+		"location": "Lorville",
 		"transactionType": "BUYS",
 		"commodity": "Fluorine",
 		"price": 309,
@@ -33,7 +33,7 @@
 		"timestamp": 1768675164.6528624
 	},
 	{
-		"location": "Loreville",
+		"location": "Lorville",
 		"transactionType": "BUYS",
 		"commodity": "Methane",
 		"price": 2204.99992,
@@ -44,7 +44,7 @@
 		"timestamp": 1768675164.6528624
 	},
 	{
-		"location": "Loreville",
+		"location": "Lorville",
 		"transactionType": "BUYS",
 		"commodity": "Quartz",
 		"price": 363,
