@@ -2,6 +2,7 @@
 ## 1.4.2
 ### Other
 - Fully remove the .NET dependency
+- Improve OCR success rate, including on non-stanton kiosks
 
 ## 1.4.1
 ### Bugs
