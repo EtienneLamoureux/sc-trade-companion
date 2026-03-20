@@ -1,0 +1,22 @@
+package tools.sctrade.companion.domain.item;
+
+import java.util.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import tools.sctrade.companion.domain.user.User;
+
+public class ItemSubmission {
+  private final Logger logger = LoggerFactory.getLogger(ItemSubmission.class);
+
+  private User user;
+  private Collection<ItemListing> listings;
+
+  public User getUser() {
+    return user;
+  }
+
+  public Collection<ItemListing> getListings() {
+    return listings;
+  }
+
+}

@@ -61,6 +61,8 @@ public class AppConfig {
   private String outputScreenshots;
   @Value("${output.intermediary-images:false}")
   private String outputIntermediaryImages;
+  @Value("${tools.sctrade.root-url:https://sc-trade.tools}")
+  private String scTradeToolsRootUrl;
 
   @Bean("SettingRepository")
   public SettingRepository buildSettingRepository() {
@@ -71,7 +73,7 @@ public class AppConfig {
         Paths.get(".", "my-data").normalize().toAbsolutePath());
     settingRepository.set(Setting.OUTPUT_SCREENSHOTS, outputScreenshots);
     settingRepository.set(Setting.OUTPUT_TRANSIENT_IMAGES, outputIntermediaryImages);
-    settingRepository.set(Setting.SC_TRADE_TOOLS_ROOT_URL, "https://sc-trade.tools");
+    settingRepository.set(Setting.SC_TRADE_TOOLS_ROOT_URL, scTradeToolsRootUrl);
 
     return settingRepository;
   }
