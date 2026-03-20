@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -14,10 +15,13 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 import reactor.netty.http.client.HttpClient;
 import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommoditySubmission;
+import tools.sctrade.companion.domain.item.ItemRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
@@ -29,7 +33,7 @@ import tools.sctrade.companion.utils.LocalizationUtil;
  * Asynchronous processor to send commodity listings to sc-trade.tools.
  */
 public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmission>
-    implements CommodityRepository, LocationRepository {
+    implements CommodityRepository, LocationRepository, ItemRepository {
   private final Logger logger = LoggerFactory.getLogger(ScTradeToolsClient.class);
 
   private WebClient webClient;
@@ -60,9 +64,9 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
   public List<String> findAllCommodities() {
     logger.debug("Fetching commodities from sc-trade.tools...");
     return Arrays
-        .stream(
-            this.webClient.get().uri("/api/items").retrieve().bodyToMono(String[].class).block())
-        .map(n -> n.toLowerCase(Locale.ROOT)).toList();
+        .stream(this.webClient.get().uri("/api/commodity/items").retrieve()
+            .bodyToMono(CommodityDto[].class).block())
+        .map(n -> n.name.toLowerCase(Locale.ROOT)).toList();
   }
 
   @Override
@@ -90,6 +94,44 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
     }).map(n -> n.name())
         .map(n -> n.substring(n.lastIndexOf(">") + 1).strip().toLowerCase(Locale.ROOT))
         .collect(Collectors.toSet());
+  }
+
+  @Override
+  @Cacheable("ScTradeToolsClient.findAllItems")
+  public List<String> findAllItems() {
+    logger.debug("Fetching items from sc-trade.tools...");
+
+    ItemPageDto firstPage = fetchItemPage(0);
+    int totalPages = firstPage.totalPages();
+    logger.debug("sc-trade.tools reports {} pages of items", totalPages);
+
+    List<String> firstPageNames = toItemNames(firstPage);
+
+    if (totalPages <= 1) {
+      return firstPageNames.stream().distinct().toList();
+    }
+
+    List<String> remainingNames = Flux.fromStream(IntStream.rangeClosed(1, totalPages - 1).boxed())
+        .parallel().runOn(Schedulers.boundedElastic())
+        .flatMap(page -> Flux.fromIterable(toItemNames(fetchItemPage(page)))).sequential()
+        .collectList().block();
+
+    List<String> itemNames = Flux.fromIterable(firstPageNames)
+        .concatWith(Flux.fromIterable(remainingNames)).distinct().collectList().block();
+    logger.debug("Fetched {} items from sc-trade.tools", itemNames.size());
+
+    return itemNames;
+  }
+
+  private ItemPageDto fetchItemPage(int pageNumber) {
+    logger.debug("Fetching items page {}", pageNumber);
+    return this.webClient.get()
+        .uri(u -> u.path("/api/item/items").queryParam("page", pageNumber).build()).retrieve()
+        .bodyToMono(ItemPageDto.class).block();
+  }
+
+  private List<String> toItemNames(ItemPageDto page) {
+    return Arrays.stream(page.content()).map(n -> n.name.toLowerCase(Locale.ROOT)).toList();
   }
 
   @Override
@@ -136,5 +178,13 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
   }
 
   private record LocationDto(String name, String type) {
+  }
+  private record CommodityDto(String name) {
+  }
+
+  private record ItemDto(String name) {
+  }
+
+  private record ItemPageDto(ItemDto[] content, int totalPages) {
   }
 }
