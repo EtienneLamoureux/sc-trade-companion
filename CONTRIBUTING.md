@@ -24,7 +24,7 @@ To ensure quality and consistency, we ask that contrbutions follow these guideli
 This project leverages [oneocr-wrapper](https://github.com/EtienneLamoureux/oneocr-wrapper). In order to build and test locally, you will need to acquire the [following DLLs](https://github.com/EtienneLamoureux/oneocr-wrapper?tab=readme-ov-file#dependencies) and copy them in the [`bin/oneocr` folder](https://github.com/EtienneLamoureux/sc-trade-companion/tree/main/bin/oneocr).
 
 ## Testing
-The test harness allows you to see if your changes are an incremental improvement on the existing processing. Run `CommoditySubmissionFactoryITest` and see if the app now scores higher than the previous accuracy value. Please note that you have to define the list of image manipulations to use in the test class itself. This allows experimenting without changing the current production behaviour.
+The test harness allows you to see if your changes are an incremental improvement on the existing processing. Run `CommoditySubmissionFactoryITest` and `ItemSubmissionFactoryITest` to see if the app now scores higher than the previous accuracy value. Please note that you have to define the list of image manipulations to use in the test class itself (this allows experimenting without changing the current production behaviour).
 
 You can also run the app locally and debug it when it processes screenshots as you would any java application.
 
