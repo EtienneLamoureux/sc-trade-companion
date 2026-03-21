@@ -22,8 +22,7 @@ public class OcrUtil {
    * @throws NoCloseStringException If no fragment is close enough to the target string
    */
   public static LocatedFragment findFragmentClosestTo(OcrResult result, String text) {
-    var fragments = result.getColumns().parallelStream()
-        .flatMap(n -> n.getFragments().parallelStream()).toList();
+    var fragments = result.getFragments();
 
     return OcrUtil.findFragmentClosestTo(fragments, text);
   }

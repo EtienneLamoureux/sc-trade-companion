@@ -1,6 +1,5 @@
 package tools.sctrade.companion.domain.item;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.awt.image.BufferedImage;
@@ -9,7 +8,6 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -30,7 +28,7 @@ import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.ResourceUtil;
 
-@Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
+// @Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
 @ExtendWith(MockitoExtension.class)
 class ItemSubmissionFactoryITest {
   private final Logger logger = LoggerFactory.getLogger(ItemSubmissionFactoryITest.class);
@@ -45,7 +43,7 @@ class ItemSubmissionFactoryITest {
   private LocationRepository locationRepository = new TestLocationRepository();
 
   private ItemLocationReader itemLocationReader = new ItemLocationReader(locationRepository);
-  private ItemListingFactory itemListingFactory = new ItemListingFactory();
+  private ItemListingFactory itemListingFactory = new ItemListingFactory(new TestItemRepository());
   private Ocr ocr;
   private NotificationService notificationService =
       new NotificationService(new ConsoleNotificationRepository());
@@ -73,7 +71,6 @@ class ItemSubmissionFactoryITest {
   // "rayari-anvik-buy-1", "lorville-sell-1"})
   void givenTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase) throws IOException {
     calulateScore(testCase);
-    assertNotNull(testCase);
   }
 
   private double calulateScore(String testCase) throws IOException {
