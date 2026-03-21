@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.LocationRepository;
+import tools.sctrade.companion.domain.TestLocationRepository;
 import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.manipulations.AlignToTemplate;
 import tools.sctrade.companion.domain.notification.ConsoleNotificationRepository;
