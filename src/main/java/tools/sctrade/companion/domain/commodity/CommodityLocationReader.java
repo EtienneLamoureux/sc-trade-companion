@@ -29,8 +29,7 @@ public class CommodityLocationReader extends LocationReader {
 
   @Override
   protected String findRawLocation(List<LocatedFragment> fragments) {
-    var yourInventoriesFragment =
-        OcrUtil.findFragmentClosestTo(fragments, getLocationLabel());
+    var yourInventoriesFragment = OcrUtil.findFragmentClosestTo(fragments, getLocationLabel());
 
     // Return the fragment that follows "your inventories"
     var it = fragments.iterator();
