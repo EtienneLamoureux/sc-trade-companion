@@ -75,7 +75,9 @@ public class ItemSubmissionFactory {
     }
 
     try {
-      var walletFragment = OcrUtil.findFragmentClosestTo(ocrResult, WALLET);
+      var walletFragment = ocrResult.getFragments().parallelStream()
+          .filter(n -> n.getText().trim().startsWith(WALLET)).findFirst()
+          .orElseThrow(() -> new NoCloseStringException(WALLET));
       maxX = (int) walletFragment.getBoundingBox().getMinX();
     } catch (NoCloseStringException e) {
       logger.warn("Could not find '{}' fragment. Falling back to default listing bounds", WALLET);

@@ -107,6 +107,11 @@ public class OcrResult {
     return new OcrResult(wordsInBoundingBox);
   }
 
+  public List<LocatedFragment> getFragments() {
+    return linesByY.values().stream().flatMap(n -> n.getFragments().stream())
+        .collect(Collectors.toList());
+  }
+
   private LocatedColumn upsert(LocatedColumn column, LocatedFragment fragment) {
     if (column == null) {
       column = new LocatedColumn(fragment);
@@ -142,10 +147,5 @@ public class OcrResult {
         columnsByX.put(newColumn.getBoundingBox().getCenterX(), newColumn);
       }
     }
-  }
-
-  private List<LocatedFragment> getFragments() {
-    return linesByY.values().stream().flatMap(n -> n.getFragments().stream())
-        .collect(Collectors.toList());
   }
 }
