@@ -43,6 +43,7 @@ class ItemSubmissionFactoryITest {
   private LocationRepository locationRepository = new TestLocationRepository();
 
   private ItemLocationReader itemLocationReader = new ItemLocationReader(locationRepository);
+  private ItemShopReader itemShopReader = new ItemShopReader();
   private ItemListingFactory itemListingFactory = new ItemListingFactory(new TestItemRepository());
   private Ocr ocr;
   private NotificationService notificationService =
@@ -59,11 +60,11 @@ class ItemSubmissionFactoryITest {
     ocr = new OneOcr(imageManipulations, diskImageWriter);
 
     submissionFactory = new ItemSubmissionFactory(userService, notificationService,
-        itemListingFactory, itemLocationReader, ocr);
+        itemListingFactory, itemLocationReader, itemShopReader, ocr);
   }
 
   @ParameterizedTest(name = "{0}")
-  @ValueSource(strings = {"armor-1"})
+  @ValueSource(strings = {"casaba-outlet-1"})
   // @ValueSource(strings = {"arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1",
   // "pyro-gateway-sell-1",
   // "seraphim-station-buy-1", "seraphim-station-sell-1", "canard-view-buy-1",

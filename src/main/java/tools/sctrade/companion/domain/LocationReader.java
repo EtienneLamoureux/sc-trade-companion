@@ -1,5 +1,6 @@
 package tools.sctrade.companion.domain;
 
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -25,7 +26,27 @@ public abstract class LocationReader {
   }
 
   /**
+   * Crops the full OCR result to the region relevant for location reading.
+   *
+   * @param screenCapture the original screen capture
+   * @param ocrResult the full OCR result
+   * @return the cropped OCR result
+   */
+  protected abstract OcrResult crop(BufferedImage screenCapture, OcrResult ocrResult);
+
+  /**
    * Reads the location from a screen capture.
+   *
+   * @param screenCapture the original screen capture
+   * @param ocrResult the full OCR result
+   * @return the location, if found
+   */
+  public Optional<String> read(BufferedImage screenCapture, OcrResult ocrResult) {
+    return read(crop(screenCapture, ocrResult));
+  }
+
+  /**
+   * Reads the location from a cropped OCR result.
    *
    * @param locationResult the cropped OCR results corresponding to the location dropdown
    * @return the location, if found
