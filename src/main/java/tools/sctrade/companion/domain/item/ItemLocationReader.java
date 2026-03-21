@@ -9,7 +9,7 @@ import tools.sctrade.companion.exceptions.LocationNotFoundException;
 
 public class ItemLocationReader extends LocationReader {
 
-  private static final String CHOOSE_DESTINATION = "choose destination";
+  static final String CHOOSE_DESTINATION = "choose destination";
 
   /**
    * Creates a new instance of the item location reader.
