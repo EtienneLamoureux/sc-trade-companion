@@ -11,6 +11,11 @@ public class ItemSubmission {
   private User user;
   private Collection<ItemListing> listings;
 
+  public ItemSubmission(User user, Collection<ItemListing> listings) {
+    this.user = user;
+    this.listings = listings;
+  }
+
   public User getUser() {
     return user;
   }

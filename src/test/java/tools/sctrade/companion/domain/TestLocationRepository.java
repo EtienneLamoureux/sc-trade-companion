@@ -1,10 +1,9 @@
-package tools.sctrade.companion.domain.commodity;
+package tools.sctrade.companion.domain;
 
 import java.util.Arrays;
 import java.util.List;
-import tools.sctrade.companion.domain.LocationRepository;
 
-class TestLocationRepository implements LocationRepository {
+public class TestLocationRepository implements LocationRepository {
   @Override
   public List<String> findAllLocations() {
     return Arrays.asList("Shubin Mining Facility SAL-5", "ARC-L2 Lively Pathway Station",
