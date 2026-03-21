@@ -43,10 +43,7 @@ public class CommoditySubmissionFactory {
 
   public CommoditySubmission build(BufferedImage screenCapture) {
     var ocrResult = ocr.read(screenCapture);
-    Rectangle topLeftBoundingBox =
-        new Rectangle(0, 0, (screenCapture.getWidth() / 2), (screenCapture.getHeight() / 3));
-    var topLeftCornerOcrResult = ocrResult.crop(topLeftBoundingBox);
-    var location = commodityLocationReader.read(topLeftCornerOcrResult);
+    var location = commodityLocationReader.read(screenCapture, ocrResult);
 
     if (location.isEmpty()) {
       notificationService.warn(LocalizationUtil.get("warnNoLocation"));

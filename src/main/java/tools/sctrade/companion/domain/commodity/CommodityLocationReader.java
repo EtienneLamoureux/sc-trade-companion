@@ -1,9 +1,12 @@
 package tools.sctrade.companion.domain.commodity;
 
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import tools.sctrade.companion.domain.LocationReader;
 import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.ocr.LocatedFragment;
+import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.OcrUtil;
 import tools.sctrade.companion.exceptions.LocationNotFoundException;
 
@@ -20,6 +23,13 @@ public class CommodityLocationReader extends LocationReader {
    */
   public CommodityLocationReader(LocationRepository locationRepository) {
     super(locationRepository);
+  }
+
+  @Override
+  protected OcrResult crop(BufferedImage screenCapture, OcrResult ocrResult) {
+    var boundingBox =
+        new Rectangle(0, 0, screenCapture.getWidth() / 2, screenCapture.getHeight() / 3);
+    return ocrResult.crop(boundingBox);
   }
 
   @Override
