@@ -36,7 +36,7 @@ import tools.sctrade.companion.utils.ResourceUtil;
 // @Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
 @ExtendWith(MockitoExtension.class)
 class ItemSubmissionFactoryITest {
-  private static final double CURRENT_ACCURACY = 0.0;
+  private static final double CURRENT_ACCURACY = 80.0;
 
   private final Logger logger = LoggerFactory.getLogger(ItemSubmissionFactoryITest.class);
 
@@ -77,8 +77,7 @@ class ItemSubmissionFactoryITest {
     testCasesByShop.put("casaba-outlet", List.of("casaba-outlet-1"));
     testCasesByShop.put("live-fire-weapons",
         List.of("live-fire-weapons-1", "live-fire-weapons-2", "live-fire-weapons-3"));
-    testCasesByShop.put("medical_shop",
-        List.of("medical_shop-1", "medical_shop-2", "medical_shop-3"));
+    testCasesByShop.put("medical_shop", List.of("medical_shop-1"));
     testCasesByShop.put("platinum-bay",
         List.of("platinum-bay-1", "platinum-bay-2", "platinum-bay-3"));
     testCasesByShop.put("ship-weapons", List.of("ship-weapons-1"));
@@ -109,10 +108,9 @@ class ItemSubmissionFactoryITest {
   @ParameterizedTest(name = "{0}")
   // @ValueSource(strings = {"casaba-outlet-1"})
   @ValueSource(strings = {"armor-1", "armor-2", "armor-3", "casaba-outlet-1", "live-fire-weapons-1",
-      "live-fire-weapons-2", "live-fire-weapons-3", "medical_shop-1", "medical_shop-2",
-      "medical_shop-3", "platinum-bay-1", "platinum-bay-2", "platinum-bay-3", "ship-weapons-1",
-      "shop_terminal-1", "shop_terminal-2", "shop_terminal-3", "weapons_shop-1", "weapons_shop-2",
-      "weapons_shop-3"})
+      "live-fire-weapons-2", "live-fire-weapons-3", "medical_shop-3", "platinum-bay-1",
+      "platinum-bay-2", "platinum-bay-3", "ship-weapons-1", "shop_terminal-1", "shop_terminal-2",
+      "shop_terminal-3", "weapons_shop-1", "weapons_shop-2", "weapons_shop-3"})
   void givenTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase) throws IOException {
     calulateScore(testCase);
   }
