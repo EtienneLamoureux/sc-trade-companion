@@ -79,7 +79,7 @@ public class ItemCsvWriter extends AsynchronousProcessor<ItemSubmission> {
   }
 
   private List<String> buildLine(ItemListing listing) {
-    return Arrays.asList(listing.name(), String.valueOf(listing.price()), listing.location(),
-        listing.shop());
+    return Arrays.asList(listing.location(), listing.shop(), listing.name(),
+        String.valueOf(listing.price()));
   }
 }
