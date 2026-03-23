@@ -38,10 +38,8 @@ public class ItemShopReader extends LocationReader {
       throw new LocationNotFoundException(fragments);
     }
 
-    String shopText = fragments.stream()
-        .map(LocatedFragment::getText)
-        .reduce("", (a, b) -> a.isEmpty() ? b : a + " " + b)
-        .trim();
+    String shopText = fragments.stream().map(LocatedFragment::getText)
+        .reduce("", (a, b) -> a.isEmpty() ? b : a + " " + b).trim();
     logger.debug("Read raw shop text: '{}'", shopText);
 
     return shopText;
@@ -67,14 +65,14 @@ public class ItemShopReader extends LocationReader {
       minX = (int) sellFragment.get().getBoundingBox().getMaxX();
     } else {
       logger.warn(COULD_NOT_FIND_FRAGMENT_FALLING_BACK_TO_DEFAULT_BOUNDS, SELL);
-      minX = (int) (ocrResult.getBoundingBox().getMinX() * 0.33);
+      minX = (int) (ocrResult.getBoundingBox().getWidth() * 0.33);
     }
 
     if (walletFragment.isPresent()) {
       maxX = (int) walletFragment.get().getBoundingBox().getMinX();
     } else {
       logger.warn(COULD_NOT_FIND_FRAGMENT_FALLING_BACK_TO_DEFAULT_BOUNDS, WALLET);
-      maxX = (int) (ocrResult.getBoundingBox().getMaxX() * 0.66);
+      maxX = (int) (ocrResult.getBoundingBox().getWidth() * 0.66);
     }
 
     if (chooseDestinationFragment.isPresent()) {
@@ -82,7 +80,7 @@ public class ItemShopReader extends LocationReader {
     } else {
       logger.warn(COULD_NOT_FIND_FRAGMENT_FALLING_BACK_TO_DEFAULT_BOUNDS,
           ItemLocationReader.CHOOSE_DESTINATION);
-      maxY = (int) ocrResult.getBoundingBox().getMaxY() / 4;
+      maxY = (int) ocrResult.getBoundingBox().getHeight() / 4;
     }
 
     int width = maxX - minX;
