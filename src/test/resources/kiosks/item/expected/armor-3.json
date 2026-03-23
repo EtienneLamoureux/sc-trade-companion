@@ -1,1 +1,38 @@
-[]
+[
+	{
+		"name": "arrowhead sniper rifle battery (16 cap)",
+		"price": 520.0,
+		"location": "Stanton Gateway",
+		"shop": "armor"
+	},
+	{
+		"name": "br-2 shotgun magazine (12 cap)",
+		"price": 248.0,
+		"location": "Stanton Gateway",
+		"shop": "armor"
+	},
+	{
+		"name": "cambio srt canister",
+		"price": 275.0,
+		"location": "Stanton Gateway",
+		"shop": "armor"
+	},
+	{
+		"name": "atzkav sniper rifle battery (8 cap)",
+		"price": 471.0,
+		"location": "Stanton Gateway",
+		"shop": "armor"
+	},
+	{
+		"name": "c54 smg magazine (50 cap)",
+		"price": 248.0,
+		"location": "Stanton Gateway",
+		"shop": "armor"
+	},
+	{
+		"name": "cambio-lite srt canister",
+		"price": 275,
+		"location": "Stanton Gateway",
+		"shop": "armor"
+	}
+]

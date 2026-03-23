@@ -1,1 +1,38 @@
-[]
+[
+	{
+		"name": "devastator shotgun battery (12 cap)",
+		"price": 471.0,
+		"location": "Stanton Gateway",
+		"shop": "armor"
+	},
+	{
+		"name": "f55 lmg magazine (150 cap)",
+		"price": 867.0,
+		"location": "Stanton Gateway",
+		"shop": "armor"
+	},
+	{
+		"name": "fs-9 magazine (75 cap)",
+		"price": 520.0,
+		"location": "Stanton Gateway",
+		"shop": "armor"
+	},
+	{
+		"name": "emod stabilizer2",
+		"price": 450.0,
+		"location": "Stanton Gateway",
+		"shop": "armor"
+	},
+	{
+		"name": "fresnel energy lmg battery (165 cap)",
+		"price": 941.0,
+		"location": "Stanton Gateway",
+		"shop": "armor"
+	},
+	{
+		"name": "fsk-8 combat knife",
+		"price": 1250.0,
+		"location": "Stanton Gateway",
+		"shop": "armor"
+	}
+]

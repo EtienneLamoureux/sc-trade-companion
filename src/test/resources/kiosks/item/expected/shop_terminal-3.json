@@ -1,1 +1,38 @@
-[] 
+[
+	{
+		"name": "attrition-1 repeater",
+		"price": 10780.0,
+		"location": "Checkmate",
+		"shop": "shop_terminal"
+	},
+	{
+		"name": "attrition-4 repeater",
+		"price": 122805.0,
+		"location": "Checkmate",
+		"shop": "shop_terminal"
+	},
+	{
+		"name": "cf-337 panther repeater",
+		"price": 42715.0,
+		"location": "Checkmate",
+		"shop": "shop_terminal"
+	},
+	{
+		"name": "attrition-3 repeater",
+		"price": 54580.0,
+		"location": "Checkmate",
+		"shop": "shop_terminal"
+	},
+	{
+		"name": "cf-227 badger repeater",
+		"price": 18985.0,
+		"location": "Checkmate",
+		"shop": "shop_terminal"
+	},
+	{
+		"name": "dominance-1 scattergun",
+		"price": 14375.0,
+		"location": "Checkmate",
+		"shop": "shop_terminal"
+	}
+]

@@ -1,1 +1,38 @@
-[] 
+[
+	{
+		"name": "a03 sniper rifle magazine (15 cap)",
+		"price": 396.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "arclight pistol battery (30 cap)",
+		"price": 273.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "atzkav sniper rifle battery (8 cap)",
+		"price": 471.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "animus missile launcher magazine (3 cap)",
+		"price": 4701.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "arrowhead sniper rifle battery (16 cap)",
+		"price": 520.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "boomtube rocket",
+		"price": 4826.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	}
+]

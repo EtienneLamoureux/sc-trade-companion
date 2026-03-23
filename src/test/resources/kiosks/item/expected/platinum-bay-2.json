@@ -1,1 +1,38 @@
-[] 
+[
+	{
+		"name": "cambio srt",
+		"price": 20900.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "cambio-lite srt attachment",
+		"price": 375.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "cinch scraper module",
+		"price": 11150.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "cambio srt canister",
+		"price": 275.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "cambio-lite srt canister",
+		"price": 275.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "cr-60",
+		"price": 78600.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	}
+]

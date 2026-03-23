@@ -1,1 +1,20 @@
-[] 
+[
+	{
+		"name": "defiant",
+		"price": 18810.0,
+		"location": "Checkmate",
+		"shop": "shop_terminal"
+	},
+	{
+		"name": "starburn",
+		"price": 103950.0,
+		"location": "Checkmate",
+		"shop": "shop_terminal"
+	},
+	{
+		"name": "durajet",
+		"price": 9900.0,
+		"location": "Checkmate",
+		"shop": "shop_terminal"
+	}
+]

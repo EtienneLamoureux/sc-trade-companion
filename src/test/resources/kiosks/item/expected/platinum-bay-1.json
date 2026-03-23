@@ -1,1 +1,38 @@
-[] 
+[
+	{
+		"name": "stor*all 2 scu self-storage container",
+		"price": 4250.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "truhold tractor beam attachment",
+		"price": 450.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "zapjet",
+		"price": 18438.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "sunflare",
+		"price": 41580.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "ward",
+		"price": 68400.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "zephyr",
+		"price": 62370.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	}
+]

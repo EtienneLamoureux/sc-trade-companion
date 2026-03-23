@@ -1,1 +1,38 @@
-[] 
+[
+	{
+		"name": "gelid",
+		"price": 14400.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "graupel",
+		"price": 17280.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "haven",
+		"price": 54000.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "geo resource pod",
+		"price": 1250.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "gsx-rf",
+		"price": 52500.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	},
+	{
+		"name": "heatsafe",
+		"price": 19974.0,
+		"location": "Stanton Gateway",
+		"shop": "platinum bay"
+	}
+]

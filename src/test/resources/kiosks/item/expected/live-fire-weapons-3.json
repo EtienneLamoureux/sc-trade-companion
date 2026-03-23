@@ -1,1 +1,38 @@
-[] 
+[
+	{
+		"name": "lumin v smg battery (45 cap)",
+		"price": 396.0,
+		"location": "Stanton Gateway",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "p6-lr magazine (8 cap)",
+		"price": 446.0,
+		"location": "Stanton Gateway",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "p8-sc smg magazine (45 cap)",
+		"price": 297.0,
+		"location": "Stanton Gateway",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "p4-ar magazine (40 cap)",
+		"price": 198.0,
+		"location": "Stanton Gateway",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "p8-ar rifle magazine (15 cap)",
+		"price": 149.0,
+		"location": "Stanton Gateway",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "parallax rifle battery (80 cap)",
+		"price": 644.0,
+		"location": "Stanton Gateway",
+		"shop": "live fire weapons"
+	}
+]
