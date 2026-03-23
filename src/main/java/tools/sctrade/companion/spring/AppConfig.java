@@ -52,9 +52,12 @@ import tools.sctrade.companion.input.KeyListener;
 import tools.sctrade.companion.input.LineListener;
 import tools.sctrade.companion.input.ScreenPrinter;
 import tools.sctrade.companion.output.DiskImageWriter;
+import tools.sctrade.companion.output.ScTradeToolsClient;
+import tools.sctrade.companion.output.ScTradeToolsLocationRepository;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
-import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
+import tools.sctrade.companion.output.commodity.ScTradeToolsCommodityPublisher;
 import tools.sctrade.companion.output.item.ItemCsvWriter;
+import tools.sctrade.companion.output.item.ScTradeToolsItemRepository;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
@@ -149,10 +152,27 @@ public class AppConfig {
     return new ItemCsvWriter(settingRepository, notificationService);
   }
 
-  @Bean("ScTradeToolsClient")
+  @Bean
   public ScTradeToolsClient buildScTradeToolsClient(WebClient.Builder webClientBuilder,
-      SettingRepository settings, NotificationService notificationService) {
-    return new ScTradeToolsClient(webClientBuilder, settings, notificationService, getVersion());
+      SettingRepository settings) {
+    return new ScTradeToolsClient(webClientBuilder, settings, getVersion());
+  }
+
+  @Bean
+  public ScTradeToolsLocationRepository buildScTradeToolsLocationRepository(
+      ScTradeToolsClient client) {
+    return new ScTradeToolsLocationRepository(client);
+  }
+
+  @Bean
+  public ScTradeToolsItemRepository buildScTradeToolsItemRepository(ScTradeToolsClient client) {
+    return new ScTradeToolsItemRepository(client);
+  }
+
+  @Bean
+  public ScTradeToolsCommodityPublisher buildScTradeToolsCommodityPublisher(
+      ScTradeToolsClient client, NotificationService notificationService) {
+    return new ScTradeToolsCommodityPublisher(client, notificationService);
   }
 
   @Bean("DiskImageWriter")
@@ -184,8 +204,9 @@ public class AppConfig {
   }
 
   @Bean("ItemListingFactory")
-  public ItemListingFactory buildItemListingFactory(ScTradeToolsClient scTradeToolsClient) {
-    return new ItemListingFactory(scTradeToolsClient);
+  public ItemListingFactory buildItemListingFactory(
+      ScTradeToolsItemRepository scTradeToolsItemRepository) {
+    return new ItemListingFactory(scTradeToolsItemRepository);
   }
 
   @Bean("ItemLocationReader")
@@ -221,10 +242,10 @@ public class AppConfig {
   public CommodityService buildCommodityService(
       CommoditySubmissionFactory commoditySubmissionFactory,
       @Qualifier("CommodityCsvWriter") CommodityCsvWriter commodityCsvLogger,
-      @Qualifier("ScTradeToolsClient") ScTradeToolsClient scTradeToolsClient,
+      ScTradeToolsCommodityPublisher scTradeToolsCommodityPublisher,
       NotificationService notificationService) {
     return new CommodityService(commoditySubmissionFactory,
-        Arrays.asList(commodityCsvLogger, scTradeToolsClient), notificationService);
+        Arrays.asList(commodityCsvLogger, scTradeToolsCommodityPublisher), notificationService);
   }
 
   @Bean
