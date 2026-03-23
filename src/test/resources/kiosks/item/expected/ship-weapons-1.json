@@ -1,0 +1,38 @@
+[
+	{
+		"name": "anvil hornet f7c nose turret",
+		"price": 4750.0,
+		"location": "Seraphim Station",
+		"shop": "ship weapons"
+	},
+	{
+		"name": "arrester iii missile",
+		"price": 7875.0,
+		"location": "Seraphim Station",
+		"shop": "ship weapons"
+	},
+	{
+		"name": "cst-313 \"castillo\"",
+		"price": 30922.0,
+		"location": "Seraphim Station",
+		"shop": "ship weapons"
+	},
+	{
+		"name": "anvil hornet mk ii s2 nose turret",
+		"price": 20250.0,
+		"location": "Seraphim Station",
+		"shop": "ship weapons"
+	},
+	{
+		"name": "cf-337 panther repeater",
+		"price": 42715.0,
+		"location": "Seraphim Station",
+		"shop": "ship weapons"
+	},
+	{
+		"name": "drake buccaneer spinal mount",
+		"price": 7000.0,
+		"location": "Seraphim Station",
+		"shop": "ship weapons"
+	}
+]

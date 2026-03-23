@@ -1,0 +1,38 @@
+[
+	{
+		"name": "a03 sniper rifle magazine (15 cap)",
+		"price": 396.0,
+		"location": "Seraphim Station",
+		"shop": "armor"
+	},
+	{
+		"name": "adp arms grey",
+		"price": 1559.0,
+		"location": "Seraphim Station",
+		"shop": "armor"
+	},
+	{
+		"name": "adp arms red",
+		"price": 1559.0,
+		"location": "Seraphim Station",
+		"shop": "armor"
+	},
+	{
+		"name": "a23 helmet woodland",
+		"price": 1293.0,
+		"location": "Seraphim Station",
+		"shop": "armor"
+	},
+	{
+		"name": "adp arms orange",
+		"price": 1559.0,
+		"location": "Seraphim Station",
+		"shop": "armor"
+	},
+	{
+		"name": "adp arms seagreen",
+		"price": 1559.0,
+		"location": "Seraphim Station",
+		"shop": "armor"
+	}
+]

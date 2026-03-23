@@ -16,7 +16,7 @@ import tools.sctrade.companion.utils.StringUtil;
 
 public class ItemListingFactory {
   private static final Pattern LISTING_PATTERN =
-      Pattern.compile("((?:.+\\R){0,2}.+)\\Rvolume:[^\\r\\n]*\\R[\\W ]*([0-9,]+)");
+      Pattern.compile("((?:.+\\R){0,2}.+)\\Rvolume:[^\\r\\n]*\\R[\\Wa-zA-Z ]*([0-9,]+)");
   private static final String WALLET = "wallet:";
   private static final String CHOOSE_CATEGORY = "choose category";
   private static final String COULD_NOT_FIND_FRAGMENT_FALLING_BACK_TO_DEFAULT_BOUNDS =

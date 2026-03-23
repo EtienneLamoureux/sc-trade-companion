@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,6 +27,7 @@ import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.output.DiskImageWriter;
+import tools.sctrade.companion.utils.JsonUtil;
 import tools.sctrade.companion.utils.ResourceUtil;
 
 // @Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
@@ -64,12 +66,8 @@ class ItemSubmissionFactoryITest {
   }
 
   @ParameterizedTest(name = "{0}")
-  @ValueSource(strings = {"casaba-outlet-1"})
-  // @ValueSource(strings = {"arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1",
-  // "pyro-gateway-sell-1",
-  // "seraphim-station-buy-1", "seraphim-station-sell-1", "canard-view-buy-1",
-  // "canard-view-sell-1", "checkmate-buy-1", "levski-buy-1", "levski-buy-2", "levski-sell-1",
-  // "rayari-anvik-buy-1", "lorville-sell-1"})
+  // @ValueSource(strings = {"casaba-outlet-1"})
+  @ValueSource(strings = {"casaba-outlet-1", "armor-1", "live-fire-weapons-1", "ship-weapons-1"})
   void givenTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase) throws IOException {
     calulateScore(testCase);
   }
@@ -77,13 +75,63 @@ class ItemSubmissionFactoryITest {
   private double calulateScore(String testCase) throws IOException {
     var image = ResourceUtil.getBufferedImage("/kiosks/item/images/" + testCase + ".jpg");
     var actualListings = getActualListingsNoFail(image);
-    // var expectedListings = getExpectedListingsFor(testCase);
+    var expectedListings = getExpectedListingsFor(testCase);
     var actualListingsIterator = actualListings.iterator();
 
     double points = 0.0;
     double total = 0.0;
 
-    return 0.0;
+    for (var expectedListing : expectedListings) {
+      total += 4;
+
+      if (!actualListingsIterator.hasNext()) {
+        logger.debug("{} (missing listing)\t{}", testCase, expectedListing.name());
+        continue;
+      }
+
+      var actualListing = actualListingsIterator.next();
+
+      if (expectedListing.location().equalsIgnoreCase(actualListing.location())) {
+        points++;
+      } else {
+        logger.debug("{} (location)\t{} != {}", testCase, expectedListing.location(),
+            actualListing.location());
+      }
+
+      if (expectedListing.shop().equalsIgnoreCase(actualListing.shop())) {
+        points++;
+      } else {
+        logger.debug("{} (shop)\t\t{} != {}", testCase, expectedListing.shop(),
+            actualListing.shop());
+      }
+
+      if (expectedListing.name().equalsIgnoreCase(actualListing.name())) {
+        points++;
+      } else {
+        logger.debug("{} (name)\t\t{} != {}", testCase, expectedListing.name(),
+            actualListing.name());
+      }
+
+      if (Math.abs(
+          expectedListing.price() - actualListing.price()) <= (0.05 * expectedListing.price())) {
+        points++;
+      } else {
+        logger.debug("{} (price)\t\t{} != {}", testCase, expectedListing.price(),
+            actualListing.price());
+      }
+    }
+
+    double score = total == 0.0 ? 0.0 : (points / total) * 100;
+    logger.info("{} (score)\t{}%", testCase, score);
+
+    return score;
+  }
+
+  private List<ItemListing> getExpectedListingsFor(String testCase) {
+    var json = ResourceUtil.getTextLines("/kiosks/item/expected/" + testCase + ".json").stream()
+        .collect(Collectors.joining(""));
+
+    return JsonUtil.parseList(json, ItemListing.class);
   }
 
   private Collection<ItemListing> getActualListingsNoFail(BufferedImage image) {
