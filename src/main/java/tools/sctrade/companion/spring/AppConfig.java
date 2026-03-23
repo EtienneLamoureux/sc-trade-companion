@@ -29,6 +29,11 @@ import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.image.manipulations.AlignToTemplate;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
+import tools.sctrade.companion.domain.item.ItemListingFactory;
+import tools.sctrade.companion.domain.item.ItemLocationReader;
+import tools.sctrade.companion.domain.item.ItemService;
+import tools.sctrade.companion.domain.item.ItemShopReader;
+import tools.sctrade.companion.domain.item.ItemSubmissionFactory;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
@@ -178,6 +183,40 @@ public class AppConfig {
         commodityListingFactory, ocr);
   }
 
+  @Bean("ItemListingFactory")
+  public ItemListingFactory buildItemListingFactory(ScTradeToolsClient scTradeToolsClient) {
+    return new ItemListingFactory(scTradeToolsClient);
+  }
+
+  @Bean("ItemLocationReader")
+  public ItemLocationReader buildItemLocationReader(LocationRepository locationRepository) {
+    return new ItemLocationReader(locationRepository);
+  }
+
+  @Bean("ItemShopReader")
+  public ItemShopReader buildItemShopReader() {
+    return new ItemShopReader();
+  }
+
+  @Bean("ItemSubmissionFactory")
+  public ItemSubmissionFactory buildItemSubmissionFactory(UserService userService,
+      NotificationService notificationService, ItemListingFactory itemListingFactory,
+      ItemLocationReader itemLocationReader, ItemShopReader itemShopReader,
+      DiskImageWriter diskImageWriter) {
+    Ocr ocr = new OneOcr(List.of(new AlignToTemplate()), diskImageWriter);
+
+    return new ItemSubmissionFactory(userService, notificationService, itemListingFactory,
+        itemLocationReader, itemShopReader, ocr);
+  }
+
+  @Bean("ItemService")
+  public ItemService buildItemService(ItemSubmissionFactory itemSubmissionFactory,
+      @Qualifier("ItemCsvWriter") ItemCsvWriter itemCsvWriter,
+      NotificationService notificationService) {
+    return new ItemService(notificationService, itemSubmissionFactory,
+        Arrays.asList(itemCsvWriter));
+  }
+
   @Bean("CommodityService")
   public CommodityService buildCommodityService(
       CommoditySubmissionFactory commoditySubmissionFactory,
@@ -196,13 +235,13 @@ public class AppConfig {
   @Bean("ScreenPrinter")
   public ScreenPrinter buildScreenPrinter(
       @Qualifier("CommodityService") CommodityService commodityService,
-      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
-      NotificationService notificationService, SettingRepository settings) {
+      @Qualifier("ItemService") ItemService itemService, ImageWriter<Optional<Path>> imageWriter,
+      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
-    return new ScreenPrinter(Arrays.asList(commodityService), postprocessingManipulations,
-        imageWriter, soundPlayer, notificationService, settings);
+    return new ScreenPrinter(Arrays.asList(commodityService, itemService),
+        postprocessingManipulations, imageWriter, soundPlayer, notificationService, settings);
   }
 
   @Bean("KeyListener")
