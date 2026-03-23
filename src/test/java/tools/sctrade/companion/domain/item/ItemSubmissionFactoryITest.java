@@ -67,7 +67,11 @@ class ItemSubmissionFactoryITest {
 
   @ParameterizedTest(name = "{0}")
   // @ValueSource(strings = {"casaba-outlet-1"})
-  @ValueSource(strings = {"casaba-outlet-1", "armor-1", "live-fire-weapons-1", "ship-weapons-1"})
+  @ValueSource(strings = {"armor-1", "armor-2", "armor-3", "armor-4", "casaba-outlet-1",
+      "live-fire-weapons-1", "live-fire-weapons-2", "live-fire-weapons-3", "live-fire-weapons-4",
+      "medical_shop-1", "medical_shop-2", "medical_shop-3", "medical_shop-4", "platinum-bay-1",
+      "platinum-bay-2", "platinum-bay-3", "ship-weapons-1", "shop_terminal-1", "shop_terminal-2",
+      "shop_terminal-3", "shop_terminal-4", "weapons_shop-1", "weapons_shop-2", "weapons_shop-3"})
   void givenTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase) throws IOException {
     calulateScore(testCase);
   }
@@ -75,6 +79,7 @@ class ItemSubmissionFactoryITest {
   private double calulateScore(String testCase) throws IOException {
     var image = ResourceUtil.getBufferedImage("/kiosks/item/images/" + testCase + ".jpg");
     var actualListings = getActualListingsNoFail(image);
+    System.out.println(actualListings);
     var expectedListings = getExpectedListingsFor(testCase);
     var actualListingsIterator = actualListings.iterator();
 
