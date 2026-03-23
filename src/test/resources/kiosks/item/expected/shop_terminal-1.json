@@ -1,1 +1,14 @@
-[] 
+[
+	{
+		"name": "suckerpunch-l cannon",
+		"price": 42190.0,
+		"location": "Checkmate",
+		"shop": "shop_terminal"
+	},
+	{
+		"name": "sw16br3",
+		"price": 36070.0,
+		"location": "Checkmate",
+		"shop": "shop_terminal"
+	}
+]

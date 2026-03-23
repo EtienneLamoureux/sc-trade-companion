@@ -1,1 +1,38 @@
-[] 
+[
+	{
+		"name": "fs-9 magazine (75 cap)",
+		"price": 520.0,
+		"location": "Stanton Gateway",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "gamma duo (2x holographic)",
+		"price": 700.0,
+		"location": "Stanton Gateway",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "killshot rifle magazine (45 cap)",
+		"price": 322.0,
+		"location": "Stanton Gateway",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "gallant rifle battery (45 cap)",
+		"price": 396.0,
+		"location": "Stanton Gateway",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "karna rifle battery (35 cap)",
+		"price": 248.0,
+		"location": "Stanton Gateway",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "lh86 pistol magazine (25 cap)",
+		"price": 174.0,
+		"location": "Stanton Gateway",
+		"shop": "live fire weapons"
+	}
+]

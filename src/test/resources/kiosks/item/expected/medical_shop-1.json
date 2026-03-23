@@ -1,1 +1,38 @@
-[] 
+[
+	{
+		"name": "medpen (hemozal)",
+		"price": 265.0,
+		"location": "Checkmate",
+		"shop": "medical_shop"
+	},
+	{
+		"name": "oxypen",
+		"price": 260.0,
+		"location": "Checkmate",
+		"shop": "medical_shop"
+	},
+	{
+		"name": "paramed medical device",
+		"price": 1250.0,
+		"location": "Checkmate",
+		"shop": "medical_shop"
+	},
+	{
+		"name": "opiopen (roxaphen)",
+		"price": 240.0,
+		"location": "Checkmate",
+		"shop": "medical_shop"
+	},
+	{
+		"name": "pancea medgel canister",
+		"price": 100000.0,
+		"location": "Checkmate",
+		"shop": "medical_shop"
+	},
+	{
+		"name": "paramed refill",
+		"price": 250.0,
+		"location": "Checkmate",
+		"shop": "medical_shop"
+	}
+]

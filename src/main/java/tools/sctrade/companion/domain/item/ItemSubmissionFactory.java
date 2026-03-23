@@ -1,6 +1,7 @@
 package tools.sctrade.companion.domain.item;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,10 @@ public class ItemSubmissionFactory {
     var location = extractLocation(screenCapture, ocrResult);
     var shop = extractShop(screenCapture, ocrResult);
 
+    if (location.isEmpty() || shop.isEmpty()) {
+      return new ItemSubmission(userService.get(), List.of());
+    }
+
     var listings = itemListingFactory.build(ocrResult, location.orElse(null), shop.orElse(null));
 
     if (listings.isEmpty()) {
@@ -50,7 +55,7 @@ public class ItemSubmissionFactory {
     var location = itemLocationReader.read(screenCapture, ocrResult);
 
     if (location.isEmpty()) {
-      notificationService.warn(LocalizationUtil.get("warnNoLocation"));
+      notificationService.error(LocalizationUtil.get("warnNoLocation"));
     }
 
     return location;
@@ -60,7 +65,7 @@ public class ItemSubmissionFactory {
     var shop = itemShopReader.read(screenCapture, ocrResult);
 
     if (shop.isEmpty()) {
-      notificationService.warn(LocalizationUtil.get("warnNoShop"));
+      notificationService.error(LocalizationUtil.get("warnNoShop"));
     }
 
     return shop;

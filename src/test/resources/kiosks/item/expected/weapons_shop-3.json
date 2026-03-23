@@ -1,1 +1,38 @@
-[] 
+[
+	{
+		"name": "gallant rifle battery (45 cap)",
+		"price": 396.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "karna rifle battery (35 cap)",
+		"price": 248.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "lh86 pistol magazine (25 cap)",
+		"price": 174.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "gp-33 mod grenade launcher magazine (6 cap)",
+		"price": 6380.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "killshot rifle magazine (45 cap)",
+		"price": 322.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "lumin v smg battery (45 cap)",
+		"price": 396.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	}
+]

@@ -1,1 +1,38 @@
-[] 
+[
+	{
+		"name": "p4-ar magazine (40 cap)",
+		"price": 198.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "p8-ar rifle magazine (15 cap)",
+		"price": 149.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "parallax rifle battery (80 cap)",
+		"price": 644.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "p6-lr magazine (8 cap)",
+		"price": 446.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "p8-sc smg magazine (45 cap)",
+		"price": 297.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	},
+	{
+		"name": "prism laser shotgun battery (20 cap)",
+		"price": 495.0,
+		"location": "Checkmate",
+		"shop": "weapons_shop"
+	}
+]
