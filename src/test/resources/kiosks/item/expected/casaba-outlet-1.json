@@ -1,0 +1,38 @@
+[
+	{
+		"name": "55-gr pants",
+		"price": 366.0,
+		"location": "Seraphim Station",
+		"shop": "casaba outlet"
+	},
+	{
+		"name": "adiva jacket black",
+		"price": 2675.0,
+		"location": "Seraphim Station",
+		"shop": "casaba outlet"
+	},
+	{
+		"name": "adiva jacket dark green",
+		"price": 3664.0,
+		"location": "Seraphim Station",
+		"shop": "casaba outlet"
+	},
+	{
+		"name": "adiva jacket aqua",
+		"price": 3664.0,
+		"location": "Seraphim Station",
+		"shop": "casaba outlet"
+	},
+	{
+		"name": "adiva jacket blue",
+		"price": 3664.0,
+		"location": "Seraphim Station",
+		"shop": "casaba outlet"
+	},
+	{
+		"name": "adiva jacket dark red",
+		"price": 3664.0,
+		"location": "Seraphim Station",
+		"shop": "casaba outlet"
+	}
+]

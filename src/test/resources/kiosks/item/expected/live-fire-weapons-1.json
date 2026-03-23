@@ -1,0 +1,38 @@
+[
+	{
+		"name": "250-e laser pointer",
+		"price": 280.0,
+		"location": "Seraphim Station",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "apx fire extinguisher",
+		"price": 1000.0,
+		"location": "Seraphim Station",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "arclight \"warhawk\" pistol",
+		"price": 820.0,
+		"location": "Seraphim Station",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "a03 sniper rifle magazine (15 cap)",
+		"price": 396.0,
+		"location": "Seraphim Station",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "arclight \"midnight\" pistol",
+		"price": 820.0,
+		"location": "Seraphim Station",
+		"shop": "live fire weapons"
+	},
+	{
+		"name": "arclight pistol battery (30 cap)",
+		"price": 273.0,
+		"location": "Seraphim Station",
+		"shop": "live fire weapons"
+	}
+]
