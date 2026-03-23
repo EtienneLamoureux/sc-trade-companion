@@ -49,6 +49,7 @@ import tools.sctrade.companion.input.ScreenPrinter;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsClient;
+import tools.sctrade.companion.output.item.ItemCsvWriter;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
@@ -135,6 +136,12 @@ public class AppConfig {
   public CommodityCsvWriter buildCommodityCsvLogger(SettingRepository settingRepository,
       NotificationService notificationService) {
     return new CommodityCsvWriter(settingRepository, notificationService);
+  }
+
+  @Bean("ItemCsvWriter")
+  public ItemCsvWriter buildItemCsvWriter(SettingRepository settingRepository,
+      NotificationService notificationService) {
+    return new ItemCsvWriter(settingRepository, notificationService);
   }
 
   @Bean("ScTradeToolsClient")
