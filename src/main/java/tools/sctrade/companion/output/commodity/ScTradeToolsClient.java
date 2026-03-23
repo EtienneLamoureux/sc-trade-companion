@@ -102,7 +102,7 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
     logger.debug("Fetching items from sc-trade.tools...");
 
     ItemPageDto firstPage = fetchItemPage(0);
-    int totalPages = firstPage.totalPages();
+    int totalPages = firstPage.page().totalPages();
     logger.debug("sc-trade.tools reports {} pages of items", totalPages);
 
     List<String> firstPageNames = toItemNames(firstPage);
@@ -185,6 +185,8 @@ public class ScTradeToolsClient extends AsynchronousProcessor<CommoditySubmissio
   private record ItemDto(String name) {
   }
 
-  private record ItemPageDto(ItemDto[] content, int totalPages) {
+  private record ItemPageDto(ItemDto[] content, PageDto page) {
+    public record PageDto(int totalPages) {
+    }
   }
 }
