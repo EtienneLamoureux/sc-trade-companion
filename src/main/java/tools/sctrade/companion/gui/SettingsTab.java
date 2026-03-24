@@ -149,20 +149,20 @@ public class SettingsTab extends JPanel {
   }
 
   private void buildPrintscreenCommodityKeybindField(SettingRepository settings) {
-    buildKeybindField(settings, LocalizationUtil.get("labelPrintscreenCommodityKeybind"),
-        Setting.PRINTSCREEN_COMMODITY_KEYBIND, NativeKeyEvent.VC_F3,
+    buildPrintscreenKeybindField(settings, Setting.PRINTSCREEN_COMMODITY_KEYBIND,
+        NativeKeyEvent.VC_F3, LocalizationUtil.get("labelPrintscreenCommodityKeybind"),
         LocalizationUtil.get("tooltipPrintscreenKeybind"));
   }
 
   private void buildPrintscreenItemKeybindField(SettingRepository settings) {
-    buildKeybindField(settings, LocalizationUtil.get("labelPrintscreenItemKeybind"),
-        Setting.PRINTSCREEN_ITEM_KEYBIND, NativeKeyEvent.VC_F4,
+    buildPrintscreenKeybindField(settings, Setting.PRINTSCREEN_ITEM_KEYBIND, NativeKeyEvent.VC_F3,
+        LocalizationUtil.get("labelPrintscreenItemKeybind"),
         LocalizationUtil.get("tooltipPrintscreenItemKeybind"));
   }
 
-  private void buildKeybindField(SettingRepository settings, String label, Setting keybindSetting,
-      int defaultKeybind, String tooltip) {
-    var keybindLabel = buildLabel(rowIndex.get(), label);
+  private void buildPrintscreenKeybindField(SettingRepository settings, Setting setting,
+      int defaultKeybind, String keybindLabelText, String tooltipText) {
+    var keybindLabel = buildLabel(rowIndex.get(), keybindLabelText);
 
     // Create a panel to hold both the display field and the button
     GridBagConstraints gridBagConstraints = new GridBagConstraints();
@@ -181,7 +181,7 @@ public class SettingsTab extends JPanel {
     displayConstraints.fill = GridBagConstraints.HORIZONTAL;
     displayConstraints.ipadx = 10;
 
-    String currentKeybind = NativeKeyEvent.getKeyText(settings.get(keybindSetting, defaultKeybind));
+    String currentKeybind = NativeKeyEvent.getKeyText(settings.get(setting, defaultKeybind));
     JTextField keybindField = new JTextField(currentKeybind);
     keybindField.setColumns(10);
     keybindField.setEditable(false);
@@ -201,24 +201,31 @@ public class SettingsTab extends JPanel {
 
     // Add action listener for the capture button
     captureButton.addActionListener(e -> {
+      // Disable button to prevent multiple clicks while listening
       captureButton.setText(LocalizationUtil.get("buttonListeningForKey"));
       captureButton.setEnabled(false);
 
       keybindField.requestFocusInWindow();
 
+      // Create a temporary key listener to capture the next key press
       NativeKeyListener captureListener = new NativeKeyListener() {
         @Override
         public void nativeKeyPressed(NativeKeyEvent event) {
           int keyCode = event.getKeyCode();
 
+          // Update UI on the Event Dispatch Thread for valid keys
           javax.swing.SwingUtilities.invokeLater(() -> {
             keybindField.setText(NativeKeyEvent.getKeyText(keyCode));
-            settings.set(keybindSetting, keyCode);
+            settings.set(setting, keyCode);
           });
 
+          // Cleanup - remove listener and reset button state regardless of key validity
+          // Note: GlobalScreen.removeNativeKeyListener is thread-safe and can be called
+          // from the native event thread
           try {
             GlobalScreen.removeNativeKeyListener(this);
           } finally {
+            // Reset button state on the Event Dispatch Thread
             javax.swing.SwingUtilities.invokeLater(() -> {
               captureButton.setText(LocalizationUtil.get("buttonCaptureKeybind"));
               captureButton.setEnabled(true);
@@ -240,9 +247,9 @@ public class SettingsTab extends JPanel {
       GlobalScreen.addNativeKeyListener(captureListener);
     });
 
-    var tooltipLabel = buildLabel(rowIndex.getAndIncrement(), tooltip);
-    tooltipLabel.putClientProperty("FlatLaf.styleClass", "small");
-    tooltipLabel.setEnabled(false);
+    var tooltip = buildLabel(rowIndex.getAndIncrement(), tooltipText);
+    tooltip.putClientProperty("FlatLaf.styleClass", "small");
+    tooltip.setEnabled(false);
     buildLabel(rowIndex.getAndIncrement(), " ");
   }
 

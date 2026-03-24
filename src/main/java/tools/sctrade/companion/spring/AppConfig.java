@@ -267,9 +267,9 @@ public class AppConfig {
   }
 
   @Bean("ItemScreenPrinter")
-  public ScreenPrinter buildItemScreenPrinter(
-      @Qualifier("ItemService") ItemService itemService, ImageWriter<Optional<Path>> imageWriter,
-      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
+  public ScreenPrinter buildItemScreenPrinter(@Qualifier("ItemService") ItemService itemService,
+      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
+      NotificationService notificationService, SettingRepository settings) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
@@ -290,7 +290,7 @@ public class AppConfig {
       @Qualifier("ItemScreenPrinter") ScreenPrinter itemScreenPrinter,
       SettingRepository settingRepository) {
     return new KeyListener(Arrays.asList(itemScreenPrinter), settingRepository,
-        Setting.PRINTSCREEN_ITEM_KEYBIND, NativeKeyEvent.VC_F4);
+        Setting.PRINTSCREEN_ITEM_KEYBIND, NativeKeyEvent.VC_F3);
   }
 
   private String getVersion() {
