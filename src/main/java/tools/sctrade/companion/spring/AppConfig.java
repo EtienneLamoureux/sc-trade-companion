@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.io.input.TailerListener;
+import org.jnativehook.keyboard.NativeKeyEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -253,22 +254,43 @@ public class AppConfig {
     return new SoundUtil();
   }
 
-  @Bean("ScreenPrinter")
-  public ScreenPrinter buildScreenPrinter(
+  @Bean("CommodityScreenPrinter")
+  public ScreenPrinter buildCommodityScreenPrinter(
       @Qualifier("CommodityService") CommodityService commodityService,
+      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
+      NotificationService notificationService, SettingRepository settings) {
+    List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
+    postprocessingManipulations.add(new UpscaleTo4k());
+
+    return new ScreenPrinter(Arrays.asList(commodityService), postprocessingManipulations,
+        imageWriter, soundPlayer, notificationService, settings);
+  }
+
+  @Bean("ItemScreenPrinter")
+  public ScreenPrinter buildItemScreenPrinter(
       @Qualifier("ItemService") ItemService itemService, ImageWriter<Optional<Path>> imageWriter,
       SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
-    return new ScreenPrinter(Arrays.asList(commodityService, itemService),
-        postprocessingManipulations, imageWriter, soundPlayer, notificationService, settings);
+    return new ScreenPrinter(Arrays.asList(itemService), postprocessingManipulations, imageWriter,
+        soundPlayer, notificationService, settings);
   }
 
-  @Bean("KeyListener")
-  public KeyListener buildNativeKeyListener(@Qualifier("ScreenPrinter") Runnable screenPrinter,
+  @Bean("CommodityKeyListener")
+  public KeyListener buildCommodityKeyListener(
+      @Qualifier("CommodityScreenPrinter") ScreenPrinter commodityScreenPrinter,
       SettingRepository settingRepository) {
-    return new KeyListener(Arrays.asList(screenPrinter), settingRepository);
+    return new KeyListener(Arrays.asList(commodityScreenPrinter), settingRepository,
+        Setting.PRINTSCREEN_COMMODITY_KEYBIND, NativeKeyEvent.VC_F3);
+  }
+
+  @Bean("ItemKeyListener")
+  public KeyListener buildItemKeyListener(
+      @Qualifier("ItemScreenPrinter") ScreenPrinter itemScreenPrinter,
+      SettingRepository settingRepository) {
+    return new KeyListener(Arrays.asList(itemScreenPrinter), settingRepository,
+        Setting.PRINTSCREEN_ITEM_KEYBIND, NativeKeyEvent.VC_F4);
   }
 
   private String getVersion() {

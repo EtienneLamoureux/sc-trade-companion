@@ -42,7 +42,8 @@ public class CompanionApplication {
       System.exit(1);
     }
 
-    GlobalScreen.addNativeKeyListener(context.getBean(KeyListener.class));
+    context.getBeansOfType(KeyListener.class).values()
+        .forEach(GlobalScreen::addNativeKeyListener);
   }
 
   private static void openGui(ConfigurableApplicationContext context) {

@@ -6,7 +6,7 @@ import java.nio.file.Paths;
  * Enumerates the settings that can be configured.
  */
 public enum Setting {
-  OUTPUT_SCREENSHOTS, OUTPUT_TRANSIENT_IMAGES, MY_IMAGES_PATH, MY_DATA_PATH, SC_TRADE_TOOLS_ROOT_URL, USERNAME, STAR_CITIZEN_LIVE_PATH, STAR_CITIZEN_MONITOR, PRINTSCREEN_KEYBIND;
+  OUTPUT_SCREENSHOTS, OUTPUT_TRANSIENT_IMAGES, MY_IMAGES_PATH, MY_DATA_PATH, SC_TRADE_TOOLS_ROOT_URL, USERNAME, STAR_CITIZEN_LIVE_PATH, STAR_CITIZEN_MONITOR, PRINTSCREEN_COMMODITY_KEYBIND, PRINTSCREEN_ITEM_KEYBIND;
 
   /**
    * Casts a string value to the appropriate type for the setting.
@@ -22,7 +22,7 @@ public enum Setting {
         return (T) Boolean.valueOf(value);
       case MY_DATA_PATH, MY_IMAGES_PATH:
         return (T) Paths.get(value);
-      case PRINTSCREEN_KEYBIND:
+      case PRINTSCREEN_COMMODITY_KEYBIND, PRINTSCREEN_ITEM_KEYBIND:
         return (T) Integer.valueOf(value);
       default:
         return (T) value;
