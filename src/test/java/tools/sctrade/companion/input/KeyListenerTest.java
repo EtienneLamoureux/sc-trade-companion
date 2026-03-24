@@ -30,11 +30,12 @@ class KeyListenerTest {
 
   @Test
   void whenPressingConfiguredKeyThenCallRunnable() {
-    when(mockSettingRepository.get(eq(Setting.PRINTSCREEN_KEYBIND), eq(CONFIGURED_KEY)))
+    when(mockSettingRepository.get(eq(Setting.PRINTSCREEN_COMMODITY_KEYBIND), eq(CONFIGURED_KEY)))
         .thenReturn(CONFIGURED_KEY);
     NativeKeyEvent event = mock(NativeKeyEvent.class);
     when(event.getKeyCode()).thenReturn(CONFIGURED_KEY);
-    keyListener = new KeyListener(Arrays.asList(mockRunnable), mockSettingRepository);
+    keyListener = new KeyListener(Arrays.asList(mockRunnable), mockSettingRepository,
+        Setting.PRINTSCREEN_COMMODITY_KEYBIND, CONFIGURED_KEY);
 
     keyListener.nativeKeyReleased(event);
 
@@ -43,11 +44,12 @@ class KeyListenerTest {
 
   @Test
   void whenPressingWrongKeyThenDoesNotCallRunnable() {
-    when(mockSettingRepository.get(eq(Setting.PRINTSCREEN_KEYBIND), eq(CONFIGURED_KEY)))
+    when(mockSettingRepository.get(eq(Setting.PRINTSCREEN_COMMODITY_KEYBIND), eq(CONFIGURED_KEY)))
         .thenReturn(CONFIGURED_KEY);
     NativeKeyEvent event = mock(NativeKeyEvent.class);
     when(event.getKeyCode()).thenReturn(DIFFERENT_KEY);
-    keyListener = new KeyListener(Arrays.asList(mockRunnable), mockSettingRepository);
+    keyListener = new KeyListener(Arrays.asList(mockRunnable), mockSettingRepository,
+        Setting.PRINTSCREEN_COMMODITY_KEYBIND, CONFIGURED_KEY);
 
     keyListener.nativeKeyReleased(event);
 

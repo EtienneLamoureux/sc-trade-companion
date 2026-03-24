@@ -18,7 +18,8 @@ import tools.sctrade.companion.utils.StringUtil;
  */
 public class SettingRepository {
   private static final Collection<Setting> USER_DEFINED = Arrays.asList(Setting.USERNAME,
-      Setting.STAR_CITIZEN_LIVE_PATH, Setting.STAR_CITIZEN_MONITOR, Setting.PRINTSCREEN_KEYBIND);
+      Setting.STAR_CITIZEN_LIVE_PATH, Setting.STAR_CITIZEN_MONITOR,
+      Setting.PRINTSCREEN_COMMODITY_KEYBIND, Setting.PRINTSCREEN_ITEM_KEYBIND);
   private final Logger logger = LoggerFactory.getLogger(SettingRepository.class);
 
   private Map<Setting, String> settings;
