@@ -37,6 +37,9 @@ dependencies {
 	implementation 'net.java.dev.jna:jna:5.15.0'
 	implementation 'net.java.dev.jna:jna-platform:5.15.0'
 
+	// Protobuf (parsing Chrome Screen AI OCR responses)
+	implementation 'com.google.protobuf:protobuf-java:4.29.3'
+
 	// Utils
 	implementation 'org.imgscalr:imgscalr-lib:4.2'
 	implementation 'org.apache.commons:commons-math3:3.6.1'
@@ -122,6 +125,35 @@ task copyJar(type: Copy, dependsOn: 'build') {
 task copyOneOcr(type: Copy) {
 	from "./bin/oneocr"
 	into "$binariesDir/oneocr"
+}
+
+task compileScreenAiHelper {
+	description 'Cross-compiles the native Screen AI callback helper for Linux and Windows'
+	def crateDir = file('src/main/rust/screenai_helper')
+	def outputDir = file("$binariesDir/screenai")
+
+	inputs.dir file("$crateDir/src")
+	inputs.file file("$crateDir/Cargo.toml")
+	outputs.dir outputDir
+
+	doLast {
+		exec {
+			workingDir crateDir
+			commandLine 'cargo', 'build', '--release',
+				'--target', 'x86_64-unknown-linux-gnu',
+				'--target', 'x86_64-pc-windows-gnu'
+		}
+		copy {
+			from "$crateDir/target/x86_64-unknown-linux-gnu/release"
+			into outputDir
+			include 'libscreenai_helper.so'
+		}
+		copy {
+			from "$crateDir/target/x86_64-pc-windows-gnu/release"
+			into outputDir
+			include 'screenai_helper.dll'
+		}
+	}
 }
 
 task copyStartScript(type: Copy) {

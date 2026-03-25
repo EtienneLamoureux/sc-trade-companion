@@ -49,6 +49,12 @@ out/
 ### Git ###
 *.orig
 
+### JVM crash logs ###
+hs_err_pid*.log
+
+### Rust ###
+**/target/
+
 ### OCR wrapper ###
 !bin/oneocr-wrapper/
 oneocr.dll

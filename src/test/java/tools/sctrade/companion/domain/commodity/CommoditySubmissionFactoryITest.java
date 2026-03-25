@@ -21,12 +21,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.LocationRepository;
-import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.manipulations.AlignToTemplate;
 import tools.sctrade.companion.domain.notification.ConsoleNotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OneOcr;
+import tools.sctrade.companion.domain.ocr.ScreenAiOcr;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
@@ -46,8 +46,6 @@ class CommoditySubmissionFactoryITest {
   @Mock
   private SettingRepository settings;
 
-  private DiskImageWriter diskImageWriter;
-
   private LocationRepository locationRepository = new TestLocationRepository();
   private CommodityRepository commodityRepository = new TestCommodityRepository();
 
@@ -55,7 +53,6 @@ class CommoditySubmissionFactoryITest {
       new CommodityLocationReader(locationRepository);
   private CommodityListingFactory commodityListingFactory =
       new CommodityListingFactory(commodityRepository);
-  private Ocr ocr;
   private NotificationService notificationService =
       new NotificationService(new ConsoleNotificationRepository());
 
@@ -64,18 +61,27 @@ class CommoditySubmissionFactoryITest {
   @BeforeEach
   void setUp() {
     setupMocks();
+  }
 
-    diskImageWriter = new DiskImageWriter(settings);
-    List<ImageManipulation> imageManipulations = List.of(new AlignToTemplate());
-    ocr = new OneOcr(imageManipulations, diskImageWriter);
-
+  private void buildSubmissionFactory(Ocr ocr) {
     submissionFactory = new CommoditySubmissionFactory(userService, notificationService,
         commodityLocationReader, commodityListingFactory, ocr);
   }
 
   @Test
-  void givenTestCasesByColorPaletteWhenProcessingThenCalculateOverallAccuracyScore()
-      throws IOException {
+  void givenOneOcrWhenProcessingThenCalculateOverallAccuracyScore() throws IOException {
+    var diskImageWriter = new DiskImageWriter(settings);
+    buildSubmissionFactory(new OneOcr(List.of(new AlignToTemplate()), diskImageWriter));
+    calculateOverallAccuracyScore();
+  }
+
+  @Test
+  void givenScreenAiOcrWhenProcessingThenCalculateOverallAccuracyScore() throws IOException {
+    buildSubmissionFactory(new ScreenAiOcr(List.of(new AlignToTemplate())));
+    calculateOverallAccuracyScore();
+  }
+
+  private void calculateOverallAccuracyScore() throws IOException {
     var testCasesByColorPalette = new java.util.LinkedHashMap<String, List<String>>();
     testCasesByColorPalette.put("uee blue",
         List.of("arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1", "pyro-gateway-sell-1",
@@ -106,14 +112,20 @@ class CommoditySubmissionFactoryITest {
     assertTrue(totalScore >= CURRENT_ACCURACY);
   }
 
-  @ParameterizedTest(name = "{0}")
+  @ParameterizedTest(name = "OneOcr - {0}")
   @ValueSource(strings = {"rayari-anvik-buy-1"})
-  // @ValueSource(strings = {"arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1",
-  // "pyro-gateway-sell-1",
-  // "seraphim-station-buy-1", "seraphim-station-sell-1", "canard-view-buy-1",
-  // "canard-view-sell-1", "checkmate-buy-1", "levski-buy-1", "levski-buy-2", "levski-sell-1",
-  // "rayari-anvik-buy-1", "lorville-sell-1"})
-  void givenTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase) throws IOException {
+  void givenOneOcrTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase)
+      throws IOException {
+    var diskImageWriter = new DiskImageWriter(settings);
+    buildSubmissionFactory(new OneOcr(List.of(new AlignToTemplate()), diskImageWriter));
+    calulateScore(testCase);
+  }
+
+  @ParameterizedTest(name = "ScreenAiOcr - {0}")
+  @ValueSource(strings = {"rayari-anvik-buy-1"})
+  void givenScreenAiOcrTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase)
+      throws IOException {
+    buildSubmissionFactory(new ScreenAiOcr(List.of(new AlignToTemplate())));
     calulateScore(testCase);
   }
 
