@@ -31,8 +31,8 @@ import tools.sctrade.companion.domain.image.manipulations.AlignToTemplate;
 import tools.sctrade.companion.domain.image.manipulations.UpscaleTo4k;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
+import tools.sctrade.companion.domain.ocr.BestEffortOcr;
 import tools.sctrade.companion.domain.ocr.Ocr;
-import tools.sctrade.companion.domain.ocr.OneOcr;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserIdGenerator;
@@ -163,7 +163,7 @@ public class AppConfig {
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
       NotificationService notificationService, CommodityLocationReader commodityLocationReader,
       CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter) {
-    Ocr ocr = new OneOcr(List.of(new AlignToTemplate()), diskImageWriter);
+    Ocr ocr = new BestEffortOcr(List.of(new AlignToTemplate()), diskImageWriter);
 
     return new CommoditySubmissionFactory(userService, notificationService, commodityLocationReader,
         commodityListingFactory, ocr);
