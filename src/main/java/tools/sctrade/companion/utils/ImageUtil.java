@@ -393,6 +393,7 @@ public class ImageUtil {
    *      "https://answers.opencv.org/question/28348/converting-bufferedimage-to-mat-in-java/">Source</a>
    */
   public static Mat toMat(BufferedImage image) throws IOException {
+    image = removeAlphaChannel(image);
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     ImageIO.write(image, "jpg", byteArrayOutputStream);
     byteArrayOutputStream.flush();
