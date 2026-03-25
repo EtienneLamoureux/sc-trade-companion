@@ -1,6 +1,5 @@
 package tools.sctrade.companion.input;
 
-import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -18,6 +17,7 @@ import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
 import tools.sctrade.companion.utils.GraphicsDeviceUtil;
 import tools.sctrade.companion.utils.LocalizationUtil;
+import tools.sctrade.companion.utils.ScreenshotUtil;
 import tools.sctrade.companion.utils.SoundUtil;
 
 /**
@@ -80,8 +80,7 @@ public class ScreenPrinter implements Runnable {
       soundPlayer.play(CAMERA_SHUTTER);
       var monitor = GraphicsDeviceUtil
           .get(settings.get(Setting.STAR_CITIZEN_MONITOR, GraphicsDeviceUtil.getPrimaryId()));
-      var screenRectangle = monitor.getDefaultConfiguration().getBounds();
-      var screenCapture = postProcess(new Robot(monitor).createScreenCapture(screenRectangle));
+      var screenCapture = postProcess(ScreenshotUtil.capture(monitor));
       logger.debug("Printed screen");
 
       logger.debug("Calling image processors...");
