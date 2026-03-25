@@ -29,6 +29,9 @@ dependencies {
 	// GUI look and feel
 	implementation 'com.formdev:flatlaf:3.5.2'
 	implementation 'com.formdev:flatlaf-intellij-themes:3.5.2'
+
+	// System tray (cross-platform replacement for AWT SystemTray)
+	implementation 'com.dorkbox:SystemTray:4.4'
 	
 	// Computer vision
 	implementation 'org.openpnp:opencv:4.9.0-0'
