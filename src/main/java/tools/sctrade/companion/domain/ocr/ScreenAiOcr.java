@@ -35,8 +35,7 @@ public class ScreenAiOcr extends Ocr {
   // -------------------------------------------------------------------------
   // Constants
   // -------------------------------------------------------------------------
-  private static final Path MODEL_DIR =
-      Path.of(System.getProperty("user.home"), ".config", "screen_ai", "resources");
+  private static final Path MODEL_DIR = getModelDir();
   private static final Path HELPER_DIR = Path.of("bin", "screenai").toAbsolutePath();
   private static final String CIPD_BASE_URL =
       "https://chrome-infra-packages.appspot.com/client?platform=%s&version=latest";
@@ -356,6 +355,29 @@ public class ScreenAiOcr extends Ocr {
     }
 
     return os + "-" + cpuArch;
+  }
+
+  /**
+   * Returns the platform-appropriate directory for Screen AI model files. On Linux, uses the XDG
+   * config directory. On macOS, uses Application Support. On Windows, uses LOCALAPPDATA.
+   */
+  private static Path getModelDir() {
+    String osName = System.getProperty("os.name").toLowerCase();
+    Path base;
+
+    if (osName.contains("win")) {
+      String localAppData = System.getenv("LOCALAPPDATA");
+      base = localAppData != null ? Path.of(localAppData)
+          : Path.of(System.getProperty("user.home"), "AppData", "Local");
+    } else if (osName.contains("mac")) {
+      base = Path.of(System.getProperty("user.home"), "Library", "Application Support");
+    } else {
+      String xdgConfig = System.getenv("XDG_CONFIG_HOME");
+      base = xdgConfig != null ? Path.of(xdgConfig)
+          : Path.of(System.getProperty("user.home"), ".config");
+    }
+
+    return base.resolve("screen_ai").resolve("resources");
   }
 
   /**
