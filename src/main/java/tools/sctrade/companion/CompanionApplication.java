@@ -1,6 +1,5 @@
 package tools.sctrade.companion;
 
-import java.awt.AWTException;
 import java.awt.EventQueue;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -21,7 +20,7 @@ public class CompanionApplication {
   private static final Logger logger = LoggerFactory.getLogger(CompanionApplication.class);
 
   @Autowired
-  public CompanionApplication(CompanionGui gui) throws AWTException {
+  public CompanionApplication(CompanionGui gui) {
     gui.initialize();
   }
 
