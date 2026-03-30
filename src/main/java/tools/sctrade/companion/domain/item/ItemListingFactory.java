@@ -85,7 +85,8 @@ public class ItemListingFactory {
     var matcher = LISTING_PATTERN.matcher(text);
 
     while (matcher.find()) {
-      String name = matcher.group(1).replaceAll(System.lineSeparator(), " ").trim();
+      String name =
+          matcher.group(1).replace("quick buy", "").replaceAll(System.lineSeparator(), " ").trim();
       double price = Double.parseDouble(matcher.group(2).replace(",", ""));
       var listing = new ItemListing(name, price, location, shop);
       listings.add(listing);
