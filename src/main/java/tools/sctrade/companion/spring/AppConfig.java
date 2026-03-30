@@ -58,6 +58,7 @@ import tools.sctrade.companion.output.ScTradeToolsLocationRepository;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsCommodityPublisher;
 import tools.sctrade.companion.output.item.ItemCsvWriter;
+import tools.sctrade.companion.output.item.ScTradeToolsItemPublisher;
 import tools.sctrade.companion.output.item.ScTradeToolsItemRepository;
 import tools.sctrade.companion.utils.SoundUtil;
 
@@ -176,6 +177,12 @@ public class AppConfig {
     return new ScTradeToolsCommodityPublisher(client, notificationService);
   }
 
+  @Bean
+  public ScTradeToolsItemPublisher buildScTradeToolsItemPublisher(ScTradeToolsClient client,
+      NotificationService notificationService) {
+    return new ScTradeToolsItemPublisher(client, notificationService);
+  }
+
   @Bean("DiskImageWriter")
   public DiskImageWriter buildDiskImageWriter(SettingRepository settingRepository) {
     return new DiskImageWriter(settingRepository);
@@ -234,9 +241,10 @@ public class AppConfig {
   @Bean("ItemService")
   public ItemService buildItemService(ItemSubmissionFactory itemSubmissionFactory,
       @Qualifier("ItemCsvWriter") ItemCsvWriter itemCsvWriter,
+      ScTradeToolsItemPublisher scTradeToolsItemPublisher,
       NotificationService notificationService) {
     return new ItemService(notificationService, itemSubmissionFactory,
-        Arrays.asList(itemCsvWriter));
+        Arrays.asList(itemCsvWriter, scTradeToolsItemPublisher));
   }
 
   @Bean("CommodityService")
