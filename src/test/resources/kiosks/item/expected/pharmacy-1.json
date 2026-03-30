@@ -1,0 +1,38 @@
+[
+	{
+		"name": "adrenapen (demexatrine)",
+		"price": 260.0,
+		"location": "Orison",
+		"shop": "pharmacy"
+	},
+	{
+		"name": "deconpen (canoiodide)",
+		"price": 265.0,
+		"location": "Orison",
+		"shop": "pharmacy"
+	},
+	{
+		"name": "lifeguard medical attachment",
+		"price": 350.0,
+		"location": "Orison",
+		"shop": "pharmacy"
+	},
+	{
+		"name": "corticopen (sterogen)",
+		"price": 295.0,
+		"location": "Orison",
+		"shop": "pharmacy"
+	},
+	{
+		"name": "detoxpen (resurgera)",
+		"price": 240.0,
+		"location": "Orison",
+		"shop": "pharmacy"
+	},
+	{
+		"name": "lifeguard refill",
+		"price": 125.0,
+		"location": "Orison",
+		"shop": "pharmacy"
+	}
+]

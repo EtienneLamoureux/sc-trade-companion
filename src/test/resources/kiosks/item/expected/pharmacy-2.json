@@ -1,0 +1,38 @@
+[
+	{
+		"name": "medpen (hemozal)",
+		"price": 265.0,
+		"location": "Orison",
+		"shop": "pharmacy"
+	},
+	{
+		"name": "oxypen",
+		"price": 260.0,
+		"location": "Orison",
+		"shop": "pharmacy"
+	},
+	{
+		"name": "paramed medical device",
+		"price": 1250.0,
+		"location": "Orison",
+		"shop": "pharmacy"
+	},
+	{
+		"name": "opiopen (roxaphen)",
+		"price": 240.0,
+		"location": "Orison",
+		"shop": "pharmacy"
+	},
+	{
+		"name": "pancea medgel canister",
+		"price": 100000.0,
+		"location": "Orison",
+		"shop": "pharmacy"
+	},
+	{
+		"name": "paramed refill",
+		"price": 250.0,
+		"location": "Orison",
+		"shop": "pharmacy"
+	}
+]
