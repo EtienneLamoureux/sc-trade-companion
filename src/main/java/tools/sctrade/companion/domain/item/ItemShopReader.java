@@ -48,7 +48,7 @@ public class ItemShopReader extends LocationReader {
   @Override
   protected Optional<String> spellCheckLocation(String rawLocation) {
     // No shop repository available; return raw value as-is
-    return Optional.of(rawLocation);
+    return Optional.of(rawLocation.replace("+", " ").trim());
   }
 
   private Rectangle calculateShopBoundingBox(OcrResult ocrResult) {
