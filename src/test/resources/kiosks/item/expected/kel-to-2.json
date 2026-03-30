@@ -1,0 +1,38 @@
+[
+	{
+		"name": "get up coffee (decaf)",
+		"price": 3.0,
+		"location": "Orison",
+		"shop": "kel.to"
+	},
+	{
+		"name": "godmother sandwich",
+		"price": 6.0,
+		"location": "Orison",
+		"shop": "kel.to"
+	},
+	{
+		"name": "high end chair",
+		"price": 2421.0,
+		"location": "Orison",
+		"shop": "kel.to"
+	},
+	{
+		"name": "get up coffee (mocha)",
+		"price": 4.0,
+		"location": "Orison",
+		"shop": "kel.to"
+	},
+	{
+		"name": "golden medmon",
+		"price": 209.0,
+		"location": "Orison",
+		"shop": "kel.to"
+	},
+	{
+		"name": "high end couch",
+		"price": 7500.0,
+		"location": "Orison",
+		"shop": "kel.to"
+	}
+]

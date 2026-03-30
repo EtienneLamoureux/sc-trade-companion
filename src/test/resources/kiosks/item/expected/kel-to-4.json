@@ -1,0 +1,38 @@
+[
+	{
+		"name": "finley the stormwal plushie",
+		"price": 77.0,
+		"location": "Orison",
+		"shop": "kel.to"
+	},
+	{
+		"name": "francis the stormwal plushie",
+		"price": 78.0,
+		"location": "Orison",
+		"shop": "kel.to"
+	},
+	{
+		"name": "jumping limes",
+		"price": 5.0,
+		"location": "Orison",
+		"shop": "kel.to"
+	},
+	{
+		"name": "francis the stormwal large plushie",
+		"price": 175.0,
+		"location": "Orison",
+		"shop": "kel.to"
+	},
+	{
+		"name": "golden medmon",
+		"price": 209.0,
+		"location": "Orison",
+		"shop": "kel.to"
+	},
+	{
+		"name": "oza",
+		"price": 4.0,
+		"location": "Orison",
+		"shop": "kel.to"
+	}
+]
