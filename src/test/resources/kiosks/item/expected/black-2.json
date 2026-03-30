@@ -1,0 +1,38 @@
+[
+	{
+		"name": "cordimon jacket yellow",
+		"price": 1275.0,
+		"location": "Orison",
+		"shop": "cargo deck"
+	},
+	{
+		"name": "cruz lux",
+		"price": 7.0,
+		"location": "Orison",
+		"shop": "cargo deck"
+	},
+	{
+		"name": "davin work gloves red",
+		"price": 180.0,
+		"location": "Orison",
+		"shop": "cargo deck"
+	},
+	{
+		"name": "crusader industries hat",
+		"price": 820.0,
+		"location": "Orison",
+		"shop": "cargo deck"
+	},
+	{
+		"name": "davin work gloves olive",
+		"price": 180.0,
+		"location": "Orison",
+		"shop": "cargo deck"
+	},
+	{
+		"name": "davin work gloves white",
+		"price": 180.0,
+		"location": "Orison",
+		"shop": "cargo deck"
+	}
+]

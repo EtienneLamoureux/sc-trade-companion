@@ -1,0 +1,38 @@
+[
+	{
+		"name": "apx fire extinguisher",
+		"price": 1000.0,
+		"location": "Orison",
+		"shop": "cargo deck"
+	},
+	{
+		"name": "aril backpack hazard",
+		"price": 1900.0,
+		"location": "Orison",
+		"shop": "cargo deck"
+	},
+	{
+		"name": "aril helmet hazard",
+		"price": 2924.0,
+		"location": "Orison",
+		"shop": "cargo deck"
+	},
+	{
+		"name": "aril arms hazard",
+		"price": 923.0,
+		"location": "Orison",
+		"shop": "cargo deck"
+	},
+	{
+		"name": "aril core hazard",
+		"price": 5168.0,
+		"location": "Orison",
+		"shop": "cargo deck"
+	},
+	{
+		"name": "aril legs hazard",
+		"price": 1790.0,
+		"location": "Orison",
+		"shop": "cargo deck"
+	}
+]

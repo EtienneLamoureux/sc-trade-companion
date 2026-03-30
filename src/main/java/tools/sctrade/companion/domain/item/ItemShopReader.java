@@ -8,7 +8,6 @@ import tools.sctrade.companion.domain.LocationReader;
 import tools.sctrade.companion.domain.ocr.LocatedFragment;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.OcrUtil;
-import tools.sctrade.companion.exceptions.LocationNotFoundException;
 import tools.sctrade.companion.exceptions.NoCloseStringException;
 
 public class ItemShopReader extends LocationReader {
@@ -17,6 +16,7 @@ public class ItemShopReader extends LocationReader {
   private static final String SELL = "sell";
   private static final String COULD_NOT_FIND_FRAGMENT_FALLING_BACK_TO_DEFAULT_BOUNDS =
       "Could not find '{}' fragment. Falling back to default bounds";
+  private static final String BLACK_SHOP = "cargo deck";
 
   public ItemShopReader() {
     super(null);
@@ -35,7 +35,7 @@ public class ItemShopReader extends LocationReader {
   @Override
   protected String findRawLocation(List<LocatedFragment> fragments) {
     if (fragments.isEmpty()) {
-      throw new LocationNotFoundException(fragments);
+      return BLACK_SHOP;
     }
 
     String shopText = fragments.stream().map(LocatedFragment::getText)
