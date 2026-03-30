@@ -22,6 +22,9 @@ public class ItemService extends AsynchronousProcessor<BufferedImage> {
   @Override
   protected void process(BufferedImage screenCapture) throws Exception {
     ItemSubmission submission = submissionFactory.build(screenCapture);
-    publishers.forEach(p -> p.processAsynchronously(submission));
+
+    if (!submission.isEmpty()) {
+      publishers.forEach(p -> p.processAsynchronously(submission));
+    }
   }
 }

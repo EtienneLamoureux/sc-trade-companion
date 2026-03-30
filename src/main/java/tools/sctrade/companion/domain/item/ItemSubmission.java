@@ -24,4 +24,8 @@ public class ItemSubmission {
     return listings;
   }
 
+  public boolean isEmpty() {
+    return listings.isEmpty();
+  }
+
 }
