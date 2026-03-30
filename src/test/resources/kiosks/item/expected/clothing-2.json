@@ -1,0 +1,38 @@
+[
+	{
+		"name": "gauntlet gloves",
+		"price": 160.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "gilick boots",
+		"price": 220.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "gilick boots white / blue",
+		"price": 220.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "geo resource pod",
+		"price": 1250.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "gilick boots black / dark blue",
+		"price": 220.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "gilick boots white / teal",
+		"price": 220.0,
+		"location": "Orison",
+		"shop": "clothing"
+	}
+]

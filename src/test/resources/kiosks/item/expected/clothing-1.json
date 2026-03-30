@@ -1,0 +1,38 @@
+[
+	{
+		"name": "altimont pants",
+		"price": 280.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "altimont pants dark teal",
+		"price": 280.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "apx fire extinguisher",
+		"price": 1000.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "altimont pants blue",
+		"price": 280.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "altimont pants teal",
+		"price": 280.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "aril arms",
+		"price": 923.0,
+		"location": "Orison",
+		"shop": "clothing"
+	}
+]
