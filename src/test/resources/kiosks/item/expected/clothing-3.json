@@ -1,0 +1,38 @@
+[
+	{
+		"name": "hardline hard hat white/blue",
+		"price": 163.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "karoby energy bar (cranberry, green tea & carob)",
+		"price": 5.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "landlite boots grey",
+		"price": 235.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "ironband hard hat",
+		"price": 175.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "landlite boots",
+		"price": 235.0,
+		"location": "Orison",
+		"shop": "clothing"
+	},
+	{
+		"name": "lifecore boots",
+		"price": 265.0,
+		"location": "Orison",
+		"shop": "clothing"
+	}
+]
