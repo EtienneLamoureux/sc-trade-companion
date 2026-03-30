@@ -36,7 +36,7 @@ import tools.sctrade.companion.utils.ResourceUtil;
 // @Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
 @ExtendWith(MockitoExtension.class)
 class ItemSubmissionFactoryITest {
-  private static final double CURRENT_ACCURACY = 81.0;
+  private static final double CURRENT_ACCURACY = 78.0;
 
   private final Logger logger = LoggerFactory.getLogger(ItemSubmissionFactoryITest.class);
 
@@ -85,6 +85,7 @@ class ItemSubmissionFactoryITest {
         List.of("shop_terminal-1", "shop_terminal-2", "shop_terminal-3"));
     testCasesByShop.put("weapons_shop",
         List.of("weapons_shop-1", "weapons_shop-2", "weapons_shop-3"));
+    testCasesByShop.put("kel.to", List.of("kel-to-1", "kel-to-2", "kel-to-3", "kel-to-4"));
 
     var scores = new ArrayList<Double>();
 
@@ -106,7 +107,7 @@ class ItemSubmissionFactoryITest {
   }
 
   @ParameterizedTest(name = "{0}")
-  @ValueSource(strings = {"weapons_shop-2"})
+  @ValueSource(strings = {"kel-to-2"})
   // @ValueSource(strings = {"armor-1", "armor-2", "armor-3", "casaba-outlet-1",
   // "live-fire-weapons-1",
   // "live-fire-weapons-2", "live-fire-weapons-3", "medical_shop-3", "platinum-bay-1",

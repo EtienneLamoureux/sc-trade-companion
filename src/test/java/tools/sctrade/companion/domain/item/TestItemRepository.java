@@ -6,12 +6,13 @@ public class TestItemRepository implements ItemRepository {
 
   @Override
   public List<String> findAllItems() {
-    return List.of("'arrow' i missile", "'bullet' ii missile", "'chaos' iii missile",
-        "'dragon' iv missile", "'war' cannon", "'warlord' cannon", "'wasp' repeater",
-        "'weak' repeater", "'whip' cannon", "'wrath' cannon", "\"quantanium\" water bottle",
-        "[ph] noodles v2", "@item_commodities_ventslug", "@item_name_dmc_gloves_01_01_02",
-        "@item_name_lna_pants_01_01_01", "@item_name_lna_vest_01_01_01",
-        "@item_name_srvl_combat_heavy_arms_03_01_01", "@item_name_srvl_combat_heavy_core_03_01_01",
+    return List.of("redimake item fabricator", "'arrow' i missile", "'bullet' ii missile",
+        "'chaos' iii missile", "'dragon' iv missile", "'war' cannon", "'warlord' cannon",
+        "'wasp' repeater", "'weak' repeater", "'whip' cannon", "'wrath' cannon",
+        "\"quantanium\" water bottle", "[ph] noodles v2", "@item_commodities_ventslug",
+        "@item_name_dmc_gloves_01_01_02", "@item_name_lna_pants_01_01_01",
+        "@item_name_lna_vest_01_01_01", "@item_name_srvl_combat_heavy_arms_03_01_01",
+        "@item_name_srvl_combat_heavy_core_03_01_01",
         "@item_name_srvl_combat_heavy_helmet_03_01_01",
         "@item_name_srvl_combat_heavy_legs_03_01_01", "@item_namecutter_paint_black_silver_stripe",
         "@item_nameflair_vehicle", "@item_nameglsn_shotgun_ballistic_01_mag",

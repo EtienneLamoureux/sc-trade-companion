@@ -26,15 +26,6 @@ public abstract class LocationReader {
   }
 
   /**
-   * Crops the full OCR result to the region relevant for location reading.
-   *
-   * @param screenCapture the original screen capture
-   * @param ocrResult the full OCR result
-   * @return the cropped OCR result
-   */
-  protected abstract OcrResult crop(BufferedImage screenCapture, OcrResult ocrResult);
-
-  /**
    * Reads the location from a screen capture.
    *
    * @param screenCapture the original screen capture
@@ -56,26 +47,23 @@ public abstract class LocationReader {
       logger.debug("Reading location...");
       var location = extractLocation(locationResult);
       logger.debug("Read location '{}'", location);
-
+  
       return location;
     } catch (Exception e) {
       logger.error("Error while reading location", e);
-
+  
       return Optional.empty();
     }
   }
 
-  private Optional<String> extractLocation(OcrResult result) {
-    List<LocatedFragment> fragments =
-        result.getLines().stream().flatMap(n -> n.getFragments().stream()).toList();
-    String rawLocation = findRawLocation(fragments);
-
-    try {
-      return spellCheckLocation(rawLocation);
-    } catch (NoSuchElementException e) {
-      throw new LocationNotFoundException(fragments);
-    }
-  }
+  /**
+   * Crops the full OCR result to the region relevant for location reading.
+   *
+   * @param screenCapture the original screen capture
+   * @param ocrResult the full OCR result
+   * @return the cropped OCR result
+   */
+  protected abstract OcrResult crop(BufferedImage screenCapture, OcrResult ocrResult);
 
   protected abstract String getLocationLabel();
 
@@ -89,6 +77,18 @@ public abstract class LocationReader {
     } catch (NoCloseStringException e) {
       logger.warn("Could not spell-check location '{}'", rawLocation);
       return Optional.empty();
+    }
+  }
+
+  private Optional<String> extractLocation(OcrResult result) {
+    List<LocatedFragment> fragments =
+        result.getLines().stream().flatMap(n -> n.getFragments().stream()).toList();
+    String rawLocation = findRawLocation(fragments);
+  
+    try {
+      return spellCheckLocation(rawLocation);
+    } catch (NoSuchElementException e) {
+      throw new LocationNotFoundException(fragments);
     }
   }
 }
