@@ -1,5 +1,6 @@
 package tools.sctrade.companion.output.item;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -66,8 +67,8 @@ public class ScTradeToolsItemPublisher extends AsynchronousProcessor<ItemSubmiss
   }
 
   private String buildBatchId(ItemListing listing) {
-    return HashUtil.hash(String.format(Locale.ROOT, "%s%s%s%s", listing.location(), listing.shop(),
-        listing.name(), listing.price()));
+    return HashUtil.hash(String.format(Locale.ROOT, "%s%s%s%s%s", listing.location(),
+        listing.shop(), listing.name(), listing.price(), Instant.now()));
   }
 
   private record ItemSubmissionDto(UserDto user, Collection<ItemListingDto> listings) {
