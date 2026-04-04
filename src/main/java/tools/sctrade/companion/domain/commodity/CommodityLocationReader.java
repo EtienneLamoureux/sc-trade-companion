@@ -40,21 +40,28 @@ public class CommodityLocationReader extends LocationReader {
   @Override
   protected String findRawLocation(List<LocatedFragment> fragments) {
     var yourInventoriesFragment = OcrUtil.findFragmentClosestTo(fragments, getLocationLabel());
+    var anchorBox = yourInventoriesFragment.getBoundingBox();
+    int anchorMaxY = anchorBox.y + anchorBox.height;
+    int anchorMinX = anchorBox.x;
+    int anchorMaxX = anchorBox.x + anchorBox.width;
 
-    // Return the fragment that follows "your inventories"
-    var it = fragments.iterator();
+    // Find the fragment that:
+    // 1. overlaps with yourInventoriesFragment on the X axis
+    // 2. starts below yourInventoriesFragment (minY > anchorMaxY)
+    // 3. has the smallest vertical distance from yourInventoriesFragment among all such fragments
+    LocatedFragment rawLocationFragment =
+        fragments.stream().filter(f -> !f.equals(yourInventoriesFragment)).filter(f -> {
+          var box = f.getBoundingBox();
+          int fMinX = box.x;
+          int fMaxX = box.x + box.width;
+          return fMinX < anchorMaxX && fMaxX > anchorMinX;
+        }).filter(f -> f.getBoundingBox().y > anchorMaxY)
+            .min(java.util.Comparator.comparingInt(f -> f.getBoundingBox().y - anchorMaxY))
+            .orElseThrow(() -> new LocationNotFoundException(fragments));
 
-    while (it.hasNext()) {
-      var next = it.next();
-
-      if (next.equals(yourInventoriesFragment)) {
-        String rawLocation = it.next().getText();
-        logger.debug("Read raw location '{}'", rawLocation);
-        return rawLocation;
-      }
-    }
-
-    throw new LocationNotFoundException(fragments);
+    String rawLocation = rawLocationFragment.getText();
+    logger.debug("Read raw location '{}'", rawLocation);
+    return rawLocation;
   }
 
 }
