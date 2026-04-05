@@ -4,7 +4,9 @@
 Desktop companion application for Star Citizen.
 
 ## Features
-- Automatic commodity kiosk scraping by pressing the <kbd>F3</kbd> key
+- Automatic _commodity_ kiosk scraping through a single hotkey
+- Automatic _equipment, gear and components_ kiosk scraping through a hotkey
+- Rebindable hotkeys
 - All extracted data saved to the `/my-data` folder as CSV files
 - All screenshots saved to the `/my-images` folder
 - Available in: 
@@ -26,6 +28,8 @@ Desktop companion application for Star Citizen.
 ## Usage
 1. Start the application by double-clicking the `sc-trade-companion.bat` file
 1. Play Star Citizen, on LIVE, in English
+
+### Commodities
 1. When you get to a commodity kiosk, interact with it
     1. To ensure good results, check-out the [best practices](https://github.com/EtienneLamoureux/sc-trade-companion#best-practices)
 1. In the left "Your inventories" dropdown, select the shop
@@ -33,6 +37,15 @@ Desktop companion application for Star Citizen.
     1. Press <kbd>F3</kbd>
     1. Scroll and repeat in order to capture all listings
 1. Repeat for the `Sell` tab
+1. Repeat throughout your play session
+1. Close the application (make sure you close it in the system tray)
+
+### Equipment, gear and components
+1. When you get to an item kiosk, interact with it
+    1. To ensure good results, check-out the [best practices](https://github.com/EtienneLamoureux/sc-trade-companion#best-practices)
+1. In the left "Choose destination" dropdown, select the shop
+1. Press <kbd>F3</kbd>
+1. Scroll/change page and repeat in order to capture all listings
 1. Repeat throughout your play session
 1. Close the application (make sure you close it in the system tray)
 
