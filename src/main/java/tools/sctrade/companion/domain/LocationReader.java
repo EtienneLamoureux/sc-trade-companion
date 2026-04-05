@@ -47,11 +47,11 @@ public abstract class LocationReader {
       logger.debug("Reading location...");
       var location = extractLocation(locationResult);
       logger.debug("Read location '{}'", location);
-  
+
       return location;
     } catch (Exception e) {
       logger.error("Error while reading location", e);
-  
+
       return Optional.empty();
     }
   }
@@ -84,7 +84,7 @@ public abstract class LocationReader {
     List<LocatedFragment> fragments =
         result.getLines().stream().flatMap(n -> n.getFragments().stream()).toList();
     String rawLocation = findRawLocation(fragments);
-  
+
     try {
       return spellCheckLocation(rawLocation);
     } catch (NoSuchElementException e) {
