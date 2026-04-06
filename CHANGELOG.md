@@ -1,4 +1,10 @@
 # SC Trade Companion
+## 1.5.0
+### Features
+- Read FPS gear, equipment and ship component (collectively known as items) kiosks
+  - Add a new keybind to trigger the item kiosk processing
+  - Screenshots and captured data still go to `/my-images` and `/my-data` folders (a new item-specific CSV file will be created)
+
 ## 1.4.2
 ### Other
 - Fully remove the .NET dependency
