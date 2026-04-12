@@ -9,6 +9,7 @@ import tools.sctrade.companion.domain.ocr.LocatedFragment;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.OcrUtil;
 import tools.sctrade.companion.exceptions.NoCloseStringException;
+import tools.sctrade.companion.utils.StringUtil;
 
 public class ItemShopReader extends LocationReader {
 
@@ -16,10 +17,17 @@ public class ItemShopReader extends LocationReader {
   private static final String SELL = "sell";
   private static final String COULD_NOT_FIND_FRAGMENT_FALLING_BACK_TO_DEFAULT_BOUNDS =
       "Could not find '{}' fragment. Falling back to default bounds";
-  private static final String BLACK_SHOP = "cargo deck";
 
-  public ItemShopReader() {
+  private final ItemShopRepository itemShopRepository;
+
+  /**
+   * Creates a new instance of the item shop reader.
+   *
+   * @param itemShopRepository the shop repository, used to spell check the read shop name
+   */
+  public ItemShopReader(ItemShopRepository itemShopRepository) {
     super(null);
+    this.itemShopRepository = itemShopRepository;
   }
 
   @Override
@@ -34,10 +42,6 @@ public class ItemShopReader extends LocationReader {
 
   @Override
   protected String findRawLocation(List<LocatedFragment> fragments) {
-    if (fragments.isEmpty()) {
-      return BLACK_SHOP;
-    }
-
     String shopText = fragments.stream().map(LocatedFragment::getText)
         .reduce("", (a, b) -> a.isEmpty() ? b : a + " " + b).trim();
     logger.debug("Read raw shop text: '{}'", shopText);
@@ -47,8 +51,14 @@ public class ItemShopReader extends LocationReader {
 
   @Override
   protected Optional<String> spellCheckLocation(String rawLocation) {
-    // No shop repository available; return raw value as-is
-    return Optional.of(rawLocation.replace("+", " ").trim());
+    try {
+      String normalized = rawLocation.replace("+", " ").trim();
+      String spellChecked = StringUtil.spellCheck(normalized, itemShopRepository.findAllTypes());
+      return Optional.of(spellChecked);
+    } catch (NoCloseStringException e) {
+      logger.warn("Could not spell-check shop '{}'", rawLocation);
+      return Optional.empty();
+    }
   }
 
   private Rectangle calculateShopBoundingBox(OcrResult ocrResult) {

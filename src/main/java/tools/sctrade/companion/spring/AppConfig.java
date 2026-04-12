@@ -34,6 +34,7 @@ import tools.sctrade.companion.domain.item.ItemListingFactory;
 import tools.sctrade.companion.domain.item.ItemLocationReader;
 import tools.sctrade.companion.domain.item.ItemService;
 import tools.sctrade.companion.domain.item.ItemShopReader;
+import tools.sctrade.companion.domain.item.ItemShopRepository;
 import tools.sctrade.companion.domain.item.ItemSubmissionFactory;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
@@ -230,8 +231,8 @@ public class AppConfig {
   }
 
   @Bean("ItemShopReader")
-  public ItemShopReader buildItemShopReader() {
-    return new ItemShopReader();
+  public ItemShopReader buildItemShopReader(ItemShopRepository itemShopRepository) {
+    return new ItemShopReader(itemShopRepository);
   }
 
   @Bean("ItemSubmissionFactory")
