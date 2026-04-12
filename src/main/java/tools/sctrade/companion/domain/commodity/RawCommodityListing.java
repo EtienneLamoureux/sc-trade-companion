@@ -2,7 +2,6 @@ package tools.sctrade.companion.domain.commodity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -151,22 +150,33 @@ public class RawCommodityListing {
   }
 
   private void extractBoxSizesInScu() {
-    var parsedBoxSizesInScu =
-        Arrays.stream(right.getFragments().getLast().getText().strip().split(" ")).map(n -> {
-          try {
-            return Integer.valueOf(n);
-          } catch (Exception e) {
-            return 0;
-          }
-        }).filter(n -> BOX_SIZES_IN_SCU.contains(n)).toList();
+    try {
+      String text = right.getFragments().getLast().getText().replaceAll("\\s", "");
+      List<Integer> sortedSizes = new ArrayList<>(BOX_SIZES_IN_SCU);
+      List<Integer> found = new ArrayList<>();
 
-    var sortedParsedBoxSizes = new ArrayList<>(parsedBoxSizesInScu);
-    Collections.sort(sortedParsedBoxSizes);
+      // Pop values biggest-first (from the end of the sorted list)
+      for (int i = sortedSizes.size() - 1; i >= 0 && !text.isEmpty(); i--) {
+        String candidate = String.valueOf(sortedSizes.get(i));
+        if (text.endsWith(candidate)) {
+          found.add(0, sortedSizes.get(i));
+          text = text.substring(0, text.length() - candidate.length());
+        }
+      }
 
-    if (parsedBoxSizesInScu.equals(sortedParsedBoxSizes)) {
-      this.boxSizesInScu = Optional.of(parsedBoxSizesInScu);
-    } else {
-      this.boxSizesInScu = Optional.empty();
+      // Reject if there is leftover text or nothing was found
+      if (!text.isEmpty() || found.isEmpty()) {
+        boxSizesInScu = Optional.empty();
+        return;
+      }
+
+      // Reject if the found sizes are not a contiguous sub-sequence of BOX_SIZES_IN_SCU
+      int startIndex = BOX_SIZES_IN_SCU.indexOf(found.get(0));
+      List<Integer> expected = BOX_SIZES_IN_SCU.subList(startIndex, startIndex + found.size());
+      boxSizesInScu = found.equals(expected) ? Optional.of(found) : Optional.empty();
+    } catch (Exception e) {
+      logger.debug("Could not extract box sizes from: {}", right);
+      boxSizesInScu = Optional.empty();
     }
   }
 
