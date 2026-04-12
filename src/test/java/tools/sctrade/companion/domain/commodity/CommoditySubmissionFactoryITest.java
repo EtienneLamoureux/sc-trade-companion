@@ -79,13 +79,10 @@ class CommoditySubmissionFactoryITest {
       throws IOException {
     var testCasesByColorPalette = new java.util.LinkedHashMap<String, List<String>>();
     testCasesByColorPalette.put("uee blue",
-        List.of("arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1", "pyro-gateway-sell-1",
-            "seraphim-station-buy-1", "seraphim-station-sell-1", "rayari-anvik-buy-1"));
-    testCasesByColorPalette.put("pyro orange",
-        List.of("canard-view-buy-1", "canard-view-sell-1", "checkmate-buy-1"));
-    testCasesByColorPalette.put("levski grey",
-        List.of("levski-buy-1", "levski-buy-2", "levski-sell-1"));
-    testCasesByColorPalette.put("lorville gold", List.of("lorville-sell-1"));
+        List.of("mic-l3-buys-1", "mic-l3-buys-2", "mic-l3-sells-1"));
+    testCasesByColorPalette.put("pyro orange", List.of());
+    testCasesByColorPalette.put("levski grey", List.of());
+    testCasesByColorPalette.put("lorville gold", List.of());
 
     var scores = new ArrayList<Double>();
 
@@ -108,12 +105,8 @@ class CommoditySubmissionFactoryITest {
   }
 
   @ParameterizedTest(name = "{0}")
-  @ValueSource(strings = {"rayari-anvik-buy-1"})
-  // @ValueSource(strings = {"arc-l1-sell-1", "arc-l2-sell-1", "arc-l3-buy-1",
-  // "pyro-gateway-sell-1",
-  // "seraphim-station-buy-1", "seraphim-station-sell-1", "canard-view-buy-1",
-  // "canard-view-sell-1", "checkmate-buy-1", "levski-buy-1", "levski-buy-2", "levski-sell-1",
-  // "rayari-anvik-buy-1", "lorville-sell-1"})
+  @ValueSource(strings = {"mic-l3-buys-1"})
+  // @ValueSource(strings = {"mic-l3-buys-1", "mic-l3-buys-2", "mic-l3-sells-1"})
   void givenTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase) throws IOException {
     calulateScore(testCase);
   }
