@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -20,8 +19,8 @@ import tools.sctrade.companion.utils.StringUtil;
  */
 public class RawCommodityListing {
   private static final Pattern RIGHT_PATTERN =
-      Pattern.compile("([0-9\\.]+) ?scu\\R.[^0-9]?([0-9\\.km]+)\\/", Pattern.CASE_INSENSITIVE);
-  private static final Set<Integer> BOX_SIZES_IN_SCU = Set.of(1, 2, 4, 8, 16, 24, 32);
+      Pattern.compile("([0-9\\.]+) ?scu\\R.([0-9,.]+)\\/", Pattern.CASE_INSENSITIVE);
+  private static final List<Integer> BOX_SIZES_IN_SCU = List.of(1, 2, 4, 8, 16, 24, 32);
 
   private final Logger logger = LoggerFactory.getLogger(RawCommodityListing.class);
 
@@ -141,19 +140,9 @@ public class RawCommodityListing {
       Matcher matcher = RIGHT_PATTERN.matcher(rightText);
       matcher.find();
       String match = matcher.group(2).toLowerCase(Locale.ROOT);
-      boolean isMillions = match.endsWith("m");
-      boolean isThousands = match.endsWith("k");
-      match = match.replace("m", "").replace("k", "");
+      match = match.replace(".", "").replace(",", "");
 
       double price = Double.parseDouble(match);
-      isThousands = isThousands || (price % 1) > 0; // Decimals = metric notation, which is 99% kilo
-
-      if (isMillions) {
-        price *= 1000000;
-      } else if (isThousands) {
-        price *= 1000;
-      }
-
       this.price = Optional.of(price);
     } catch (Exception e) {
       logger.debug(String.format(Locale.ROOT, "Could not extract price from: %s", right));
