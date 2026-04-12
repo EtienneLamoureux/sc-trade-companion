@@ -46,19 +46,16 @@ class ItemSubmissionFactoryITest {
   @Mock
   private SettingRepository settings;
 
-  private DiskImageWriter diskImageWriter;
-
   private LocationRepository locationRepository = new TestLocationRepository();
-
   private ItemShopRepository itemShopRepository = new TestItemShopRepository();
-
   private ItemLocationReader itemLocationReader = new ItemLocationReader(locationRepository);
   private ItemShopReader itemShopReader = new ItemShopReader(itemShopRepository);
   private ItemListingFactory itemListingFactory = new ItemListingFactory(new TestItemRepository());
-  private Ocr ocr;
   private NotificationService notificationService =
       new NotificationService(new ConsoleNotificationRepository());
 
+  private DiskImageWriter diskImageWriter;
+  private Ocr ocr;
   private ItemSubmissionFactory submissionFactory;
 
   @BeforeEach
