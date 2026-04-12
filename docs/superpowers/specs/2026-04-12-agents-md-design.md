@@ -63,6 +63,9 @@ Capture the core rules from `CONTRIBUTING.md` in a concise policy-style section.
 - files in `tools.sctrade.companion.domain` must not import outside the package except for `tools.sctrade.companion.utils`;
 - public classes and methods must be documented;
 - changes must be unit tested;
+- test names should follow `given X when Y then Z`, or `when Y then X` when the setup is generic;
+- tests should assert one thing;
+- tests should be parameterized when possible;
 - changes must not reduce existing code coverage;
 - changes should respect the project structure;
 - changes should be self-explanatory;
@@ -81,6 +84,7 @@ Translate repo expectations into direct instructions for autonomous agents. This
 - use the Gradle wrapper rather than inventing alternate build tooling;
 - use `gradlew spotlessApply` when formatting/import order changes are needed;
 - use `gradlew clean build` as the primary validation gate;
+- keep new or updated tests aligned with the repository's naming and structure rules;
 - avoid claiming completion if repo constraints or local environment issues prevent full validation.
 
 This section is where the document becomes an operational manual instead of a policy summary.
@@ -134,4 +138,5 @@ That keeps the file aligned with the current contributor policy while making it 
 
 - The file should reference `CONTRIBUTING.md` rather than restating large sections verbatim.
 - It should remain specific to `sc-trade-companion`, especially around Gradle commands, formatting configuration, package-boundary rules, and local native dependencies.
+- It should explicitly document the repository's preferred test naming and structure conventions.
 - It should avoid speculative rules that are not supported by the current repository documentation or configuration.
