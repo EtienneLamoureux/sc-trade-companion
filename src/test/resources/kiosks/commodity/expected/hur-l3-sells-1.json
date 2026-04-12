@@ -1,11 +1,11 @@
-[][
+[
 	{
 		"location": "HUR-L3 Thundering Express Station",
 		"transactionType": "SELLS",
 		"commodity": "waste",
 		"price": 229.0,
 		"inventory": 75,
-		"inventoryLevel": "MAX_INVENTORY",
+		"inventoryLevel": "MAX",
 		"boxSizesInScu": [
 			1,
 			2,
@@ -24,7 +24,7 @@
 		"commodity": "nitrogen",
 		"price": 2767.0,
 		"inventory": 230,
-		"inventoryLevel": "LOW_INVENTORY",
+		"inventoryLevel": "LOW",
 		"boxSizesInScu": [
 			1,
 			2,

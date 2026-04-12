@@ -16,7 +16,7 @@
 	<logger name="tools.sctrade.companion.utils.ProcessRunner" level="INFO">
 	</logger>
 
-	<logger name="tools.sctrade.companion.domain.commodity.CommoditySubmissionFactoryITest" level="INFO">
+	<logger name="tools.sctrade.companion.domain.commodity.CommoditySubmissionFactoryITest" level="DEBUG">
 	</logger>
 
 	<logger name="tools.sctrade.companion.domain.item.ItemSubmissionFactoryITest" level="DEBUG">

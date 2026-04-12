@@ -24,7 +24,7 @@
 		"commodity": "stims",
 		"price": 5400.0,
 		"inventory": 702,
-		"inventoryLevel": "MEDIUM_INVENTORY",
+		"inventoryLevel": "MEDIUM",
 		"boxSizesInScu": [
 			1,
 			2,
