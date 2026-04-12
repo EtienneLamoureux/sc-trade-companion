@@ -13,12 +13,14 @@ import tools.sctrade.companion.domain.ocr.LocatedWord;
 
 class RawCommodityListingTest {
 
+  private static final String SOME_TEXT = "foo";
+
   static Object[][] provideValidBoxSizesInScuCases() {
     return new Object[][] {
-        {"when the right text is a subset encoded without separators then parse the subset", "124",
-            Optional.of(List.of(1, 2, 4))},
-        {"when the right text uses internal whitespace then strip it before parsing", "1\t2\n4",
-            Optional.of(List.of(1, 2, 4))},
+        {"when the right text is a subset encoded without separators then parse the subset",
+            "2481624", Optional.of(List.of(2, 4, 8, 16, 24))},
+        {"when the right text uses internal whitespace then strip it before parsing", "1\t2\n4 8",
+            Optional.of(List.of(1, 2, 4, 8))},
         {"when the right text encodes the full set then parse every box size", "1248162432",
             Optional.of(List.of(1, 2, 4, 8, 16, 24, 32))}};
   }
@@ -27,14 +29,14 @@ class RawCommodityListingTest {
   @MethodSource("provideValidBoxSizesInScuCases")
   void givenBoxSizeTextWhenParsingThenReturnExpectedBoxSizesInScu(String name, String rightText,
       Optional<List<Integer>> expectedBoxSizesInScu) {
-    var listing = new RawCommodityListing(columnWithText("foo"), columnWithText(rightText));
+    var listing = new RawCommodityListing(columnWithText(SOME_TEXT), columnWithText(rightText));
 
     assertEquals(expectedBoxSizesInScu, listing.getBoxSizesInScu());
   }
 
   static Object[][] provideInvalidBoxSizesInScuCases() {
     return new Object[][] {
-        {"when the right text repeats an encoded size then return empty", "121", Optional.empty()},
+        {"when the right text has gaps in the sequence then return empty", "128", Optional.empty()},
         {"when the right text leaves leftover content then return empty", "1245", Optional.empty()},
         {"when the right text contains no encoded box sizes then return empty", "999",
             Optional.empty()}};
@@ -44,7 +46,7 @@ class RawCommodityListingTest {
   @MethodSource("provideInvalidBoxSizesInScuCases")
   void givenInvalidBoxSizeTextWhenParsingThenReturnEmpty(String name, String rightText,
       Optional<List<Integer>> expectedBoxSizesInScu) {
-    var listing = new RawCommodityListing(columnWithText("foo"), columnWithText(rightText));
+    var listing = new RawCommodityListing(columnWithText(SOME_TEXT), columnWithText(rightText));
 
     assertEquals(expectedBoxSizesInScu, listing.getBoxSizesInScu());
   }
