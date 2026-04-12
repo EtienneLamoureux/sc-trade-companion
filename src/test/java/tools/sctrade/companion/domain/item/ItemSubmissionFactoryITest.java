@@ -50,8 +50,10 @@ class ItemSubmissionFactoryITest {
 
   private LocationRepository locationRepository = new TestLocationRepository();
 
+  private ItemShopRepository itemShopRepository = new TestItemShopRepository();
+
   private ItemLocationReader itemLocationReader = new ItemLocationReader(locationRepository);
-  private ItemShopReader itemShopReader = new ItemShopReader();
+  private ItemShopReader itemShopReader = new ItemShopReader(itemShopRepository);
   private ItemListingFactory itemListingFactory = new ItemListingFactory(new TestItemRepository());
   private Ocr ocr;
   private NotificationService notificationService =
