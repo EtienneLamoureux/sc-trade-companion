@@ -19,7 +19,7 @@ import tools.sctrade.companion.utils.StringUtil;
  */
 public class RawCommodityListing {
   private static final Pattern RIGHT_PATTERN =
-      Pattern.compile("([0-9\\.]+) ?scu\\R.([0-9,.]+)\\/", Pattern.CASE_INSENSITIVE);
+      Pattern.compile("([0-9\\.]+) ?scu\\R[^0-9]?([0-9,.]+)\\/", Pattern.CASE_INSENSITIVE);
   private static final List<Integer> BOX_SIZES_IN_SCU = List.of(1, 2, 4, 8, 16, 24, 32);
 
   private final Logger logger = LoggerFactory.getLogger(RawCommodityListing.class);
