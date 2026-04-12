@@ -232,7 +232,7 @@ public class AppConfig {
       NotificationService notificationService, ItemListingFactory itemListingFactory,
       ItemLocationReader itemLocationReader, ItemShopReader itemShopReader,
       DiskImageWriter diskImageWriter) {
-    Ocr ocr = new OneOcr(List.of(new AlignToTemplate()), diskImageWriter);
+    Ocr ocr = new OneOcr(List.of(), diskImageWriter);
 
     return new ItemSubmissionFactory(userService, notificationService, itemListingFactory,
         itemLocationReader, itemShopReader, ocr);
