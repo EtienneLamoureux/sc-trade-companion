@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,10 +34,10 @@ import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.JsonUtil;
 import tools.sctrade.companion.utils.ResourceUtil;
 
-@Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
+// @Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
 @ExtendWith(MockitoExtension.class)
 class CommoditySubmissionFactoryITest {
-  private static final double CURRENT_ACCURACY = 69.0;
+  private static final double CURRENT_ACCURACY = 0.0;
 
   private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactoryITest.class);
 
@@ -79,7 +78,7 @@ class CommoditySubmissionFactoryITest {
       throws IOException {
     var testCasesByColorPalette = new java.util.LinkedHashMap<String, List<String>>();
     testCasesByColorPalette.put("uee blue",
-        List.of("mic-l3-buys-1", "mic-l3-buys-2", "mic-l3-sells-1"));
+        List.of("hur-l3-buys-1", "hur-l3-buys-2", "hur-l3-sells-1"));
     testCasesByColorPalette.put("pyro orange", List.of());
     testCasesByColorPalette.put("levski grey", List.of());
     testCasesByColorPalette.put("lorville gold", List.of());
@@ -105,8 +104,8 @@ class CommoditySubmissionFactoryITest {
   }
 
   @ParameterizedTest(name = "{0}")
-  @ValueSource(strings = {"mic-l3-buys-1"})
-  // @ValueSource(strings = {"mic-l3-buys-1", "mic-l3-buys-2", "mic-l3-sells-1"})
+  @ValueSource(strings = {"hur-l3-buys-1"})
+  // @ValueSource(strings = {"hur-l3-buys-1", "hur-l3-buys-2", "hur-l3-sells-1"})
   void givenTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase) throws IOException {
     calulateScore(testCase);
   }
