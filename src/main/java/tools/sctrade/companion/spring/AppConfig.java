@@ -60,6 +60,7 @@ import tools.sctrade.companion.output.commodity.ScTradeToolsCommodityPublisher;
 import tools.sctrade.companion.output.item.ItemCsvWriter;
 import tools.sctrade.companion.output.item.ScTradeToolsItemPublisher;
 import tools.sctrade.companion.output.item.ScTradeToolsItemRepository;
+import tools.sctrade.companion.output.item.ScTradeToolsItemShopRepository;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
@@ -169,6 +170,12 @@ public class AppConfig {
   @Bean
   public ScTradeToolsItemRepository buildScTradeToolsItemRepository(ScTradeToolsClient client) {
     return new ScTradeToolsItemRepository(client);
+  }
+
+  @Bean
+  public ScTradeToolsItemShopRepository buildScTradeToolsItemShopRepository(
+      ScTradeToolsClient client) {
+    return new ScTradeToolsItemShopRepository(client);
   }
 
   @Bean
