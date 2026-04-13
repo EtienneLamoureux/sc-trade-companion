@@ -3,9 +3,9 @@ package tools.sctrade.companion.spring;
 import java.awt.EventQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.springframework.scheduling.annotation.Async;
+import tools.sctrade.companion.domain.CompanionVersionRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.gui.CompanionGui;
-import tools.sctrade.companion.output.ScTradeToolsCompanionVersionRepository;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 /**
@@ -13,7 +13,7 @@ import tools.sctrade.companion.utils.LocalizationUtil;
  * an update is found.
  */
 public class CompanionVersionChecker {
-  private final ScTradeToolsCompanionVersionRepository repository;
+  private final CompanionVersionRepository repository;
   private final CompanionGui gui;
   private final NotificationService notificationService;
   private final String currentVersion;
@@ -27,8 +27,8 @@ public class CompanionVersionChecker {
    * @param notificationService the notification service, used to warn when the check fails
    * @param currentVersion the version of the currently running application
    */
-  public CompanionVersionChecker(ScTradeToolsCompanionVersionRepository repository,
-      CompanionGui gui, NotificationService notificationService, String currentVersion) {
+  public CompanionVersionChecker(CompanionVersionRepository repository, CompanionGui gui,
+      NotificationService notificationService, String currentVersion) {
     this.repository = repository;
     this.gui = gui;
     this.notificationService = notificationService;

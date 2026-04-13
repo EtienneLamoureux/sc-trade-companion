@@ -16,6 +16,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
+import tools.sctrade.companion.domain.CompanionVersionRepository;
 import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.commodity.CommodityListingFactory;
 import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
@@ -170,9 +171,8 @@ public class AppConfig {
   }
 
   @Bean
-  public CompanionVersionChecker buildCompanionVersionChecker(
-      ScTradeToolsCompanionVersionRepository repository, CompanionGui companionGui,
-      NotificationService notificationService) {
+  public CompanionVersionChecker buildCompanionVersionChecker(CompanionVersionRepository repository,
+      CompanionGui companionGui, NotificationService notificationService) {
     return new CompanionVersionChecker(repository, companionGui, notificationService, getVersion());
   }
 

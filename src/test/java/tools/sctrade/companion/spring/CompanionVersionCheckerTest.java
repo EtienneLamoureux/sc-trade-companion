@@ -13,9 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.sctrade.companion.domain.CompanionVersionRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.gui.CompanionGui;
-import tools.sctrade.companion.output.ScTradeToolsCompanionVersionRepository;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,7 +24,7 @@ class CompanionVersionCheckerTest {
   private static final String LATEST_VERSION = "1.1.0";
 
   @Mock
-  private ScTradeToolsCompanionVersionRepository mockRepository;
+  private CompanionVersionRepository mockRepository;
   @Mock
   private CompanionGui mockGui;
   @Mock
