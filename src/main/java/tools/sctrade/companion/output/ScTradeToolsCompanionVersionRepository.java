@@ -20,7 +20,13 @@ public class ScTradeToolsCompanionVersionRepository implements CompanionVersionR
 
   @Override
   public String fetchLatestVersion() {
-    return webClient.get().uri("/api/crowdsource/companion-versions/latest").retrieve()
+    String version = webClient.get().uri("/api/crowdsource/companion-versions/latest").retrieve()
         .bodyToMono(String.class).block();
+
+    if (version == null || version.isBlank()) {
+      throw new IllegalStateException("Received null or blank latest-version response");
+    }
+
+    return version;
   }
 }
