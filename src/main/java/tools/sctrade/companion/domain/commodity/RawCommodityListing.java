@@ -92,7 +92,8 @@ public class RawCommodityListing {
       fragments.remove(fragments.size() - 1);
       String rawCommodity =
           fragments.stream().map(n -> n.getText()).collect(Collectors.joining(" "));
-      rawCommodity = rawCommodity.replaceAll("[^a-zA-Z ]", "").strip();
+      rawCommodity = rawCommodity.replaceAll("[^a-zA-Z ]", "").strip()
+          .replaceFirst("^(?:in )?(?:stock )|^(?:out )?(?:of )?(?:stock )", "");
       commodity = Optional.of(rawCommodity);
     } catch (Exception e) {
       logger.debug(String.format(Locale.ROOT, "Could not extract commodity from: %s", left));

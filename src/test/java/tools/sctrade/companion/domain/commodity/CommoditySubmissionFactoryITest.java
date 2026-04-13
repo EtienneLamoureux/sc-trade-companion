@@ -77,8 +77,7 @@ class CommoditySubmissionFactoryITest {
   void givenTestCasesByColorPaletteWhenProcessingThenCalculateOverallAccuracyScore()
       throws IOException {
     var testCasesByColorPalette = new java.util.LinkedHashMap<String, List<String>>();
-    testCasesByColorPalette.put("uee blue",
-        List.of("hur-l3-buys-1", "hur-l3-buys-2", "hur-l3-sells-1"));
+    testCasesByColorPalette.put("uee blue", List.of("hur-l3-buys-1", "hur-l3-sells-1"));
     testCasesByColorPalette.put("pyro orange", List.of());
     testCasesByColorPalette.put("levski grey", List.of());
     testCasesByColorPalette.put("lorville gold", List.of());
@@ -104,8 +103,8 @@ class CommoditySubmissionFactoryITest {
   }
 
   @ParameterizedTest(name = "{0}")
-  @ValueSource(strings = {"hur-l3-buys-1"})
-  // @ValueSource(strings = {"hur-l3-buys-1", "hur-l3-buys-2", "hur-l3-sells-1"})
+  @ValueSource(strings = {"hur-l3-buys-2"})
+  // @ValueSource(strings = {"hur-l3-buys-1", "hur-l3-sells-1"})
   void givenTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase) throws IOException {
     calulateScore(testCase);
   }
