@@ -1,6 +1,7 @@
 package tools.sctrade.companion.output;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -8,6 +9,9 @@ import static org.mockito.Mockito.when;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -58,5 +62,18 @@ class ScTradeToolsCompanionVersionRepositoryTest {
     String result = repository.fetchLatestVersion();
 
     assertEquals(VERSION, result);
+  }
+
+  @ParameterizedTest
+  @NullAndEmptySource
+  @ValueSource(strings = {" ", "\t", "\n"})
+  void givenNullOrBlankBodyWhenFetchingLatestVersionThenThrows(String body) {
+    doReturn(requestHeadersUriSpec).when(webClient).get();
+    doReturn(requestHeadersUriSpec).when(requestHeadersUriSpec).uri(LATEST_VERSION_ENDPOINT);
+    doReturn(responseSpec).when(requestHeadersUriSpec).retrieve();
+    Mono<String> mono = body == null ? Mono.empty() : Mono.just(body);
+    when(responseSpec.bodyToMono(String.class)).thenReturn(mono);
+
+    assertThrows(IllegalStateException.class, () -> repository.fetchLatestVersion());
   }
 }
