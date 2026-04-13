@@ -55,6 +55,7 @@ import tools.sctrade.companion.input.LineListener;
 import tools.sctrade.companion.input.ScreenPrinter;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.output.ScTradeToolsClient;
+import tools.sctrade.companion.output.ScTradeToolsCompanionVersionRepository;
 import tools.sctrade.companion.output.ScTradeToolsLocationRepository;
 import tools.sctrade.companion.output.commodity.CommodityCsvWriter;
 import tools.sctrade.companion.output.commodity.ScTradeToolsCommodityPublisher;
@@ -160,6 +161,19 @@ public class AppConfig {
   public ScTradeToolsClient buildScTradeToolsClient(WebClient.Builder webClientBuilder,
       SettingRepository settings) {
     return new ScTradeToolsClient(webClientBuilder, settings, getVersion());
+  }
+
+  @Bean
+  public ScTradeToolsCompanionVersionRepository buildScTradeToolsCompanionVersionRepository(
+      ScTradeToolsClient client) {
+    return new ScTradeToolsCompanionVersionRepository(client);
+  }
+
+  @Bean
+  public CompanionVersionChecker buildCompanionVersionChecker(
+      ScTradeToolsCompanionVersionRepository repository, CompanionGui companionGui,
+      NotificationService notificationService) {
+    return new CompanionVersionChecker(repository, companionGui, notificationService, getVersion());
   }
 
   @Bean
