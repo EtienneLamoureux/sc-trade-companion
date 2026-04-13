@@ -72,6 +72,19 @@ public class CompanionGui extends JFrame implements NotificationRepository {
     setupTray();
   }
 
+  /**
+   * Shows a popup informing the user that a newer version is available.
+   *
+   * <p>
+   * Placeholder — full popup UI will be implemented in a later task.
+   *
+   * @param currentVersion the currently running version
+   * @param latestVersion the latest available version
+   */
+  public void showUpdateAvailablePopup(String currentVersion, String latestVersion) {
+    // TODO: implement popup dialog in a later task
+  }
+
   @Override
   public void add(NotificationLevel level, String message) {
     if (logsTab != null) {
