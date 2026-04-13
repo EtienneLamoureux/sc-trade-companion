@@ -1,6 +1,7 @@
 package tools.sctrade.companion.spring;
 
 import java.awt.EventQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.springframework.scheduling.annotation.Async;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.gui.CompanionGui;
@@ -16,7 +17,7 @@ public class CompanionVersionChecker {
   private final CompanionGui gui;
   private final NotificationService notificationService;
   private final String currentVersion;
-  private volatile boolean popupAlreadyShown;
+  private final AtomicBoolean popupAlreadyShown = new AtomicBoolean(false);
 
   /**
    * Constructs a new {@link CompanionVersionChecker}.
@@ -32,7 +33,6 @@ public class CompanionVersionChecker {
     this.gui = gui;
     this.notificationService = notificationService;
     this.currentVersion = currentVersion;
-    this.popupAlreadyShown = false;
   }
 
   /**
@@ -49,15 +49,14 @@ public class CompanionVersionChecker {
    * service and no popup is shown.
    */
   public void check() {
-    if (popupAlreadyShown) {
+    if (popupAlreadyShown.get()) {
       return;
     }
 
     try {
       String latestVersion = repository.fetchLatestVersion();
 
-      if (!currentVersion.equals(latestVersion)) {
-        popupAlreadyShown = true;
+      if (!currentVersion.equals(latestVersion) && popupAlreadyShown.compareAndSet(false, true)) {
         EventQueue.invokeLater(() -> gui.showUpdateAvailablePopup(currentVersion, latestVersion));
       }
     } catch (RuntimeException e) {
