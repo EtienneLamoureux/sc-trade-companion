@@ -11,8 +11,6 @@ import java.lang.reflect.InvocationTargetException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tools.sctrade.companion.domain.CompanionVersionRepository;
@@ -97,9 +95,8 @@ class CompanionVersionCheckerTest {
     verify(mockGui, never()).showUpdateAvailablePopup(anyString(), anyString());
   }
 
-  @ParameterizedTest
-  @ValueSource(strings = {"", " ", "\t"})
-  void givenBlankVersionResponseWhenCheckingThenWarns(String blank)
+  @Test
+  void givenBlankVersionResponseWhenCheckingThenWarns()
       throws InterruptedException, InvocationTargetException {
     when(mockRepository.fetchLatestVersion())
         .thenThrow(new IllegalStateException("Received null or blank latest-version response"));
@@ -110,9 +107,8 @@ class CompanionVersionCheckerTest {
     verify(mockNotificationService).warn(LocalizationUtil.get("warningUnableToCheckLatestVersion"));
   }
 
-  @ParameterizedTest
-  @ValueSource(strings = {"", " ", "\t"})
-  void givenBlankVersionResponseWhenCheckingThenDoesNotShowPopup(String blank)
+  @Test
+  void givenBlankVersionResponseWhenCheckingThenDoesNotShowPopup()
       throws InterruptedException, InvocationTargetException {
     when(mockRepository.fetchLatestVersion())
         .thenThrow(new IllegalStateException("Received null or blank latest-version response"));
