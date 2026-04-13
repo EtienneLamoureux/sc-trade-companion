@@ -1,0 +1,38 @@
+[
+	{
+		"name": "MSD-524 MISSILE RACK",
+		"price": 31310,
+		"location": "HUR-L2 FAITHFUL DREAM STATION",
+		"shop": "ship weapons"
+	},
+	{
+		"name": "MSD-582 MISSILE RACK",
+		"price": 13915,
+		"location": "HUR-L2 FAITHFUL DREAM STATION",
+		"shop": "ship weapons"
+	},
+	{
+		"name": "MSD-625 MISSILE RACK",
+		"price": 78280,
+		"location": "HUR-L2 FAITHFUL DREAM STATION",
+		"shop": "ship weapons"
+	},
+	{
+		"name": "MSD-543 MISSILE RACK",
+		"price": 20875,
+		"location": "HUR-L2 FAITHFUL DREAM STATION",
+		"shop": "ship weapons"
+	},
+	{
+		"name": "MSD-616 MISSILE RACK",
+		"price": 117415,
+		"location": "HUR-L2 FAITHFUL DREAM STATION",
+		"shop": "ship weapons"
+	},
+	{
+		"name": "MSD-683 MISSILE RACK",
+		"price": 34790,
+		"location": "HUR-L2 FAITHFUL DREAM STATION",
+		"shop": "ship weapons"
+	}
+]

@@ -1,0 +1,38 @@
+[
+	{
+		"name": "ADP ARMS DARK RED",
+		"price": 1559,
+		"location": "area18",
+		"shop": "cubby blast"
+	},
+	{
+		"name": "ADP ARMS ORANGE",
+		"price": 1326,
+		"location": "area18",
+		"shop": "cubby blast"
+	},
+	{
+		"name": "ADP ARMS RED",
+		"price": 1559,
+		"location": "area18",
+		"shop": "cubby blast"
+	},
+	{
+		"name": "ADP ARMS OLIVE",
+		"price": 1326,
+		"location": "area18",
+		"shop": "cubby blast"
+	},
+	{
+		"name": "ADP ARMS PURPLE",
+		"price": 1559,
+		"location": "area18",
+		"shop": "cubby blast"
+	},
+	{
+		"name": "ADP ARMS SEAGREEN",
+		"price": 1559,
+		"location": "area18",
+		"shop": "cubby blast"
+	}
+]

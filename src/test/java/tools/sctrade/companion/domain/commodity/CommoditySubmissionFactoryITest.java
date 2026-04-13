@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,10 +35,10 @@ import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.JsonUtil;
 import tools.sctrade.companion.utils.ResourceUtil;
 
-// @Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
+@Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
 @ExtendWith(MockitoExtension.class)
 class CommoditySubmissionFactoryITest {
-  private static final double CURRENT_ACCURACY = 0.0;
+  private static final double CURRENT_ACCURACY = 100.0;
 
   private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactoryITest.class);
 

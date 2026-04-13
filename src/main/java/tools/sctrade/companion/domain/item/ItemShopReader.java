@@ -53,6 +53,7 @@ public class ItemShopReader extends LocationReader {
   protected Optional<String> spellCheckLocation(String rawLocation) {
     try {
       String normalized = rawLocation.replace("+", " ").trim();
+      normalized = inferFromFragment(normalized);
       String spellChecked = StringUtil.spellCheck(normalized, itemShopRepository.findAllTypes());
       return Optional.of(spellChecked);
     } catch (NoCloseStringException e) {
@@ -111,5 +112,28 @@ public class ItemShopReader extends LocationReader {
   private Optional<LocatedFragment> findWalletFragment(OcrResult ocrResult) {
     return ocrResult.getFragments().parallelStream()
         .filter(n -> n.getText().trim().startsWith(WALLET)).findFirst();
+  }
+
+  /**
+   * Some item shop names in the top-middle of the screen are more logos than names. This method
+   * tries to infer the shop name from the OCR fragments.
+   *
+   * @param normalized the normalized shop name, with special characters removed and trimmed
+   * @return the inferred shop name, or the original normalized name if no inference could be made
+   */
+  private String inferFromFragment(String normalized) {
+    if (normalized.contains("mas") || normalized.contains("ass")) {
+      return "centermass";
+    }
+
+    if (normalized.contains("since") || normalized.contains("2932")) {
+      return "cubby blast";
+    }
+
+    if (normalized.contains("cargo")) {
+      return "cargo services";
+    }
+
+    return normalized;
   }
 }

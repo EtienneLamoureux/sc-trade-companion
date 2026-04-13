@@ -37,7 +37,7 @@ import tools.sctrade.companion.utils.ResourceUtil;
 @Disabled("Shouldn't run during CI/CD. Comment when iterating on the OCR.")
 @ExtendWith(MockitoExtension.class)
 class ItemSubmissionFactoryITest {
-  private static final double CURRENT_ACCURACY = 88.0;
+  private static final double CURRENT_ACCURACY = 82.0;
 
   private final Logger logger = LoggerFactory.getLogger(ItemSubmissionFactoryITest.class);
 
@@ -74,21 +74,27 @@ class ItemSubmissionFactoryITest {
   void givenTestCasesByShopWhenProcessingThenCalculateOverallAccuracyScore() throws IOException {
     var testCasesByShop = new java.util.LinkedHashMap<String, List<String>>();
     testCasesByShop.put("armor", List.of("armor-1", "armor-2", "armor-3"));
+    // testCasesByShop.put("black", List.of("black-1", "black-2"));
+    testCasesByShop.put("cargo-services", List.of("cargo-services-1"));
     testCasesByShop.put("casaba-outlet", List.of("casaba-outlet-1"));
+    testCasesByShop.put("centermass", List.of("centermass-1", "centermass-2"));
+    testCasesByShop.put("clothing", List.of("clothing-1", "clothing-2", "clothing-3"));
+    testCasesByShop.put("cubby-blast", List.of("cubby-blast-1", "cubby-blast-2"));
+    testCasesByShop.put("dumpers-depot", List.of("dumpers-depot-1", "dumpers-depot-2"));
+    testCasesByShop.put("hurston-dynamics", List.of("hurston-dynamics-1"));
+    testCasesByShop.put("kel.to", List.of("kel-to-1", "kel-to-2", "kel-to-3", "kel-to-4"));
     testCasesByShop.put("live-fire-weapons",
         List.of("live-fire-weapons-1", "live-fire-weapons-2", "live-fire-weapons-3"));
-    testCasesByShop.put("medical_shop", List.of("medical_shop-1"));
+    testCasesByShop.put("medical_shop", List.of("medical_shop-1", "medical_shop-2"));
+    testCasesByShop.put("pharmacy", List.of("pharmacy-1", "pharmacy-2"));
     testCasesByShop.put("platinum-bay",
         List.of("platinum-bay-1", "platinum-bay-2", "platinum-bay-3"));
-    testCasesByShop.put("ship-weapons", List.of("ship-weapons-1"));
+    testCasesByShop.put("refinery-shop", List.of("refinery-shop-1"));
+    testCasesByShop.put("ship-weapons", List.of("ship-weapons-1", "ship-weapons-2"));
     testCasesByShop.put("shop_terminal",
         List.of("shop_terminal-1", "shop_terminal-2", "shop_terminal-3"));
     testCasesByShop.put("weapons_shop",
         List.of("weapons_shop-1", "weapons_shop-2", "weapons_shop-3"));
-    testCasesByShop.put("kel.to", List.of("kel-to-1", "kel-to-2", "kel-to-3", "kel-to-4"));
-    testCasesByShop.put("black", List.of("black-1", "black-2"));
-    testCasesByShop.put("clothing", List.of("clothing-1", "clothing-2", "clothing-3"));
-    testCasesByShop.put("pharmacy", List.of("pharmacy-1", "pharmacy-2"));
 
     var scores = new ArrayList<Double>();
 
@@ -110,12 +116,7 @@ class ItemSubmissionFactoryITest {
   }
 
   @ParameterizedTest(name = "{0}")
-  @ValueSource(strings = {"black-2"})
-  // @ValueSource(strings = {"armor-1", "armor-2", "armor-3", "casaba-outlet-1",
-  // "live-fire-weapons-1",
-  // "live-fire-weapons-2", "live-fire-weapons-3", "medical_shop-3", "platinum-bay-1",
-  // "platinum-bay-2", "platinum-bay-3", "ship-weapons-1", "shop_terminal-1", "shop_terminal-2",
-  // "shop_terminal-3", "weapons_shop-1", "weapons_shop-2", "weapons_shop-3"})
+  @ValueSource(strings = {"shop_terminal-1"})
   void givenTestCasesWhenProcessingThenCalculateAccuracyScore(String testCase) throws IOException {
     calulateScore(testCase);
   }

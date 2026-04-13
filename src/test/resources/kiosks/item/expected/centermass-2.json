@@ -1,0 +1,38 @@
+[
+	{
+		"name": "scimitar v-g missile",
+		"price": 14170.0,
+		"location": "area18",
+		"shop": "centermass"
+	},
+	{
+		"name": "SEEKER IX TORPEDO",
+		"price": 297540.0,
+		"location": "area18",
+		"shop": "centermass"
+	},
+	{
+		"name": "SION COMPENSATOR2",
+		"price": 450.0,
+		"location": "area18",
+		"shop": "centermass"
+	},
+	{
+		"name": "SCORPION GT-215 GATLING",
+		"price": 12494.0,
+		"location": "area18",
+		"shop": "centermass"
+	},
+	{
+		"name": "SION COMPENSATOR1",
+		"price": 300.0,
+		"location": "area18",
+		"shop": "centermass"
+	},
+	{
+		"name": "SLEDGE I MASS DRIVER CANNON",
+		"price": 11476.0,
+		"location": "area18",
+		"shop": "centermass"
+	}
+]

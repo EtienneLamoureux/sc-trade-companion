@@ -1,0 +1,38 @@
+[
+	{
+		"name": "ATTRITION-1 REPEATER",
+		"price": 10241,
+		"location": "lorville",
+		"shop": "hurston dynamics"
+	},
+	{
+		"name": "ATTRITION-3 REPEATER",
+		"price": 51851,
+		"location": "lorville",
+		"shop": "hurston dynamics"
+	},
+	{
+		"name": "ATTRITION-5 REPEATER",
+		"price": 262495,
+		"location": "lorville",
+		"shop": "hurston dynamics"
+	},
+	{
+		"name": "ATTRITION-2 REPEATER",
+		"price": 23047,
+		"location": "lorville",
+		"shop": "hurston dynamics"
+	},
+	{
+		"name": "ATTRITION-4 REPEATER",
+		"price": 116665,
+		"location": "lorville",
+		"shop": "hurston dynamics"
+	},
+	{
+		"name": "ATTRITION-6 REPEATER",
+		"price": 590615,
+		"location": "lorville",
+		"shop": "hurston dynamics"
+	}
+]

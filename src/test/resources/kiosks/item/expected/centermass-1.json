@@ -1,0 +1,38 @@
+[
+	{
+		"name": "p4-ar \"warhawk\" rifle",
+		"price": 4559.0,
+		"location": "area18",
+		"shop": "centermass"
+	},
+	{
+		"name": "p6-lr magazine (8 cap)",
+		"price": 446.0,
+		"location": "area18",
+		"shop": "centermass"
+	},
+	{
+		"name": "p8-sc",
+		"price": 2936.0,
+		"location": "area18",
+		"shop": "centermass"
+	},
+	{
+		"name": "p4-ar magazine (40 cap)",
+		"price": 198.0,
+		"location": "area18",
+		"shop": "centermass"
+	},
+	{
+		"name": "p8-ar rifle magazine (15 cap)",
+		"price": 149.0,
+		"location": "area18",
+		"shop": "centermass"
+	},
+	{
+		"name": "p8-sc",
+		"price": 2936.0,
+		"location": "area18",
+		"shop": "centermass"
+	}
+]

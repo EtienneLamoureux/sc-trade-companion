@@ -1,0 +1,38 @@
+[
+	{
+		"name": "DAY ONE SHIRT GREY",
+		"price": 570,
+		"location": "arc-l1 wide forest station",
+		"shop": "refinery shop"
+	},
+	{
+		"name": "DAY ONE SHIRT SEAGREEN",
+		"price": 570,
+		"location": "arc-l1 wide forest station",
+		"shop": "refinery shop"
+	},
+	{
+		"name": "DRAKE ORE POD",
+		"price": 25500,
+		"location": "arc-l1 wide forest station",
+		"shop": "refinery shop"
+	},
+	{
+		"name": "DAY ONE SHIRT OLIVE",
+		"price": 570,
+		"location": "arc-l1 wide forest station",
+		"shop": "refinery shop"
+	},
+	{
+		"name": "DECONPEN (CANOIODIDE)",
+		"price": 265,
+		"location": "arc-l1 wide forest station",
+		"shop": "refinery shop"
+	},
+	{
+		"name": "EDGEWEAR PANTS",
+		"price": 465,
+		"location": "arc-l1 wide forest station",
+		"shop": "refinery shop"
+	}
+]
