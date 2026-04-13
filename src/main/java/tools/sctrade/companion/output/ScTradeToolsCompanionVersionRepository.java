@@ -1,14 +1,29 @@
 package tools.sctrade.companion.output;
 
+import org.springframework.web.reactive.function.client.WebClient;
+
 /**
- * Repository for fetching the latest published version of SC Trade Companion from sc-trade.tools.
+ * sc-trade.tools adapter for fetching the latest published version of SC Trade Companion.
  */
-public interface ScTradeToolsCompanionVersionRepository {
+public class ScTradeToolsCompanionVersionRepository {
+  private final WebClient webClient;
 
   /**
-   * Returns the latest available version string (e.g. {@code "1.2.3"}).
+   * Creates a new instance of {@link ScTradeToolsCompanionVersionRepository}.
    *
-   * @return the latest version string
+   * @param client The sc-trade.tools HTTP client.
    */
-  String fetchLatestVersion();
+  public ScTradeToolsCompanionVersionRepository(ScTradeToolsClient client) {
+    this.webClient = client.getWebClient();
+  }
+
+  /**
+   * Fetches the latest available version string from sc-trade.tools.
+   *
+   * @return the latest version string (e.g. {@code "1.2.3"})
+   */
+  public String fetchLatestVersion() {
+    return webClient.get().uri("/api/crowdsource/companion-versions/latest").retrieve()
+        .bodyToMono(String.class).block();
+  }
 }
