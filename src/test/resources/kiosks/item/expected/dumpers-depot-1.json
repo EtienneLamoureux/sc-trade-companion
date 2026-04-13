@@ -1,0 +1,38 @@
+[
+	{
+		"name": "TRAWLER SCRAPER MODULE",
+		"price": 31150,
+		"location": "area18",
+		"shop": "dumper's depot"
+	},
+	{
+		"name": "TRUHOLD TRACTOR BEAM ATTACHMENT",
+		"price": 450,
+		"location": "area18",
+		"shop": "dumper's depot"
+	},
+	{
+		"name": "UNE GOLD INGOT (DAMAGED)",
+		"price": 1550,
+		"location": "area18",
+		"shop": "dumper's depot"
+	},
+	{
+		"name": "TROMMEL",
+		"price": 42637,
+		"location": "area18",
+		"shop": "dumper's depot"
+	},
+	{
+		"name": "TYPHOON IX TORPEDO",
+		"price": 297540,
+		"location": "area18",
+		"shop": "dumper's depot"
+	},
+	{
+		"name": "UNE UNIFICATION WAR MEDAL (DAMAGED)",
+		"price": 960,
+		"location": "area18",
+		"shop": "dumper's depot"
+	}
+]

@@ -1,0 +1,38 @@
+[
+	{
+		"name": "ADRENAPEN (DEMEXATRINE)",
+		"price": 260,
+		"location": "Megumi Refueling",
+		"shop": "medical_shop"
+	},
+	{
+		"name": "DECONPEN (CANOIODIDE)",
+		"price": 265,
+		"location": "Megumi Refueling",
+		"shop": "medical_shop"
+	},
+	{
+		"name": "LIFEGUARD MEDICAL ATTACHMENT",
+		"price": 350,
+		"location": "Megumi Refueling",
+		"shop": "medical_shop"
+	},
+	{
+		"name": "CORTICOPEN (STEROGEN)",
+		"price": 295,
+		"location": "Megumi Refueling",
+		"shop": "medical_shop"
+	},
+	{
+		"name": "DETOXPEN (RESURGERA)",
+		"price": 240,
+		"location": "Megumi Refueling",
+		"shop": "medical_shop"
+	},
+	{
+		"name": "LIFEGUARD REFILL",
+		"price": 125,
+		"location": "Megumi Refueling",
+		"shop": "medical_shop"
+	}
+]

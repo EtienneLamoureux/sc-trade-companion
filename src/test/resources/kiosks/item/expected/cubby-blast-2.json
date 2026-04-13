@@ -1,0 +1,38 @@
+[
+	{
+		"name": "ARGUS HELMET BLACK/SILVER/YELLOW",
+		"price": 1472,
+		"location": "area18",
+		"shop": "cubby blast"
+	},
+	{
+		"name": "ARGUS HELMET GOLD/GREY/BLACK",
+		"price": 1795,
+		"location": "area18",
+		"shop": "cubby blast"
+	},
+	{
+		"name": "ARGUS HELMET RED/SILVER",
+		"price": 1472,
+		"location": "area18",
+		"shop": "cubby blast"
+	},
+	{
+		"name": "ARGUS HELMET BLACK/WHITE/VIOLET",
+		"price": 1795,
+		"location": "area18",
+		"shop": "cubby blast"
+	},
+	{
+		"name": "ARGUS HELMET GREY/GREEN",
+		"price": 1795,
+		"location": "area18",
+		"shop": "cubby blast"
+	},
+	{
+		"name": "ARGUS HELMET SILVER/GOLD/GREY",
+		"price": 1795,
+		"location": "area18",
+		"shop": "cubby blast"
+	}
+]

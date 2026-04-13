@@ -1,4 +1,15 @@
 # SC Trade Companion
+## 1.5.1
+4.7 changed the number formatting of the prices shown on the commodity kiosks. This release correctly supports those new changes.
+
+### Bugs
+- Fix many causes of "[Code 5] Listings could not be read"
+- Fix an issue when parsing available box sizes
+
+### Other
+- Remove unnecessary pre-processing when reading item kiosks
+- Spellcheck item kiosk shop names
+
 ## 1.5.0
 ### Features
 - Read FPS gear, equipment and ship component (collectively known as items) kiosks

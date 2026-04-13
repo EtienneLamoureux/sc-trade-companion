@@ -34,6 +34,7 @@ import tools.sctrade.companion.domain.item.ItemListingFactory;
 import tools.sctrade.companion.domain.item.ItemLocationReader;
 import tools.sctrade.companion.domain.item.ItemService;
 import tools.sctrade.companion.domain.item.ItemShopReader;
+import tools.sctrade.companion.domain.item.ItemShopRepository;
 import tools.sctrade.companion.domain.item.ItemSubmissionFactory;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
@@ -60,6 +61,7 @@ import tools.sctrade.companion.output.commodity.ScTradeToolsCommodityPublisher;
 import tools.sctrade.companion.output.item.ItemCsvWriter;
 import tools.sctrade.companion.output.item.ScTradeToolsItemPublisher;
 import tools.sctrade.companion.output.item.ScTradeToolsItemRepository;
+import tools.sctrade.companion.output.item.ScTradeToolsItemShopRepository;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
@@ -172,6 +174,12 @@ public class AppConfig {
   }
 
   @Bean
+  public ScTradeToolsItemShopRepository buildScTradeToolsItemShopRepository(
+      ScTradeToolsClient client) {
+    return new ScTradeToolsItemShopRepository(client);
+  }
+
+  @Bean
   public ScTradeToolsCommodityPublisher buildScTradeToolsCommodityPublisher(
       ScTradeToolsClient client, NotificationService notificationService) {
     return new ScTradeToolsCommodityPublisher(client, notificationService);
@@ -223,8 +231,8 @@ public class AppConfig {
   }
 
   @Bean("ItemShopReader")
-  public ItemShopReader buildItemShopReader() {
-    return new ItemShopReader();
+  public ItemShopReader buildItemShopReader(ItemShopRepository itemShopRepository) {
+    return new ItemShopReader(itemShopRepository);
   }
 
   @Bean("ItemSubmissionFactory")
@@ -232,7 +240,7 @@ public class AppConfig {
       NotificationService notificationService, ItemListingFactory itemListingFactory,
       ItemLocationReader itemLocationReader, ItemShopReader itemShopReader,
       DiskImageWriter diskImageWriter) {
-    Ocr ocr = new OneOcr(List.of(new AlignToTemplate()), diskImageWriter);
+    Ocr ocr = new OneOcr(List.of(), diskImageWriter);
 
     return new ItemSubmissionFactory(userService, notificationService, itemListingFactory,
         itemLocationReader, itemShopReader, ocr);

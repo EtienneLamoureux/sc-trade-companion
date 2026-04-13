@@ -1,0 +1,88 @@
+[
+	{
+		"location": "HUR-L3 Thundering Express Station",
+		"transactionType": "BUYS",
+		"commodity": "hydrogen",
+		"price": 1100.0,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"boxSizesInScu": [
+			1,
+			2,
+			4,
+			8,
+			16,
+			24,
+			32
+		],
+		"batchId": "f4c3d2b1a0e9d8c7b6a5f4e3d2c1b0a9988776655443322110ffeeddccbbaa",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "HUR-L3 Thundering Express Station",
+		"transactionType": "BUYS",
+		"commodity": "stims",
+		"price": 5400.0,
+		"inventory": 702,
+		"inventoryLevel": "MEDIUM",
+		"boxSizesInScu": [
+			1,
+			2,
+			4,
+			8,
+			16,
+			24,
+			32
+		],
+		"batchId": "f4c3d2b1a0e9d8c7b6a5f4e3d2c1b0a9988776655443322110ffeeddccbbaa",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "HUR-L3 Thundering Express Station",
+		"transactionType": "BUYS",
+		"commodity": "Dolivine",
+		"price": 150000.0,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"boxSizesInScu": [
+			1,
+			2,
+			4,
+			8,
+			16,
+			24,
+			32
+		],
+		"batchId": "f4c3d2b1a0e9d8c7b6a5f4e3d2c1b0a9988776655443322110ffeeddccbbaa",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "HUR-L3 Thundering Express Station",
+		"transactionType": "BUYS",
+		"commodity": "compboard",
+		"price": 270000.0,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"boxSizesInScu": [
+			1,
+			2,
+			4,
+			8,
+			16,
+			24,
+			32
+		],
+		"batchId": "f4c3d2b1a0e9d8c7b6a5f4e3d2c1b0a9988776655443322110ffeeddccbbaa",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "HUR-L3 Thundering Express Station",
+		"transactionType": "BUYS",
+		"commodity": "degnous root",
+		"price": 630000.0,
+		"inventory": 0,
+		"inventoryLevel": "SOLD_OUT",
+		"batchId": "f4c3d2b1a0e9d8c7b6a5f4e3d2c1b0a9988776655443322110ffeeddccbbaa",
+		"timestamp": 1768675164.6528624
+	}
+]

@@ -9,6 +9,7 @@ import tools.sctrade.companion.domain.ocr.LocatedFragment;
 import tools.sctrade.companion.domain.ocr.OcrResult;
 import tools.sctrade.companion.domain.ocr.OcrUtil;
 import tools.sctrade.companion.exceptions.NoCloseStringException;
+import tools.sctrade.companion.utils.StringUtil;
 
 public class ItemShopReader extends LocationReader {
 
@@ -16,10 +17,17 @@ public class ItemShopReader extends LocationReader {
   private static final String SELL = "sell";
   private static final String COULD_NOT_FIND_FRAGMENT_FALLING_BACK_TO_DEFAULT_BOUNDS =
       "Could not find '{}' fragment. Falling back to default bounds";
-  private static final String BLACK_SHOP = "cargo deck";
 
-  public ItemShopReader() {
+  private final ItemShopRepository itemShopRepository;
+
+  /**
+   * Creates a new instance of the item shop reader.
+   *
+   * @param itemShopRepository the shop repository, used to spell check the read shop name
+   */
+  public ItemShopReader(ItemShopRepository itemShopRepository) {
     super(null);
+    this.itemShopRepository = itemShopRepository;
   }
 
   @Override
@@ -34,10 +42,6 @@ public class ItemShopReader extends LocationReader {
 
   @Override
   protected String findRawLocation(List<LocatedFragment> fragments) {
-    if (fragments.isEmpty()) {
-      return BLACK_SHOP;
-    }
-
     String shopText = fragments.stream().map(LocatedFragment::getText)
         .reduce("", (a, b) -> a.isEmpty() ? b : a + " " + b).trim();
     logger.debug("Read raw shop text: '{}'", shopText);
@@ -47,8 +51,15 @@ public class ItemShopReader extends LocationReader {
 
   @Override
   protected Optional<String> spellCheckLocation(String rawLocation) {
-    // No shop repository available; return raw value as-is
-    return Optional.of(rawLocation.replace("+", " ").trim());
+    try {
+      String normalized = rawLocation.replace("+", " ").trim();
+      normalized = inferFromFragment(normalized);
+      String spellChecked = StringUtil.spellCheck(normalized, itemShopRepository.findAllTypes());
+      return Optional.of(spellChecked);
+    } catch (NoCloseStringException e) {
+      logger.warn("Could not spell-check shop '{}'", rawLocation);
+      return Optional.empty();
+    }
   }
 
   private Rectangle calculateShopBoundingBox(OcrResult ocrResult) {
@@ -101,5 +112,28 @@ public class ItemShopReader extends LocationReader {
   private Optional<LocatedFragment> findWalletFragment(OcrResult ocrResult) {
     return ocrResult.getFragments().parallelStream()
         .filter(n -> n.getText().trim().startsWith(WALLET)).findFirst();
+  }
+
+  /**
+   * Some item shop names in the top-middle of the screen are more logos than names. This method
+   * tries to infer the shop name from the OCR fragments.
+   *
+   * @param normalized the normalized shop name, with special characters removed and trimmed
+   * @return the inferred shop name, or the original normalized name if no inference could be made
+   */
+  private String inferFromFragment(String normalized) {
+    if (normalized.contains("mas") || normalized.contains("ass")) {
+      return "centermass";
+    }
+
+    if (normalized.contains("since") || normalized.contains("2932")) {
+      return "cubby blast";
+    }
+
+    if (normalized.contains("cargo")) {
+      return "cargo services";
+    }
+
+    return normalized;
   }
 }

@@ -48,6 +48,7 @@ out/
 
 ### Git ###
 *.orig
+.worktrees/
 
 ### OCR wrapper ###
 !bin/oneocr-wrapper/

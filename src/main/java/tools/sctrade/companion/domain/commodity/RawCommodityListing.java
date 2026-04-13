@@ -2,11 +2,9 @@ package tools.sctrade.companion.domain.commodity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -20,8 +18,8 @@ import tools.sctrade.companion.utils.StringUtil;
  */
 public class RawCommodityListing {
   private static final Pattern RIGHT_PATTERN =
-      Pattern.compile("([0-9\\.]+) ?scu\\R.[^0-9]?([0-9\\.km]+)\\/", Pattern.CASE_INSENSITIVE);
-  private static final Set<Integer> BOX_SIZES_IN_SCU = Set.of(1, 2, 4, 8, 16, 24, 32);
+      Pattern.compile("([0-9\\.]+) ?scu\\R[^0-9]?([0-9,.]+)\\/", Pattern.CASE_INSENSITIVE);
+  private static final List<Integer> BOX_SIZES_IN_SCU = List.of(1, 2, 4, 8, 16, 24, 32);
 
   private final Logger logger = LoggerFactory.getLogger(RawCommodityListing.class);
 
@@ -94,7 +92,8 @@ public class RawCommodityListing {
       fragments.remove(fragments.size() - 1);
       String rawCommodity =
           fragments.stream().map(n -> n.getText()).collect(Collectors.joining(" "));
-      rawCommodity = rawCommodity.replaceAll("[^a-zA-Z ]", "").strip();
+      rawCommodity = rawCommodity.replaceAll("[^a-zA-Z ]", "").strip()
+          .replaceFirst("^(?:in )?(?:stock )|^(?:out )?(?:of )?(?:stock )", "");
       commodity = Optional.of(rawCommodity);
     } catch (Exception e) {
       logger.debug(String.format(Locale.ROOT, "Could not extract commodity from: %s", left));
@@ -141,19 +140,9 @@ public class RawCommodityListing {
       Matcher matcher = RIGHT_PATTERN.matcher(rightText);
       matcher.find();
       String match = matcher.group(2).toLowerCase(Locale.ROOT);
-      boolean isMillions = match.endsWith("m");
-      boolean isThousands = match.endsWith("k");
-      match = match.replace("m", "").replace("k", "");
+      match = match.replace(".", "").replace(",", "");
 
       double price = Double.parseDouble(match);
-      isThousands = isThousands || (price % 1) > 0; // Decimals = metric notation, which is 99% kilo
-
-      if (isMillions) {
-        price *= 1000000;
-      } else if (isThousands) {
-        price *= 1000;
-      }
-
       this.price = Optional.of(price);
     } catch (Exception e) {
       logger.debug(String.format(Locale.ROOT, "Could not extract price from: %s", right));
@@ -162,22 +151,33 @@ public class RawCommodityListing {
   }
 
   private void extractBoxSizesInScu() {
-    var parsedBoxSizesInScu =
-        Arrays.stream(right.getFragments().getLast().getText().strip().split(" ")).map(n -> {
-          try {
-            return Integer.valueOf(n);
-          } catch (Exception e) {
-            return 0;
-          }
-        }).filter(n -> BOX_SIZES_IN_SCU.contains(n)).toList();
+    try {
+      String text = right.getFragments().getLast().getText().replaceAll("\\s", "");
+      List<Integer> sortedSizes = new ArrayList<>(BOX_SIZES_IN_SCU);
+      List<Integer> found = new ArrayList<>();
 
-    var sortedParsedBoxSizes = new ArrayList<>(parsedBoxSizesInScu);
-    Collections.sort(sortedParsedBoxSizes);
+      // Pop values biggest-first (from the end of the sorted list)
+      for (int i = sortedSizes.size() - 1; i >= 0 && !text.isEmpty(); i--) {
+        String candidate = String.valueOf(sortedSizes.get(i));
+        if (text.endsWith(candidate)) {
+          found.add(0, sortedSizes.get(i));
+          text = text.substring(0, text.length() - candidate.length());
+        }
+      }
 
-    if (parsedBoxSizesInScu.equals(sortedParsedBoxSizes)) {
-      this.boxSizesInScu = Optional.of(parsedBoxSizesInScu);
-    } else {
-      this.boxSizesInScu = Optional.empty();
+      // Reject if there is leftover text or nothing was found
+      if (!text.isEmpty() || found.isEmpty()) {
+        boxSizesInScu = Optional.empty();
+        return;
+      }
+
+      // Reject if the found sizes are not a contiguous sub-sequence of BOX_SIZES_IN_SCU
+      int startIndex = BOX_SIZES_IN_SCU.indexOf(found.get(0));
+      List<Integer> expected = BOX_SIZES_IN_SCU.subList(startIndex, startIndex + found.size());
+      boxSizesInScu = found.equals(expected) ? Optional.of(found) : Optional.empty();
+    } catch (Exception e) {
+      logger.debug("Could not extract box sizes from: {}", right);
+      boxSizesInScu = Optional.empty();
     }
   }
 

@@ -1,0 +1,38 @@
+[
+	{
+		"name": "5CA 'AKURA'",
+		"price": 71237,
+		"location": "area18",
+		"shop": "dumper's depot"
+	},
+	{
+		"name": "5SA 'RHADA'",
+		"price": 17810,
+		"location": "area18",
+		"shop": "dumper's depot"
+	},
+	{
+		"name": "6SA 'ARBITER'",
+		"price": 21375,
+		"location": "area18",
+		"shop": "dumper's depot"
+	},
+	{
+		"name": "5MA 'CHIMALLI'",
+		"price": 34200,
+		"location": "area18",
+		"shop": "dumper's depot"
+	},
+	{
+		"name": "6MA 'KOZANE'",
+		"price": 42750,
+		"location": "area18",
+		"shop": "dumper's depot"
+	},
+	{
+		"name": "ABRADE SCRAPER MODULE",
+		"price": 21250,
+		"location": "area18",
+		"shop": "dumper's depot"
+	}
+]

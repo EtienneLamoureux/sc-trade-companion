@@ -1,0 +1,38 @@
+[
+	{
+		"location": "HUR-L3 Thundering Express Station",
+		"transactionType": "SELLS",
+		"commodity": "waste",
+		"price": 229.0,
+		"inventory": 75,
+		"inventoryLevel": "MAX",
+		"boxSizesInScu": [
+			1,
+			2,
+			4,
+			8,
+			16,
+			24,
+			32
+		],
+		"batchId": "f4c3d2b1a0e9d8c7b6a5f4e3d2c1b0a9988776655443322110ffeeddccbbaa",
+		"timestamp": 1768675164.6528624
+	},
+	{
+		"location": "HUR-L3 Thundering Express Station",
+		"transactionType": "SELLS",
+		"commodity": "nitrogen",
+		"price": 2767.0,
+		"inventory": 230,
+		"inventoryLevel": "LOW",
+		"boxSizesInScu": [
+			1,
+			2,
+			4,
+			8,
+			16
+		],
+		"batchId": "f4c3d2b1a0e9d8c7b6a5f4e3d2c1b0a9988776655443322110ffeeddccbbaa",
+		"timestamp": 1768675164.6528624
+	}
+]
