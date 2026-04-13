@@ -14,6 +14,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import tools.sctrade.companion.gui.CompanionGui;
 import tools.sctrade.companion.input.KeyListener;
+import tools.sctrade.companion.spring.CompanionVersionChecker;
 
 @SpringBootApplication
 @EnableScheduling
@@ -47,8 +48,9 @@ public class CompanionApplication {
 
   private static void openGui(ConfigurableApplicationContext context) {
     EventQueue.invokeLater(() -> {
-      var ex = context.getBean(CompanionGui.class);
-      ex.setVisible(true);
+      var gui = context.getBean(CompanionGui.class);
+      gui.setVisible(true);
+      context.getBean(CompanionVersionChecker.class).checkAsynchronously();
     });
   }
 }

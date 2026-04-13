@@ -3,17 +3,21 @@ package tools.sctrade.companion.gui;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.intellijthemes.FlatArcDarkOrangeIJTheme;
 import java.awt.AWTException;
+import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Locale;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.notification.NotificationLevel;
@@ -73,16 +77,28 @@ public class CompanionGui extends JFrame implements NotificationRepository {
   }
 
   /**
-   * Shows a popup informing the user that a newer version is available.
+   * Shows a modal dialog informing the user that a newer version is available.
    *
    * <p>
-   * Placeholder — full popup UI will be implemented in a later task.
+   * Clicking <em>Download</em> opens the GitHub releases page in the system browser. Clicking
+   * <em>Later</em> dismisses the dialog without further action.
    *
    * @param currentVersion the currently running version
    * @param latestVersion the latest available version
    */
   public void showUpdateAvailablePopup(String currentVersion, String latestVersion) {
-    // TODO: implement popup dialog in a later task
+    Object[] options = {LocalizationUtil.get("updatePopupDownloadButton"),
+        LocalizationUtil.get("updatePopupCloseButton")};
+    String message = String.format(Locale.ROOT, LocalizationUtil.get("updatePopupMessage"),
+        currentVersion, latestVersion);
+
+    int selection =
+        JOptionPane.showOptionDialog(this, message, LocalizationUtil.get("updatePopupTitle"),
+            JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+
+    if (selection == JOptionPane.YES_OPTION) {
+      openReleasePage();
+    }
   }
 
   @Override
@@ -90,6 +106,20 @@ public class CompanionGui extends JFrame implements NotificationRepository {
     if (logsTab != null) {
       logsTab.addLog(
           new Object[] {TimeUtil.getNowAsString(TimeFormat.LOG_ENTRY), level.toString(), message});
+    }
+  }
+
+  private void openReleasePage() {
+    if (!Desktop.isDesktopSupported() || !Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+      add(NotificationLevel.WARN, LocalizationUtil.get("warningUnableToOpenReleasePage"));
+      return;
+    }
+
+    try {
+      Desktop.getDesktop()
+          .browse(URI.create("https://github.com/EtienneLamoureux/sc-trade-companion/releases"));
+    } catch (IOException e) {
+      add(NotificationLevel.WARN, LocalizationUtil.get("warningUnableToOpenReleasePage"));
     }
   }
 
