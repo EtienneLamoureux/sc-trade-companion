@@ -5,8 +5,10 @@
 ### Bugs
 - Fix many causes of "[Code 5] Listings could not be read"
 - Fix an issue when parsing available box sizes
+- Fix text wrapping on the instructions tab
 
 ### Other
+- Add a pop-up when a new version of the companion is available
 - Remove unnecessary pre-processing when reading item kiosks
 - Spellcheck item kiosk shop names
 
