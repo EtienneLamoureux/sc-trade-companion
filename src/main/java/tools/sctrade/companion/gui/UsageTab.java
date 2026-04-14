@@ -1,7 +1,10 @@
 package tools.sctrade.companion.gui;
 
-import javax.swing.JLabel;
+import java.awt.BorderLayout;
+import javax.swing.BorderFactory;
+import javax.swing.JEditorPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 /**
@@ -15,9 +18,22 @@ public class UsageTab extends JPanel {
    * Creates a new instance of the usage tab.
    */
   public UsageTab() {
-    super();
+    super(new BorderLayout());
 
-    JLabel instructions = new JLabel(LocalizationUtil.get("instructions"));
-    add(instructions);
+    JEditorPane instructions = new JEditorPane("text/html", LocalizationUtil.get("instructions")) {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public boolean getScrollableTracksViewportWidth() {
+        return true;
+      }
+    };
+    instructions.setEditable(false);
+    instructions.setOpaque(false);
+    instructions.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+
+    JScrollPane scrollPane = new JScrollPane(instructions);
+    scrollPane.setBorder(BorderFactory.createEmptyBorder());
+    add(scrollPane, BorderLayout.CENTER);
   }
 }
