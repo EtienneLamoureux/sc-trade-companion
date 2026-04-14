@@ -1,11 +1,9 @@
-package tools.sctrade.companion.spring;
+package tools.sctrade.companion.domain.version;
 
 import java.awt.EventQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.springframework.scheduling.annotation.Async;
-import tools.sctrade.companion.domain.CompanionVersionRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
-import tools.sctrade.companion.gui.CompanionGui;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 /**
@@ -14,7 +12,7 @@ import tools.sctrade.companion.utils.LocalizationUtil;
  */
 public class CompanionVersionChecker {
   private final CompanionVersionRepository repository;
-  private final CompanionGui gui;
+  private final UpdateAvailablePopup popup;
   private final NotificationService notificationService;
   private final String currentVersion;
   private final AtomicBoolean popupAlreadyShown = new AtomicBoolean(false);
@@ -23,14 +21,14 @@ public class CompanionVersionChecker {
    * Constructs a new {@link CompanionVersionChecker}.
    *
    * @param repository the repository used to fetch the latest published version
-   * @param gui the companion GUI, used to show the update popup on the EDT
+   * @param popup the output port used to show the update popup on the EDT
    * @param notificationService the notification service, used to warn when the check fails
    * @param currentVersion the version of the currently running application
    */
-  public CompanionVersionChecker(CompanionVersionRepository repository, CompanionGui gui,
+  public CompanionVersionChecker(CompanionVersionRepository repository, UpdateAvailablePopup popup,
       NotificationService notificationService, String currentVersion) {
     this.repository = repository;
-    this.gui = gui;
+    this.popup = popup;
     this.notificationService = notificationService;
     this.currentVersion = currentVersion;
   }
@@ -57,7 +55,7 @@ public class CompanionVersionChecker {
       String latestVersion = repository.fetchLatestVersion();
 
       if (!currentVersion.equals(latestVersion) && popupAlreadyShown.compareAndSet(false, true)) {
-        EventQueue.invokeLater(() -> gui.showUpdateAvailablePopup(currentVersion, latestVersion));
+        EventQueue.invokeLater(() -> popup.showUpdateAvailablePopup(currentVersion, latestVersion));
       }
     } catch (RuntimeException e) {
       notificationService.warn(LocalizationUtil.get("warningUnableToCheckLatestVersion"));

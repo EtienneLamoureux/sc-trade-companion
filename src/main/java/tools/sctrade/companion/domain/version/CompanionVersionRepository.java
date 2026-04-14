@@ -1,4 +1,4 @@
-package tools.sctrade.companion.domain;
+package tools.sctrade.companion.domain.version;
 
 /**
  * Repository port for fetching the latest published version of SC Trade Companion.

@@ -16,7 +16,9 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
-import tools.sctrade.companion.domain.CompanionVersionRepository;
+import tools.sctrade.companion.domain.version.CompanionVersionChecker;
+import tools.sctrade.companion.domain.version.CompanionVersionRepository;
+import tools.sctrade.companion.domain.version.UpdateAvailablePopup;
 import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.commodity.CommodityListingFactory;
 import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
@@ -141,6 +143,11 @@ public class AppConfig {
     return new CompanionGui(userService, gameLogService, settings, getVersion());
   }
 
+  @Bean
+  public UpdateAvailablePopup buildUpdateAvailablePopup(CompanionGui companionGui) {
+    return companionGui;
+  }
+
   @Bean("NotificationService")
   public NotificationService buildNotificationService(NotificationRepository repository) {
     return new NotificationService(repository);
@@ -172,8 +179,8 @@ public class AppConfig {
 
   @Bean
   public CompanionVersionChecker buildCompanionVersionChecker(CompanionVersionRepository repository,
-      CompanionGui companionGui, NotificationService notificationService) {
-    return new CompanionVersionChecker(repository, companionGui, notificationService, getVersion());
+      UpdateAvailablePopup popup, NotificationService notificationService) {
+    return new CompanionVersionChecker(repository, popup, notificationService, getVersion());
   }
 
   @Bean

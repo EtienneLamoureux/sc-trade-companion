@@ -19,8 +19,6 @@ import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
 class ScTradeToolsCompanionVersionRepositoryTest {
-  private static final String LATEST_VERSION_ENDPOINT =
-      "/api/crowdsource/companion-versions/latest";
   private static final String VERSION = "1.2.3";
 
   @Mock
@@ -43,19 +41,22 @@ class ScTradeToolsCompanionVersionRepositoryTest {
   @Test
   void whenFetchingLatestVersionThenCallsCorrectEndpoint() {
     doReturn(requestHeadersUriSpec).when(webClient).get();
-    doReturn(requestHeadersUriSpec).when(requestHeadersUriSpec).uri(LATEST_VERSION_ENDPOINT);
+    doReturn(requestHeadersUriSpec).when(requestHeadersUriSpec)
+        .uri(ScTradeToolsCompanionVersionRepository.LATEST_VERSION_ENDPOINT);
     doReturn(responseSpec).when(requestHeadersUriSpec).retrieve();
     when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(VERSION));
 
     repository.fetchLatestVersion();
 
-    verify(requestHeadersUriSpec).uri(LATEST_VERSION_ENDPOINT);
+    verify(requestHeadersUriSpec)
+        .uri(ScTradeToolsCompanionVersionRepository.LATEST_VERSION_ENDPOINT);
   }
 
   @Test
   void whenFetchingLatestVersionThenReturnsResponseBody() {
     doReturn(requestHeadersUriSpec).when(webClient).get();
-    doReturn(requestHeadersUriSpec).when(requestHeadersUriSpec).uri(LATEST_VERSION_ENDPOINT);
+    doReturn(requestHeadersUriSpec).when(requestHeadersUriSpec)
+        .uri(ScTradeToolsCompanionVersionRepository.LATEST_VERSION_ENDPOINT);
     doReturn(responseSpec).when(requestHeadersUriSpec).retrieve();
     when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(VERSION));
 
@@ -68,7 +69,8 @@ class ScTradeToolsCompanionVersionRepositoryTest {
   @ValueSource(strings = {"1.2.3\n", " 1.2.3", "1.2.3 ", " 1.2.3 "})
   void givenBodyWithSurroundingWhitespaceWhenFetchingLatestVersionThenReturnsTrimmed(String body) {
     doReturn(requestHeadersUriSpec).when(webClient).get();
-    doReturn(requestHeadersUriSpec).when(requestHeadersUriSpec).uri(LATEST_VERSION_ENDPOINT);
+    doReturn(requestHeadersUriSpec).when(requestHeadersUriSpec)
+        .uri(ScTradeToolsCompanionVersionRepository.LATEST_VERSION_ENDPOINT);
     doReturn(responseSpec).when(requestHeadersUriSpec).retrieve();
     when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(body));
 
@@ -82,7 +84,8 @@ class ScTradeToolsCompanionVersionRepositoryTest {
   @ValueSource(strings = {" ", "\t", "\n"})
   void givenNullOrBlankBodyWhenFetchingLatestVersionThenThrows(String body) {
     doReturn(requestHeadersUriSpec).when(webClient).get();
-    doReturn(requestHeadersUriSpec).when(requestHeadersUriSpec).uri(LATEST_VERSION_ENDPOINT);
+    doReturn(requestHeadersUriSpec).when(requestHeadersUriSpec)
+        .uri(ScTradeToolsCompanionVersionRepository.LATEST_VERSION_ENDPOINT);
     doReturn(responseSpec).when(requestHeadersUriSpec).retrieve();
     Mono<String> mono = body == null ? Mono.empty() : Mono.just(body);
     when(responseSpec.bodyToMono(String.class)).thenReturn(mono);
