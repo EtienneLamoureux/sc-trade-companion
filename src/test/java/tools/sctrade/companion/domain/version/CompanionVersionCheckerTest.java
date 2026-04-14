@@ -1,8 +1,9 @@
-package tools.sctrade.companion.spring;
+package tools.sctrade.companion.domain.version;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -13,9 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import tools.sctrade.companion.domain.CompanionVersionRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
-import tools.sctrade.companion.gui.CompanionGui;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,7 +25,7 @@ class CompanionVersionCheckerTest {
   @Mock
   private CompanionVersionRepository mockRepository;
   @Mock
-  private CompanionGui mockGui;
+  private UpdateAvailablePopup mockPopup;
   @Mock
   private NotificationService mockNotificationService;
 
@@ -34,7 +33,7 @@ class CompanionVersionCheckerTest {
 
   @BeforeEach
   void setUp() {
-    checker = new CompanionVersionChecker(mockRepository, mockGui, mockNotificationService,
+    checker = new CompanionVersionChecker(mockRepository, mockPopup, mockNotificationService,
         CURRENT_VERSION);
   }
 
@@ -46,7 +45,7 @@ class CompanionVersionCheckerTest {
     checker.check();
     flushEdt();
 
-    verify(mockGui).showUpdateAvailablePopup(CURRENT_VERSION, LATEST_VERSION);
+    verify(mockPopup).showUpdateAvailablePopup(CURRENT_VERSION, LATEST_VERSION);
   }
 
   @Test
@@ -57,7 +56,7 @@ class CompanionVersionCheckerTest {
     checker.check();
     flushEdt();
 
-    verify(mockGui, never()).showUpdateAvailablePopup(anyString(), anyString());
+    verify(mockPopup, never()).showUpdateAvailablePopup(anyString(), anyString());
   }
 
   @Test
@@ -70,7 +69,7 @@ class CompanionVersionCheckerTest {
     checker.check();
     flushEdt();
 
-    verify(mockGui).showUpdateAvailablePopup(eq(CURRENT_VERSION), eq(LATEST_VERSION));
+    verify(mockPopup, times(1)).showUpdateAvailablePopup(eq(CURRENT_VERSION), eq(LATEST_VERSION));
   }
 
   @Test
@@ -92,7 +91,7 @@ class CompanionVersionCheckerTest {
     checker.check();
     flushEdt();
 
-    verify(mockGui, never()).showUpdateAvailablePopup(anyString(), anyString());
+    verify(mockPopup, never()).showUpdateAvailablePopup(anyString(), anyString());
   }
 
   @Test
@@ -116,7 +115,7 @@ class CompanionVersionCheckerTest {
     checker.check();
     flushEdt();
 
-    verify(mockGui, never()).showUpdateAvailablePopup(anyString(), anyString());
+    verify(mockPopup, never()).showUpdateAvailablePopup(anyString(), anyString());
   }
 
   private static void flushEdt() throws InterruptedException, InvocationTargetException {

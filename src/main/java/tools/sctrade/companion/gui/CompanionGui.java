@@ -24,6 +24,7 @@ import tools.sctrade.companion.domain.notification.NotificationLevel;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
+import tools.sctrade.companion.domain.version.UpdateAvailablePopup;
 import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.TimeFormat;
 import tools.sctrade.companion.utils.TimeUtil;
@@ -31,7 +32,7 @@ import tools.sctrade.companion.utils.TimeUtil;
 /**
  * The main GUI class for the companion application.
  */
-public class CompanionGui extends JFrame implements NotificationRepository {
+public class CompanionGui extends JFrame implements NotificationRepository, UpdateAvailablePopup {
   private static final long serialVersionUID = -983766141308946535L;
 
   private transient UserService userService;
@@ -76,16 +77,7 @@ public class CompanionGui extends JFrame implements NotificationRepository {
     setupTray();
   }
 
-  /**
-   * Shows a modal dialog informing the user that a newer version is available.
-   *
-   * <p>
-   * Clicking <em>Download</em> opens the GitHub releases page in the system browser. Clicking
-   * <em>Later</em> dismisses the dialog without further action.
-   *
-   * @param currentVersion the currently running version
-   * @param latestVersion the latest available version
-   */
+  @Override
   public void showUpdateAvailablePopup(String currentVersion, String latestVersion) {
     Object[] options = {LocalizationUtil.get("updatePopupDownloadButton"),
         LocalizationUtil.get("updatePopupCloseButton")};

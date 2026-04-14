@@ -1,12 +1,14 @@
 package tools.sctrade.companion.output;
 
 import org.springframework.web.reactive.function.client.WebClient;
-import tools.sctrade.companion.domain.CompanionVersionRepository;
+import tools.sctrade.companion.domain.version.CompanionVersionRepository;
 
 /**
  * sc-trade.tools implementation of {@link CompanionVersionRepository}.
  */
 public class ScTradeToolsCompanionVersionRepository implements CompanionVersionRepository {
+  static final String LATEST_VERSION_ENDPOINT = "/api/crowdsource/companion-versions/latest";
+
   private final WebClient webClient;
 
   /**
@@ -20,7 +22,7 @@ public class ScTradeToolsCompanionVersionRepository implements CompanionVersionR
 
   @Override
   public String fetchLatestVersion() {
-    String version = webClient.get().uri("/api/crowdsource/companion-versions/latest").retrieve()
+    String version = webClient.get().uri(LATEST_VERSION_ENDPOINT).retrieve()
         .bodyToMono(String.class).block();
 
     if (version == null || version.isBlank()) {
