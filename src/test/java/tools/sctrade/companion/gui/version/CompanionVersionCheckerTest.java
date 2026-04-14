@@ -15,9 +15,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tools.sctrade.companion.domain.notification.NotificationService;
-import tools.sctrade.companion.gui.version.CompanionVersionChecker;
-import tools.sctrade.companion.gui.version.CompanionVersionRepository;
-import tools.sctrade.companion.gui.version.UpdateAvailablePopup;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 @ExtendWith(MockitoExtension.class)
