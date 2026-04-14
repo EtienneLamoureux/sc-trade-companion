@@ -1,4 +1,4 @@
-package tools.sctrade.companion.domain.version;
+package tools.sctrade.companion.gui.version;
 
 import java.awt.EventQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
