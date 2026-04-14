@@ -27,6 +27,6 @@ public class ScTradeToolsCompanionVersionRepository implements CompanionVersionR
       throw new IllegalStateException("Received null or blank latest-version response");
     }
 
-    return version;
+    return version.strip();
   }
 }
