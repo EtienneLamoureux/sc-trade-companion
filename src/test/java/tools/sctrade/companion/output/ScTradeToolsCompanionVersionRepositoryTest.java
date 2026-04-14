@@ -65,6 +65,19 @@ class ScTradeToolsCompanionVersionRepositoryTest {
   }
 
   @ParameterizedTest
+  @ValueSource(strings = {"1.2.3\n", " 1.2.3", "1.2.3 ", " 1.2.3 "})
+  void givenBodyWithSurroundingWhitespaceWhenFetchingLatestVersionThenReturnsTrimmed(String body) {
+    doReturn(requestHeadersUriSpec).when(webClient).get();
+    doReturn(requestHeadersUriSpec).when(requestHeadersUriSpec).uri(LATEST_VERSION_ENDPOINT);
+    doReturn(responseSpec).when(requestHeadersUriSpec).retrieve();
+    when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(body));
+
+    String result = repository.fetchLatestVersion();
+
+    assertEquals(VERSION, result);
+  }
+
+  @ParameterizedTest
   @NullAndEmptySource
   @ValueSource(strings = {" ", "\t", "\n"})
   void givenNullOrBlankBodyWhenFetchingLatestVersionThenThrows(String body) {
