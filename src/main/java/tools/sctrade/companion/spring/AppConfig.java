@@ -16,9 +16,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
-import tools.sctrade.companion.domain.version.CompanionVersionChecker;
-import tools.sctrade.companion.domain.version.CompanionVersionRepository;
-import tools.sctrade.companion.domain.version.UpdateAvailablePopup;
 import tools.sctrade.companion.domain.LocationRepository;
 import tools.sctrade.companion.domain.commodity.CommodityListingFactory;
 import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
@@ -53,6 +50,9 @@ import tools.sctrade.companion.domain.user.idgenerators.RandomUserIdGenerator;
 import tools.sctrade.companion.domain.user.idgenerators.WindowsUserIdGenerator;
 import tools.sctrade.companion.gui.CompanionGui;
 import tools.sctrade.companion.gui.LogsTab;
+import tools.sctrade.companion.gui.version.CompanionVersionChecker;
+import tools.sctrade.companion.gui.version.CompanionVersionRepository;
+import tools.sctrade.companion.gui.version.UpdateAvailablePopup;
 import tools.sctrade.companion.input.KeyListener;
 import tools.sctrade.companion.input.LineListener;
 import tools.sctrade.companion.input.ScreenPrinter;
@@ -143,11 +143,6 @@ public class AppConfig {
     return new CompanionGui(userService, gameLogService, settings, getVersion());
   }
 
-  @Bean
-  public UpdateAvailablePopup buildUpdateAvailablePopup(CompanionGui companionGui) {
-    return companionGui;
-  }
-
   @Bean("NotificationService")
   public NotificationService buildNotificationService(NotificationRepository repository) {
     return new NotificationService(repository);
@@ -172,8 +167,7 @@ public class AppConfig {
   }
 
   @Bean
-  public ScTradeToolsCompanionVersionRepository buildScTradeToolsCompanionVersionRepository(
-      ScTradeToolsClient client) {
+  public CompanionVersionRepository buildCompanionVersionRepository(ScTradeToolsClient client) {
     return new ScTradeToolsCompanionVersionRepository(client);
   }
 

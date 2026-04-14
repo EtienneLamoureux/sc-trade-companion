@@ -1,7 +1,7 @@
 package tools.sctrade.companion.output;
 
 import org.springframework.web.reactive.function.client.WebClient;
-import tools.sctrade.companion.domain.version.CompanionVersionRepository;
+import tools.sctrade.companion.gui.version.CompanionVersionRepository;
 
 /**
  * sc-trade.tools implementation of {@link CompanionVersionRepository}.

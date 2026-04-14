@@ -24,7 +24,7 @@ import tools.sctrade.companion.domain.notification.NotificationLevel;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
-import tools.sctrade.companion.domain.version.UpdateAvailablePopup;
+import tools.sctrade.companion.gui.version.UpdateAvailablePopup;
 import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.TimeFormat;
 import tools.sctrade.companion.utils.TimeUtil;
