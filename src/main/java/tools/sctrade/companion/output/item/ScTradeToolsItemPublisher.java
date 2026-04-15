@@ -46,7 +46,7 @@ public class ScTradeToolsItemPublisher extends AsynchronousProcessor<ItemSubmiss
       var response = webClient.post().uri("/api/crowdsource/item-listings")
           .contentType(MediaType.APPLICATION_JSON)
           .body(BodyInserters.fromValue(buildDto(submission))).header("signature", "").retrieve()
-          .toBodilessEntity();
+          .toBodilessEntity().retryWhen(ScTradeToolsClient.onTransientNetworkError());
       response.block();
       logger.info("Sent {} item listings to SC Trade Tools", submission.getListings().size());
       notificationService.info(

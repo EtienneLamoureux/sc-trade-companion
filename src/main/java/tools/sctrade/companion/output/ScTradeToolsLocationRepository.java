@@ -31,7 +31,8 @@ public class ScTradeToolsLocationRepository implements LocationRepository {
   public Collection<String> findAllLocations() {
     logger.debug("Fetching locations from sc-trade.tools...");
     LocationDto[] locationDtos =
-        webClient.get().uri("/api/locations").retrieve().bodyToMono(LocationDto[].class).block();
+        webClient.get().uri("/api/locations").retrieve().bodyToMono(LocationDto[].class)
+            .retryWhen(ScTradeToolsClient.onTransientNetworkError()).block();
     return Arrays.stream(locationDtos).filter(n -> {
       String type = n.type();
 

@@ -46,8 +46,9 @@ public class ScTradeToolsCommodityPublisher extends AsynchronousProcessor<Commod
   public List<String> findAllCommodities() {
     logger.debug("Fetching commodities from sc-trade.tools...");
     return Arrays
-        .stream(webClient.get().uri("/api/commodity/items").retrieve()
-            .bodyToMono(CommodityDto[].class).block())
+        .stream(
+            webClient.get().uri("/api/commodity/items").retrieve().bodyToMono(CommodityDto[].class)
+                .retryWhen(ScTradeToolsClient.onTransientNetworkError()).block())
         .map(n -> n.name().toLowerCase(Locale.ROOT)).toList();
   }
 
@@ -60,7 +61,7 @@ public class ScTradeToolsCommodityPublisher extends AsynchronousProcessor<Commod
       var response = webClient.post().uri("/api/crowdsource/commodity-listings")
           .contentType(MediaType.APPLICATION_JSON)
           .body(BodyInserters.fromValue(buildDto(submission))).header("signature", "").retrieve()
-          .toBodilessEntity();
+          .toBodilessEntity().retryWhen(ScTradeToolsClient.onTransientNetworkError());
       response.block();
       logger.info("Sent {} commodity listings to SC Trade Tools", submission.getListings().size());
       notificationService.info(String.format(Locale.ROOT,

@@ -60,7 +60,8 @@ public class ScTradeToolsItemRepository implements ItemRepository {
     logger.debug("Fetching items page {}", pageNumber);
     return webClient.get()
         .uri(u -> u.path("/api/item/items").queryParam("page", pageNumber).build()).retrieve()
-        .bodyToMono(ItemPageDto.class).block();
+        .bodyToMono(ItemPageDto.class).retryWhen(ScTradeToolsClient.onTransientNetworkError())
+        .block();
   }
 
   private List<String> toItemNames(ItemPageDto page) {
