@@ -1,4 +1,8 @@
 # SC Trade Companion
+## 1.5.2
+### Bugs
+- Fix "Connection reset" error
+
 ## 1.5.1
 4.7 changed the number formatting of the prices shown on the commodity kiosks. This release correctly supports those new changes.
 
