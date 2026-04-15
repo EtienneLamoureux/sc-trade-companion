@@ -29,8 +29,8 @@ public class ScTradeToolsItemShopRepository implements ItemShopRepository {
   @Cacheable("ScTradeToolsItemShopRepository.findAllTypes")
   public Collection<String> findAllTypes() {
     logger.debug("Fetching item shop types from sc-trade.tools...");
-    String[] types =
-        webClient.get().uri("/api/items/shop-types").retrieve().bodyToMono(String[].class).block();
+    String[] types = webClient.get().uri("/api/items/shop-types").retrieve()
+        .bodyToMono(String[].class).retryWhen(ScTradeToolsClient.onTransientNetworkError()).block();
     logger.debug("Fetched {} item shop types from sc-trade.tools", types.length);
     return Arrays.asList(types);
   }
