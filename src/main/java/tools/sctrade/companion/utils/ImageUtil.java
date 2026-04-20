@@ -393,6 +393,7 @@ public class ImageUtil {
    *      "https://answers.opencv.org/question/28348/converting-bufferedimage-to-mat-in-java/">Source</a>
    */
   public static Mat toMat(BufferedImage image) throws IOException {
+    image = removeAlphaChannel(image);
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     ImageIO.write(image, "jpg", byteArrayOutputStream);
     byteArrayOutputStream.flush();
@@ -451,7 +452,25 @@ public class ImageUtil {
     Files.createDirectories(path.getParent());
     File imageFile = new File(path.toString());
     String format = path.toString().substring(path.toString().lastIndexOf(".") + 1);
+
+    // JPEG does not support alpha channels. If the image has one (e.g. from the XDG Desktop
+    // Portal on Wayland), strip it by drawing onto an opaque RGB image.
+    if ("jpg".equalsIgnoreCase(format) || "jpeg".equalsIgnoreCase(format)) {
+      image = removeAlphaChannel(image);
+    }
+
     ImageIO.write(image, format, imageFile);
+  }
+
+  private static BufferedImage removeAlphaChannel(BufferedImage image) {
+    if (!image.getColorModel().hasAlpha()) {
+      return image;
+    }
+
+    BufferedImage rgb =
+        new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+    rgb.createGraphics().drawImage(image, 0, 0, null);
+    return rgb;
   }
 
   /**
