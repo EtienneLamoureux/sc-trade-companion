@@ -155,7 +155,7 @@ public class SettingsTab extends JPanel {
   }
 
   private void buildPrintscreenItemKeybindField(SettingRepository settings) {
-    buildPrintscreenKeybindField(settings, Setting.PRINTSCREEN_ITEM_KEYBIND, NativeKeyEvent.VC_F3,
+    buildPrintscreenKeybindField(settings, Setting.PRINTSCREEN_ITEM_KEYBIND, NativeKeyEvent.VC_F5,
         LocalizationUtil.get("labelPrintscreenItemKeybind"),
         LocalizationUtil.get("tooltipPrintscreenItemKeybind"));
   }

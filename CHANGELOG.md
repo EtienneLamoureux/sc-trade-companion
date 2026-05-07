@@ -1,4 +1,9 @@
 # SC Trade Companion
+## 1.5.3
+### Bugs
+- Clarify the landing tab instructions by splitting commodity and item terminal guidance, including good and bad capture examples for each
+- Change the default item kiosk screenshot keybind to <kbd>F5</kbd>
+
 ## 1.5.2
 ### Bugs
 - Fix "Connection reset" error

@@ -7,7 +7,7 @@ plugins {
 
 // JAR
 group = 'tools.sctrade'
-version = '1.5.2'
+version = '1.5.3'
 
 java {
 	sourceCompatibility = '21'

@@ -320,7 +320,7 @@ public class AppConfig {
       @Qualifier("ItemScreenPrinter") ScreenPrinter itemScreenPrinter,
       SettingRepository settingRepository) {
     return new KeyListener(Arrays.asList(itemScreenPrinter), settingRepository,
-        Setting.PRINTSCREEN_ITEM_KEYBIND, NativeKeyEvent.VC_F3);
+        Setting.PRINTSCREEN_ITEM_KEYBIND, NativeKeyEvent.VC_F5);
   }
 
   private String getVersion() {

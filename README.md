@@ -39,15 +39,19 @@ Desktop companion application for Star Citizen.
 1. Repeat for the `Sell` tab
 1. Repeat throughout your play session
 1. Close the application (make sure you close it in the system tray)
+1. Good capture example: keep the terminal centered, fully visible, and free of glare or overlays
+1. Bad capture example: avoid angled screenshots, cropped listing areas, and HUD elements covering prices or selectors
 
 ### Equipment, gear and components
 1. When you get to an item kiosk, interact with it
     1. To ensure good results, check-out the [best practices](https://github.com/EtienneLamoureux/sc-trade-companion#best-practices)
 1. In the left "Choose destination" dropdown, select the shop
-1. Press <kbd>F3</kbd>
+1. Press <kbd>F5</kbd>
 1. Scroll/change page and repeat in order to capture all listings
 1. Repeat throughout your play session
 1. Close the application (make sure you close it in the system tray)
+1. Good capture example: keep the kiosk centered, with readable item rows and the destination selector visible
+1. Bad capture example: avoid camera tilt, glare, and captures that crop the destination selector or item names
 
 ### Best practices
 1. Align your character **as close and as straight** to the screen as possible
