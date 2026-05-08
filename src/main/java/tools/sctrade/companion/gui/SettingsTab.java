@@ -1,17 +1,18 @@
 package tools.sctrade.companion.gui;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Vector;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javafx.application.Platform;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -28,10 +29,8 @@ import tools.sctrade.companion.utils.LocalizationUtil;
  *
  * @see SettingRepository
  */
-public class SettingsTab extends JPanel {
-  private static final long serialVersionUID = -3532718267415423680L;
-
-  private IncrementingInt rowIndex;
+public class SettingsTab extends GridPane {
+  private final IncrementingInt rowIndex;
 
   /**
    * Creates a new instance of the settings tab.
@@ -42,10 +41,11 @@ public class SettingsTab extends JPanel {
    */
   public SettingsTab(UserService userService, GameLogPathSubject gameLogService,
       SettingRepository settings) {
-    super();
     rowIndex = new IncrementingInt();
 
-    setLayout(new GridBagLayout());
+    setPadding(new Insets(10));
+    setHgap(10);
+    setVgap(6);
 
     buildUsernameField(userService);
     buildPrintscreenCommodityKeybindField(settings);
@@ -61,35 +61,12 @@ public class SettingsTab extends JPanel {
   private void buildUsernameField(UserService userService) {
     var usernameLabel = buildLabel(rowIndex.get(), LocalizationUtil.get("labelUsername"));
     var usernameField = buildTextField(rowIndex.getAndIncrement(), userService.get().label());
-    usernameField.putClientProperty("JTextField.placeholderText",
-        LocalizationUtil.get("textFieldUsernamePlaceholder"));
+    usernameField.setPromptText(LocalizationUtil.get("textFieldUsernamePlaceholder"));
     usernameLabel.setLabelFor(usernameField);
+    usernameField.textProperty()
+        .addListener((observable, oldValue, newValue) -> userService.updateUsername(newValue));
 
-    usernameField.getDocument().addDocumentListener(new DocumentListener() {
-      @Override
-      public void insertUpdate(DocumentEvent e) {
-        updateUsername();
-      }
-
-      @Override
-      public void removeUpdate(DocumentEvent e) {
-        updateUsername();
-      }
-
-      @Override
-      public void changedUpdate(DocumentEvent e) {
-        updateUsername();
-      }
-
-      private void updateUsername() {
-        userService.updateUsername(usernameField.getText());
-      }
-    });
-
-    var tooltip = buildLabel(rowIndex.getAndIncrement(), LocalizationUtil.get("tooltipUsername"));
-    tooltip.putClientProperty("FlatLaf.styleClass", "small");
-    tooltip.setEnabled(false);
-    buildLabel(rowIndex.getAndIncrement(), " ");
+    buildTooltip(LocalizationUtil.get("tooltipUsername"));
   }
 
   private void buildStarCitizenLivePathField(GameLogPathSubject gameLogService) {
@@ -97,36 +74,13 @@ public class SettingsTab extends JPanel {
         buildLabel(rowIndex.get(), LocalizationUtil.get("labelStarCitizenLivePath"));
     var starCitizenLivePathField = buildTextField(rowIndex.getAndIncrement(),
         gameLogService.getStarCitizenLivePath().orElse(null));
-    starCitizenLivePathField.putClientProperty("JTextField.placeholderText",
-        LocalizationUtil.get("textFieldStarCitizenLivePathPlaceholder"));
+    starCitizenLivePathField
+        .setPromptText(LocalizationUtil.get("textFieldStarCitizenLivePathPlaceholder"));
     starCitizenLivePathLabel.setLabelFor(starCitizenLivePathField);
+    starCitizenLivePathField.textProperty().addListener(
+        (observable, oldValue, newValue) -> gameLogService.setStarCitizenLivePath(newValue));
 
-    starCitizenLivePathField.getDocument().addDocumentListener(new DocumentListener() {
-      @Override
-      public void insertUpdate(DocumentEvent e) {
-        updateStarCitizenLivePath();
-      }
-
-      @Override
-      public void removeUpdate(DocumentEvent e) {
-        updateStarCitizenLivePath();
-      }
-
-      @Override
-      public void changedUpdate(DocumentEvent e) {
-        updateStarCitizenLivePath();
-      }
-
-      private void updateStarCitizenLivePath() {
-        gameLogService.setStarCitizenLivePath(starCitizenLivePathField.getText());
-      }
-    });
-
-    var tooltip =
-        buildLabel(rowIndex.getAndIncrement(), LocalizationUtil.get("tooltipStarCitizenLivePath"));
-    tooltip.putClientProperty("FlatLaf.styleClass", "small");
-    tooltip.setEnabled(false);
-    buildLabel(rowIndex.getAndIncrement(), " ");
+    buildTooltip(LocalizationUtil.get("tooltipStarCitizenLivePath"));
   }
 
   private void buildStarCitizenMonitorComboBox(SettingRepository settings) {
@@ -139,96 +93,60 @@ public class SettingsTab extends JPanel {
     var starCitizenMonitorComboBox =
         buildComboBox(rowIndex.getAndIncrement(), monitorIds, selectedMonitorId);
     starCitizenMonitorLabel.setLabelFor(starCitizenMonitorComboBox);
-
-    starCitizenMonitorComboBox.addActionListener(e -> {
-      @SuppressWarnings("unchecked")
-      var comboBox = (JComboBox<String>) e.getSource();
-      String value = (String) comboBox.getSelectedItem();
-      settings.set(Setting.STAR_CITIZEN_MONITOR, value);
-    });
+    starCitizenMonitorComboBox.valueProperty().addListener(
+        (observable, oldValue, newValue) -> settings.set(Setting.STAR_CITIZEN_MONITOR, newValue));
   }
 
   private void buildPrintscreenCommodityKeybindField(SettingRepository settings) {
     buildPrintscreenKeybindField(settings, Setting.PRINTSCREEN_COMMODITY_KEYBIND,
         NativeKeyEvent.VC_F3, LocalizationUtil.get("labelPrintscreenCommodityKeybind"),
-        LocalizationUtil.get("tooltipPrintscreenKeybind"));
+        "commodityKeybindField", LocalizationUtil.get("tooltipPrintscreenKeybind"));
   }
 
   private void buildPrintscreenItemKeybindField(SettingRepository settings) {
     buildPrintscreenKeybindField(settings, Setting.PRINTSCREEN_ITEM_KEYBIND, NativeKeyEvent.VC_F3,
-        LocalizationUtil.get("labelPrintscreenItemKeybind"),
+        LocalizationUtil.get("labelPrintscreenItemKeybind"), "itemKeybindField",
         LocalizationUtil.get("tooltipPrintscreenItemKeybind"));
   }
 
   private void buildPrintscreenKeybindField(SettingRepository settings, Setting setting,
-      int defaultKeybind, String keybindLabelText, String tooltipText) {
+      int defaultKeybind, String keybindLabelText, String keybindFieldId, String tooltipText) {
     var keybindLabel = buildLabel(rowIndex.get(), keybindLabelText);
 
-    // Create a panel to hold both the display field and the button
-    GridBagConstraints gridBagConstraints = new GridBagConstraints();
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = rowIndex.getAndIncrement();
-    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-
-    JPanel keybindPanel = new JPanel();
-    keybindPanel.setLayout(new GridBagLayout());
-
-    // Display field
-    GridBagConstraints displayConstraints = new GridBagConstraints();
-    displayConstraints.gridx = 0;
-    displayConstraints.gridy = 0;
-    displayConstraints.weightx = 1.0;
-    displayConstraints.fill = GridBagConstraints.HORIZONTAL;
-    displayConstraints.ipadx = 10;
-
     String currentKeybind = NativeKeyEvent.getKeyText(settings.get(setting, defaultKeybind));
-    JTextField keybindField = new JTextField(currentKeybind);
-    keybindField.setColumns(10);
+    TextField keybindField = new TextField(currentKeybind);
+    keybindField.setId(keybindFieldId);
     keybindField.setEditable(false);
-    keybindPanel.add(keybindField, displayConstraints);
+    keybindField.setPrefColumnCount(10);
+    HBox.setHgrow(keybindField, Priority.ALWAYS);
 
-    // Button to capture keybind
-    GridBagConstraints buttonConstraints = new GridBagConstraints();
-    buttonConstraints.gridx = 1;
-    buttonConstraints.gridy = 0;
-    buttonConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+    Button captureButton = new Button(LocalizationUtil.get("buttonCaptureKeybind"));
 
-    JButton captureButton = new JButton(LocalizationUtil.get("buttonCaptureKeybind"));
-    keybindPanel.add(captureButton, buttonConstraints);
+    HBox keybindPanel = new HBox(5, keybindField, captureButton);
+    add(keybindPanel, 1, rowIndex.getAndIncrement());
+    keybindLabel.setLabelFor(keybindField);
 
-    add(keybindPanel, gridBagConstraints);
-    keybindLabel.setLabelFor(keybindPanel);
-
-    // Add action listener for the capture button
-    captureButton.addActionListener(e -> {
-      // Disable button to prevent multiple clicks while listening
+    captureButton.setOnAction(event -> {
       captureButton.setText(LocalizationUtil.get("buttonListeningForKey"));
-      captureButton.setEnabled(false);
+      captureButton.setDisable(true);
+      keybindField.requestFocus();
 
-      keybindField.requestFocusInWindow();
-
-      // Create a temporary key listener to capture the next key press
       NativeKeyListener captureListener = new NativeKeyListener() {
         @Override
         public void nativeKeyPressed(NativeKeyEvent event) {
           int keyCode = event.getKeyCode();
 
-          // Update UI on the Event Dispatch Thread for valid keys
-          javax.swing.SwingUtilities.invokeLater(() -> {
+          Platform.runLater(() -> {
             keybindField.setText(NativeKeyEvent.getKeyText(keyCode));
             settings.set(setting, keyCode);
           });
 
-          // Cleanup - remove listener and reset button state regardless of key validity
-          // Note: GlobalScreen.removeNativeKeyListener is thread-safe and can be called
-          // from the native event thread
           try {
             GlobalScreen.removeNativeKeyListener(this);
           } finally {
-            // Reset button state on the Event Dispatch Thread
-            javax.swing.SwingUtilities.invokeLater(() -> {
+            Platform.runLater(() -> {
               captureButton.setText(LocalizationUtil.get("buttonCaptureKeybind"));
-              captureButton.setEnabled(true);
+              captureButton.setDisable(false);
             });
           }
         }
@@ -247,59 +165,44 @@ public class SettingsTab extends JPanel {
       GlobalScreen.addNativeKeyListener(captureListener);
     });
 
-    var tooltip = buildLabel(rowIndex.getAndIncrement(), tooltipText);
-    tooltip.putClientProperty("FlatLaf.styleClass", "small");
-    tooltip.setEnabled(false);
-    buildLabel(rowIndex.getAndIncrement(), " ");
+    buildTooltip(tooltipText);
   }
 
   private void buildTextRow(String label, String value) {
-    var jLabel = buildLabel(rowIndex.get(), label);
-    var jTextField = buildTextField(rowIndex.getAndIncrement(), value);
-    jTextField.setEditable(false);
-    jLabel.setLabelFor(jTextField);
+    var fxLabel = buildLabel(rowIndex.get(), label);
+    var textField = buildTextField(rowIndex.getAndIncrement(), value);
+    textField.setEditable(false);
+    fxLabel.setLabelFor(textField);
   }
 
-  private JLabel buildLabel(int y, String string) {
-    GridBagConstraints gridBagConstraints = new GridBagConstraints();
-    gridBagConstraints.anchor = GridBagConstraints.EAST;
-    gridBagConstraints.gridx = 0;
-    gridBagConstraints.gridy = y;
-
-    JLabel label = new JLabel(string);
-
-    add(label, gridBagConstraints);
-
+  private Label buildLabel(int y, String text) {
+    Label label = new Label(text);
+    add(label, 0, y);
+    GridPane.setHalignment(label, HPos.RIGHT);
     return label;
   }
 
-  private JTextField buildTextField(int y, String value) {
-    GridBagConstraints gridBagConstraints = new GridBagConstraints();
-    gridBagConstraints.ipadx = 10;
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = y;
-
-    JTextField textField = new JTextField(value);
-    textField.setColumns(20);
-
-    add(textField, gridBagConstraints);
-
+  private TextField buildTextField(int y, String value) {
+    TextField textField = new TextField(value == null ? "" : value);
+    textField.setPrefColumnCount(20);
+    add(textField, 1, y);
     return textField;
   }
 
-  private JComboBox<String> buildComboBox(int y, Collection<String> values, String value) {
-    GridBagConstraints gridBagConstraints = new GridBagConstraints();
-    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-    gridBagConstraints.gridx = 1;
-    gridBagConstraints.gridy = y;
-
-    Vector<String> orderedValues = new Vector<>(values);
+  private ComboBox<String> buildComboBox(int y, Collection<String> values, String value) {
+    var orderedValues = new ArrayList<>(values);
     Collections.sort(orderedValues);
-    JComboBox<String> comboBox = new JComboBox<>(orderedValues);
-    comboBox.setSelectedItem(value);
 
-    add(comboBox, gridBagConstraints);
-
+    ComboBox<String> comboBox = new ComboBox<>();
+    comboBox.getItems().setAll(orderedValues);
+    comboBox.setValue(value);
+    add(comboBox, 1, y);
     return comboBox;
+  }
+
+  private void buildTooltip(String text) {
+    Label tooltip = buildLabel(rowIndex.getAndIncrement(), text);
+    tooltip.setDisable(true);
+    buildLabel(rowIndex.getAndIncrement(), " ");
   }
 }

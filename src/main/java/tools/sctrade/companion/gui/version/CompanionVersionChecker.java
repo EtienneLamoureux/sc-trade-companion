@@ -1,7 +1,7 @@
 package tools.sctrade.companion.gui.version;
 
-import java.awt.EventQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javafx.application.Platform;
 import org.springframework.scheduling.annotation.Async;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.utils.LocalizationUtil;
@@ -55,7 +55,7 @@ public class CompanionVersionChecker {
       String latestVersion = repository.fetchLatestVersion();
 
       if (!currentVersion.equals(latestVersion) && popupAlreadyShown.compareAndSet(false, true)) {
-        EventQueue.invokeLater(() -> popup.showUpdateAvailablePopup(currentVersion, latestVersion));
+        Platform.runLater(() -> popup.showUpdateAvailablePopup(currentVersion, latestVersion));
       }
     } catch (RuntimeException e) {
       notificationService.warn(LocalizationUtil.get("warningUnableToCheckLatestVersion"));

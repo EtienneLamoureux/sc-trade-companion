@@ -1,14 +1,12 @@
 package tools.sctrade.companion.gui;
 
-import java.awt.GridLayout;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
@@ -17,20 +15,16 @@ import tools.sctrade.companion.utils.LocalizationUtil;
  *
  * @see NotificationRepository
  */
-public class LogsTab extends JPanel {
-  private static final long serialVersionUID = 5664549029232335333L;
-
-  private DefaultTableModel model;
+public class LogsTab extends BorderPane {
+  private final ObservableList<LogEntry> logs = FXCollections.observableArrayList();
+  private final TableView<LogEntry> table = new TableView<>(logs);
 
   /**
    * Creates a new instance of the logs tab.
    */
   public LogsTab() {
-    super(new GridLayout());
-
-    buildModel();
-    var table = buildTable();
-    add(new JScrollPane(table));
+    buildTable();
+    setCenter(table);
   }
 
   /**
@@ -39,36 +33,60 @@ public class LogsTab extends JPanel {
    * @param row The row to add.
    */
   public void addLog(Object[] row) {
-    model.addRow(row);
+    logs.add(new LogEntry(String.valueOf(row[0]), String.valueOf(row[1]), String.valueOf(row[2])));
   }
 
-  private DefaultTableModel buildModel() {
-    model = new DefaultTableModel() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public boolean isCellEditable(int row, int column) {
-        return false;
-      }
-    };
-    model.addColumn(LocalizationUtil.get("tableColumnTime"));
-    model.addColumn(LocalizationUtil.get("tableColumnType"));
-    model.addColumn(LocalizationUtil.get("tableColumnMessage"));
-
-    return model;
+  /**
+   * Returns the number of log entries currently shown.
+   *
+   * @return the number of visible log entries
+   */
+  public int getLogCount() {
+    return logs.size();
   }
 
-  private JTable buildTable() {
-    var table = new JTable(model);
-    table.setAutoCreateRowSorter(true);
-    table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-    table.getColumnModel().getColumn(0).setMaxWidth(150);
-    table.getColumnModel().getColumn(1).setMaxWidth(50);
+  private void buildTable() {
+    TableColumn<LogEntry, String> timeColumn =
+        new TableColumn<>(LocalizationUtil.get("tableColumnTime"));
+    timeColumn.setCellValueFactory(cell -> cell.getValue().timeProperty());
+    timeColumn.setPrefWidth(150);
+    timeColumn.setSortType(TableColumn.SortType.DESCENDING);
 
-    TableRowSorter<TableModel> sorter = new TableRowSorter<>(model);
-    table.setRowSorter(sorter);
-    sorter.setSortKeys(java.util.List.of(new RowSorter.SortKey(0, SortOrder.DESCENDING)));
+    TableColumn<LogEntry, String> typeColumn =
+        new TableColumn<>(LocalizationUtil.get("tableColumnType"));
+    typeColumn.setCellValueFactory(cell -> cell.getValue().typeProperty());
+    typeColumn.setPrefWidth(50);
 
-    return table;
+    TableColumn<LogEntry, String> messageColumn =
+        new TableColumn<>(LocalizationUtil.get("tableColumnMessage"));
+    messageColumn.setCellValueFactory(cell -> cell.getValue().messageProperty());
+
+    table.getColumns().setAll(java.util.List.of(timeColumn, typeColumn, messageColumn));
+    table.getSortOrder().setAll(java.util.List.of(timeColumn));
+    table.sort();
+  }
+
+  private static final class LogEntry {
+    private final StringProperty time;
+    private final StringProperty type;
+    private final StringProperty message;
+
+    private LogEntry(String time, String type, String message) {
+      this.time = new SimpleStringProperty(time);
+      this.type = new SimpleStringProperty(type);
+      this.message = new SimpleStringProperty(message);
+    }
+
+    private StringProperty timeProperty() {
+      return time;
+    }
+
+    private StringProperty typeProperty() {
+      return type;
+    }
+
+    private StringProperty messageProperty() {
+      return message;
+    }
   }
 }

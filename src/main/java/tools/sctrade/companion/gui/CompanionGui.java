@@ -1,8 +1,5 @@
 package tools.sctrade.companion.gui;
 
-import com.formdev.flatlaf.FlatLaf;
-import com.formdev.flatlaf.intellijthemes.FlatArcDarkOrangeIJTheme;
-import java.awt.AWTException;
 import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.MenuItem;
@@ -13,12 +10,21 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Locale;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
+import javafx.application.Platform;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.notification.NotificationLevel;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
@@ -32,13 +38,12 @@ import tools.sctrade.companion.utils.TimeUtil;
 /**
  * The main GUI class for the companion application.
  */
-public class CompanionGui extends JFrame implements NotificationRepository, UpdateAvailablePopup {
-  private static final long serialVersionUID = -983766141308946535L;
-
+public class CompanionGui implements NotificationRepository, UpdateAvailablePopup {
   private transient UserService userService;
   private transient GameLogPathSubject gameLogService;
   private transient SettingRepository settings;
   private final String version;
+  private Stage stage;
   private LogsTab logsTab;
 
   /**
@@ -58,37 +63,44 @@ public class CompanionGui extends JFrame implements NotificationRepository, Upda
   }
 
   /**
-   * Initializes the companion GUI.
+   * Initializes the companion GUI stage.
    *
-   * @throws AWTException If the system tray is not supported.
+   * @param primaryStage the primary JavaFX stage
    */
-  public void initialize() throws AWTException {
-    setLookAndFeel();
-    setIconImages();
+  public void initialize(Stage primaryStage) {
+    stage = primaryStage;
+    Platform.setImplicitExit(false);
 
-    setTitle(
+    stage.setTitle(
         String.format(Locale.ROOT, "%s %s", LocalizationUtil.get("applicationTitle"), version));
-
-    setSize(600, 575);
-    setLocationRelativeTo(null);
-
-    buildMenuBar();
-    buildTabs();
+    stage.setWidth(600);
+    stage.setHeight(575);
+    stage.setScene(buildScene());
+    stage.getIcons().addAll(Arrays.asList("icon128", "icon64", "icon32", "icon16").stream()
+        .map(this::getFxIcon).toList());
+    centerStage();
     setupTray();
+    stage.setOnCloseRequest(event -> {
+      Platform.exit();
+      System.exit(0);
+    });
   }
 
   @Override
   public void showUpdateAvailablePopup(String currentVersion, String latestVersion) {
-    Object[] options = {LocalizationUtil.get("updatePopupDownloadButton"),
-        LocalizationUtil.get("updatePopupCloseButton")};
     String message = String.format(Locale.ROOT, LocalizationUtil.get("updatePopupMessage"),
         currentVersion, latestVersion);
+    ButtonType downloadButton =
+        new ButtonType(LocalizationUtil.get("updatePopupDownloadButton"), ButtonData.OK_DONE);
+    ButtonType laterButton =
+        new ButtonType(LocalizationUtil.get("updatePopupCloseButton"), ButtonData.CANCEL_CLOSE);
 
-    int selection =
-        JOptionPane.showOptionDialog(this, message, LocalizationUtil.get("updatePopupTitle"),
-            JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+    Alert alert = new Alert(Alert.AlertType.INFORMATION, message, downloadButton, laterButton);
+    alert.initOwner(stage);
+    alert.setTitle(LocalizationUtil.get("updatePopupTitle"));
+    alert.setHeaderText(null);
 
-    if (selection == JOptionPane.YES_OPTION) {
+    if (alert.showAndWait().orElse(laterButton) == downloadButton) {
       openReleasePage();
     }
   }
@@ -115,57 +127,67 @@ public class CompanionGui extends JFrame implements NotificationRepository, Upda
     }
   }
 
-  private void setLookAndFeel() {
-    FlatArcDarkOrangeIJTheme.setup();
-    FlatLaf.updateUI();
+  private Scene buildScene() {
+    logsTab = new LogsTab();
+
+    VBox root = new VBox();
+    root.getChildren().add(buildMenuBar());
+
+    BorderPane content = new BorderPane();
+    content.setCenter(buildTabs());
+    VBox.setVgrow(content, Priority.ALWAYS);
+    root.getChildren().add(content);
+
+    return new Scene(root, 600, 575);
   }
 
-  private void setIconImages() {
-    var iconPaths = Arrays.asList("icon128", "icon64", "icon32", "icon16");
-    var iconImages = iconPaths.parallelStream().map(this::getIcon).toList();
-
-    setIconImages(iconImages);
+  private void centerStage() {
+    Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+    stage.setX((bounds.getWidth() - stage.getWidth()) / 2);
+    stage.setY((bounds.getHeight() - stage.getHeight()) / 2);
   }
 
-  private void buildMenuBar() {
-    var menuBar = new JMenuBar();
-    menuBar.add(buildFileMenu());
-
-    setJMenuBar(menuBar);
+  private MenuBar buildMenuBar() {
+    var menuBar = new MenuBar();
+    menuBar.getMenus().add(buildFileMenu());
+    return menuBar;
   }
 
-  private JMenu buildFileMenu() {
-    var fileMenu = new JMenu();
-    fileMenu.setText(LocalizationUtil.get("menuFile"));
+  private Menu buildFileMenu() {
+    var fileMenu = new Menu(LocalizationUtil.get("menuFile"));
 
-    JMenuItem closeMenuItem = new JMenuItem();
-    closeMenuItem.setText(LocalizationUtil.get("menuItemSendToTray"));
-    closeMenuItem.addActionListener(e -> setVisible(false));
-    fileMenu.add(closeMenuItem);
+    javafx.scene.control.MenuItem closeMenuItem =
+        new javafx.scene.control.MenuItem(LocalizationUtil.get("menuItemSendToTray"));
+    closeMenuItem.setOnAction(event -> stage.hide());
+    fileMenu.getItems().add(closeMenuItem);
 
-    JMenuItem exitMenuItem = new JMenuItem();
-    exitMenuItem.setText(LocalizationUtil.get("menuItemExit"));
-    exitMenuItem.addActionListener(e -> System.exit(0));
-    fileMenu.add(exitMenuItem);
+    javafx.scene.control.MenuItem exitMenuItem =
+        new javafx.scene.control.MenuItem(LocalizationUtil.get("menuItemExit"));
+    exitMenuItem.setOnAction(event -> {
+      Platform.exit();
+      System.exit(0);
+    });
+    fileMenu.getItems().add(exitMenuItem);
     return fileMenu;
   }
 
-  private void buildTabs() {
-    logsTab = new LogsTab();
-
-    var tabbedPane = new JTabbedPane();
-    tabbedPane.addTab(LocalizationUtil.get("tabUsage"), new UsageTab());
-    tabbedPane.addTab(LocalizationUtil.get("tabSettings"),
-        new SettingsTab(userService, gameLogService, settings));
-    tabbedPane.addTab(LocalizationUtil.get("tabLogs"), logsTab);
-
-    add(tabbedPane);
+  private TabPane buildTabs() {
+    var tabbedPane = new TabPane();
+    tabbedPane.getTabs().add(buildTab(LocalizationUtil.get("tabUsage"), new UsageTab()));
+    tabbedPane.getTabs().add(buildTab(LocalizationUtil.get("tabSettings"),
+        new SettingsTab(userService, gameLogService, settings)));
+    tabbedPane.getTabs().add(buildTab(LocalizationUtil.get("tabLogs"), logsTab));
+    return tabbedPane;
   }
 
-  private void setupTray() throws AWTException {
-    if (SystemTray.isSupported()) {
-      setDefaultCloseOperation(HIDE_ON_CLOSE);
+  private Tab buildTab(String title, javafx.scene.Node content) {
+    Tab tab = new Tab(title, content);
+    tab.setClosable(false);
+    return tab;
+  }
 
+  private void setupTray() {
+    if (SystemTray.isSupported()) {
       PopupMenu popupMenu = new PopupMenu();
       popupMenu.add(buildOpenMenuItem());
       popupMenu.add(buildExitMenuItem());
@@ -175,29 +197,42 @@ public class CompanionGui extends JFrame implements NotificationRepository, Upda
       trayIcon.setImageAutoSize(true);
       trayIcon.setToolTip(LocalizationUtil.get("applicationTitle"));
 
-      SystemTray systemTray = SystemTray.getSystemTray();
-      systemTray.add(trayIcon);
+      try {
+        SystemTray systemTray = SystemTray.getSystemTray();
+        systemTray.add(trayIcon);
+      } catch (Exception e) {
+        throw new IllegalStateException("Unable to initialize the system tray", e);
+      }
     }
-
-    setDefaultCloseOperation(EXIT_ON_CLOSE);
   }
 
   private MenuItem buildOpenMenuItem() {
     MenuItem openMenuItem = new MenuItem(LocalizationUtil.get("menuItemOpen"));
-    openMenuItem.addActionListener(e -> setVisible(true));
+    openMenuItem.addActionListener(e -> Platform.runLater(() -> {
+      stage.show();
+      stage.toFront();
+    }));
 
     return openMenuItem;
   }
 
   private MenuItem buildExitMenuItem() {
     MenuItem exitMenuItem = new MenuItem(LocalizationUtil.get("menuItemExit"));
-    exitMenuItem.addActionListener(e -> System.exit(0));
+    exitMenuItem.addActionListener(e -> Platform.runLater(() -> {
+      Platform.exit();
+      System.exit(0);
+    }));
 
     return exitMenuItem;
   }
 
   private Image getIcon(String name) {
-    return getToolkit()
+    return java.awt.Toolkit.getDefaultToolkit()
         .getImage(getClass().getResource(String.format(Locale.ROOT, "/images/icons/%s.png", name)));
+  }
+
+  private javafx.scene.image.Image getFxIcon(String name) {
+    return new javafx.scene.image.Image(
+        getClass().getResourceAsStream(String.format(Locale.ROOT, "/images/icons/%s.png", name)));
   }
 }
