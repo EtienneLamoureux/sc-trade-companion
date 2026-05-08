@@ -48,7 +48,6 @@ import tools.sctrade.companion.domain.user.idgenerators.HardwareUserIdGenerator;
 import tools.sctrade.companion.domain.user.idgenerators.RandomUserIdGenerator;
 import tools.sctrade.companion.domain.user.idgenerators.WindowsUserIdGenerator;
 import tools.sctrade.companion.gui.CompanionGui;
-import tools.sctrade.companion.gui.LogsTab;
 import tools.sctrade.companion.gui.version.CompanionVersionChecker;
 import tools.sctrade.companion.gui.version.CompanionVersionRepository;
 import tools.sctrade.companion.gui.version.UpdateAvailablePopup;
@@ -92,11 +91,6 @@ public class AppConfig {
     settingRepository.set(Setting.SC_TRADE_TOOLS_ROOT_URL, scTradeToolsRootUrl);
 
     return settingRepository;
-  }
-
-  @Bean("LogsTab")
-  public LogsTab buildLogsTab() {
-    return new LogsTab();
   }
 
   @Bean("UserIdGenerator")
