@@ -131,14 +131,18 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
     logsTab = new LogsTab();
 
     VBox root = new VBox();
+    root.getStyleClass().add("companion-root");
     root.getChildren().add(buildMenuBar());
 
     BorderPane content = new BorderPane();
+    content.getStyleClass().add("companion-content");
     content.setCenter(buildTabs());
     VBox.setVgrow(content, Priority.ALWAYS);
     root.getChildren().add(content);
 
-    return new Scene(root, 600, 575);
+    Scene scene = new Scene(root, 600, 575);
+    scene.getStylesheets().add(getClass().getResource("/styles/companion.css").toExternalForm());
+    return scene;
   }
 
   private void centerStage() {
@@ -173,6 +177,7 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
 
   private TabPane buildTabs() {
     var tabbedPane = new TabPane();
+    tabbedPane.getStyleClass().add("companion-tabs");
     tabbedPane.getTabs().add(buildTab(LocalizationUtil.get("tabUsage"), new UsageTab()));
     tabbedPane.getTabs().add(buildTab(LocalizationUtil.get("tabSettings"),
         new SettingsTab(userService, gameLogService, settings)));

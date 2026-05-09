@@ -52,6 +52,7 @@ class CompanionGuiTest {
     Scene scene = stage.getScene();
     VBox root = assertInstanceOf(VBox.class, scene.getRoot());
     assertInstanceOf(MenuBar.class, root.getChildren().get(0));
+    assertEquals(1, scene.getStylesheets().size());
 
     BorderPane content = assertInstanceOf(BorderPane.class, root.getChildren().get(1));
     TabPane tabPane = assertInstanceOf(TabPane.class, content.getCenter());

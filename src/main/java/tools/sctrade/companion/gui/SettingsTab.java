@@ -113,7 +113,7 @@ public class SettingsTab extends GridPane {
       int defaultKeybind, String keybindLabelText, String keybindFieldId, String tooltipText) {
     var keybindLabel = buildLabel(rowIndex.get(), keybindLabelText);
 
-    String currentKeybind = NativeKeyEvent.getKeyText(settings.get(setting, defaultKeybind));
+    String currentKeybind = formatKeybind(settings.get(setting, defaultKeybind));
     TextField keybindField = new TextField(currentKeybind);
     keybindField.setId(keybindFieldId);
     keybindField.setEditable(false);
@@ -137,7 +137,7 @@ public class SettingsTab extends GridPane {
           int keyCode = event.getKeyCode();
 
           Platform.runLater(() -> {
-            keybindField.setText(NativeKeyEvent.getKeyText(keyCode));
+            keybindField.setText(formatKeybind(keyCode));
             settings.set(setting, keyCode);
           });
 
@@ -204,5 +204,13 @@ public class SettingsTab extends GridPane {
     Label tooltip = buildLabel(rowIndex.getAndIncrement(), text);
     tooltip.setDisable(true);
     buildLabel(rowIndex.getAndIncrement(), " ");
+  }
+
+  private String formatKeybind(int keyCode) {
+    if (keyCode >= NativeKeyEvent.VC_F1 && keyCode <= NativeKeyEvent.VC_F24) {
+      return String.format("F%d", keyCode - NativeKeyEvent.VC_F1 + 1);
+    }
+
+    return NativeKeyEvent.getKeyText(keyCode);
   }
 }

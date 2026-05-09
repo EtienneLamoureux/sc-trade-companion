@@ -34,8 +34,7 @@ dependencies {
 	implementation 'com.1stleg:jnativehook:2.1.0'
 
 	// GUI look and feel
-	implementation 'com.formdev:flatlaf:3.5.2'
-	implementation 'com.formdev:flatlaf-intellij-themes:3.5.2'
+	implementation 'io.github.mkpaz:atlantafx-base:2.1.0'
 	
 	// Computer vision
 	implementation 'org.openpnp:opencv:4.9.0-0'

@@ -23,6 +23,7 @@ public class LogsTab extends BorderPane {
    * Creates a new instance of the logs tab.
    */
   public LogsTab() {
+    table.getStyleClass().add("logs-table");
     buildTable();
     setCenter(table);
   }

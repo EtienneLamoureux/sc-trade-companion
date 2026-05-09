@@ -15,9 +15,11 @@ public class UsageTab extends BorderPane {
    */
   public UsageTab() {
     WebView instructions = new WebView();
-    instructions.getEngine().loadContent(LocalizationUtil.get("instructions"));
+    instructions.getEngine()
+        .loadContent(CompanionTheme.wrapInstructionsHtml(LocalizationUtil.get("instructions")));
 
     ScrollPane scrollPane = new ScrollPane(instructions);
+    scrollPane.getStyleClass().add("usage-scroll-pane");
     scrollPane.setFitToHeight(true);
     scrollPane.setFitToWidth(true);
     setCenter(scrollPane);

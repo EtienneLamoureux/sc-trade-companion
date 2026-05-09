@@ -1,0 +1,21 @@
+.companion-root,
+.companion-content {
+  -fx-background-color: -color-bg-default;
+}
+
+.companion-tabs {
+  -fx-tab-min-width: 120px;
+}
+
+.usage-scroll-pane {
+  -fx-background-insets: 0;
+  -fx-padding: 0;
+}
+
+.usage-scroll-pane > .viewport {
+  -fx-background-color: transparent;
+}
+
+.logs-table {
+  -fx-fixed-cell-size: 24px;
+}

@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import org.springframework.context.ConfigurableApplicationContext;
 import tools.sctrade.companion.gui.CompanionGui;
+import tools.sctrade.companion.gui.CompanionTheme;
 import tools.sctrade.companion.gui.version.CompanionVersionChecker;
 
 /**
@@ -28,6 +29,7 @@ public class CompanionFxApplication extends Application {
    */
   @Override
   public void start(Stage primaryStage) {
+    CompanionTheme.applyUserAgentStylesheet();
     var gui = applicationContext.getBean(CompanionGui.class);
     gui.initialize(primaryStage);
     primaryStage.show();
