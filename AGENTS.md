@@ -32,7 +32,7 @@
 - Prefer surgical changes over broad refactors.
 - Match existing naming, structure, and architectural patterns.
 - Use the Gradle wrapper instead of introducing alternate build tooling.
-- Use `gradlew spotlessApply` when formatting or import order updates are needed.
+- Run `gradlew spotlessApply` after edits instead of trying to fix Spotless issues manually.
 - Use `gradlew clean build` as the primary validation command for code changes.
 - Keep tests aligned with the repository's naming and structure rules.
 - Do not claim completion if local environment constraints prevent full validation.
