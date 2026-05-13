@@ -20,6 +20,7 @@
 - Changes SHALL be unit tested.
 - Tests SHALL be named using `given X when Y then Z`; when setup is generic, `when Y then X` is acceptable.
 - Tests SHALL assert one thing.
+- Production code SHALL NOT expose test-only methods; when test-specific access is needed, use a test-package subclass that extends the real class.
 - Tests SHOULD be parameterized when possible.
 - Changes SHALL NOT reduce existing coverage.
 - Changes SHOULD respect the current project structure.
