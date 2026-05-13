@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.BorderPane;
@@ -16,14 +17,20 @@ import tools.sctrade.companion.utils.LocalizationUtil;
  * @see NotificationRepository
  */
 public class LogsTab extends BorderPane {
+  static final int TIME_COLUMN_WIDTH = 175;
+  static final int LOG_TYPE_COLUMN_WIDTH = 75;
+
   private final ObservableList<LogEntry> logs = FXCollections.observableArrayList();
-  private final TableView<LogEntry> table = new TableView<>(logs);
+  private final TableView<LogEntry> table = new TableView<>();
+  private final SortedList<LogEntry> sortedLogs = new SortedList<>(logs);
 
   /**
    * Creates a new instance of the logs tab.
    */
   public LogsTab() {
     table.getStyleClass().add("logs-table");
+    sortedLogs.comparatorProperty().bind(table.comparatorProperty());
+    table.setItems(sortedLogs);
     buildTable();
     setCenter(table);
   }
@@ -37,34 +44,47 @@ public class LogsTab extends BorderPane {
     logs.add(new LogEntry(String.valueOf(row[0]), String.valueOf(row[1]), String.valueOf(row[2])));
   }
 
-  /**
-   * Returns the number of log entries currently shown.
-   *
-   * @return the number of visible log entries
-   */
-  public int getLogCount() {
-    return logs.size();
-  }
-
   private void buildTable() {
     TableColumn<LogEntry, String> timeColumn =
         new TableColumn<>(LocalizationUtil.get("tableColumnTime"));
     timeColumn.setCellValueFactory(cell -> cell.getValue().timeProperty());
-    timeColumn.setPrefWidth(150);
+    timeColumn.setMinWidth(TIME_COLUMN_WIDTH);
+    timeColumn.setPrefWidth(TIME_COLUMN_WIDTH);
+    timeColumn.setMaxWidth(TIME_COLUMN_WIDTH);
     timeColumn.setSortType(TableColumn.SortType.DESCENDING);
+    timeColumn.setReorderable(false);
+    timeColumn.setResizable(false);
 
     TableColumn<LogEntry, String> typeColumn =
         new TableColumn<>(LocalizationUtil.get("tableColumnType"));
     typeColumn.setCellValueFactory(cell -> cell.getValue().typeProperty());
-    typeColumn.setPrefWidth(50);
+    typeColumn.setMinWidth(LOG_TYPE_COLUMN_WIDTH);
+    typeColumn.setPrefWidth(LOG_TYPE_COLUMN_WIDTH);
+    typeColumn.setMaxWidth(LOG_TYPE_COLUMN_WIDTH);
+    typeColumn.setReorderable(false);
+    typeColumn.setResizable(false);
 
     TableColumn<LogEntry, String> messageColumn =
         new TableColumn<>(LocalizationUtil.get("tableColumnMessage"));
     messageColumn.setCellValueFactory(cell -> cell.getValue().messageProperty());
+    messageColumn.setMinWidth(0);
+    messageColumn.setReorderable(false);
 
     table.getColumns().setAll(java.util.List.of(timeColumn, typeColumn, messageColumn));
+    synchronizeMessageColumnWidth(messageColumn);
     table.getSortOrder().setAll(java.util.List.of(timeColumn));
     table.sort();
+  }
+
+  private void synchronizeMessageColumnWidth(TableColumn<LogEntry, String> messageColumn) {
+    table.widthProperty()
+        .addListener((observable, oldWidth, newWidth) -> updateMessageColumnWidth(messageColumn));
+    updateMessageColumnWidth(messageColumn);
+  }
+
+  private void updateMessageColumnWidth(TableColumn<LogEntry, String> messageColumn) {
+    messageColumn
+        .setPrefWidth(Math.max(0, table.getWidth() - TIME_COLUMN_WIDTH - LOG_TYPE_COLUMN_WIDTH));
   }
 
   private static final class LogEntry {
