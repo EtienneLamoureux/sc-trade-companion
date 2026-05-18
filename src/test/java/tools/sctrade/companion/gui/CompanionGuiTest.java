@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import atlantafx.base.controls.ModalPane;
+import atlantafx.base.controls.RingProgressIndicator;
 import java.nio.file.Path;
 import java.util.Optional;
 import javafx.scene.Scene;
@@ -21,8 +23,6 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import atlantafx.base.controls.ModalPane;
-import atlantafx.base.controls.RingProgressIndicator;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
@@ -182,7 +182,8 @@ class CompanionGuiTest {
     Scene scene = stage.getScene();
     StackPane rootStack = assertInstanceOf(StackPane.class, scene.getRoot());
     ModalPane modalPane = assertInstanceOf(ModalPane.class, rootStack.lookup("#closingModalPane"));
-    assertFalse(modalPane.getPersistent(), "Closing modal should be non-persistent until requested");
+    assertFalse(modalPane.getPersistent(),
+        "Closing modal should be non-persistent until requested");
     assertEquals(Double.MAX_VALUE, modalPane.getMaxWidth(),
         "Closing modal should expand horizontally with window size");
     assertEquals(Double.MAX_VALUE, modalPane.getMaxHeight(),
@@ -271,7 +272,8 @@ class CompanionGuiTest {
   }
 
   private static BorderPane companionRoot(StackPane stackRoot) {
-    return stackRoot.getChildren().stream().filter(BorderPane.class::isInstance).map(BorderPane.class::cast)
-        .findFirst().orElseThrow(() -> new AssertionError("Companion root BorderPane not found"));
+    return stackRoot.getChildren().stream().filter(BorderPane.class::isInstance)
+        .map(BorderPane.class::cast).findFirst()
+        .orElseThrow(() -> new AssertionError("Companion root BorderPane not found"));
   }
 }

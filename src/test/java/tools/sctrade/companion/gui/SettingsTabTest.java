@@ -181,12 +181,9 @@ class SettingsTabTest {
       SettingsTab settingsTab = new SettingsTab(userService, gameLogPathSubject, settings);
       Node topSpacer = settingsTab.lookup("#settingsTopSpacer");
       Node bottomSpacer = settingsTab.lookup("#settingsBottomSpacer");
-      return new Object[] {
-          topSpacer != null,
-          bottomSpacer != null,
+      return new Object[] {topSpacer != null, bottomSpacer != null,
           topSpacer == null ? null : GridPane.getVgrow(topSpacer),
-          bottomSpacer == null ? null : GridPane.getVgrow(bottomSpacer)
-      };
+          bottomSpacer == null ? null : GridPane.getVgrow(bottomSpacer)};
     });
 
     assertTrue((Boolean) vgrowValues[0], "Top spacer should exist");
