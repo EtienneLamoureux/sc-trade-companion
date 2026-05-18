@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.sctrade.companion.domain.SubmissionFactory;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OcrResult;
@@ -12,7 +13,7 @@ import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.exceptions.NoListingsException;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
-public class ItemSubmissionFactory {
+public class ItemSubmissionFactory implements SubmissionFactory<ItemSubmission> {
   private final Logger logger = LoggerFactory.getLogger(ItemSubmissionFactory.class);
 
   private UserService userService;
@@ -33,6 +34,7 @@ public class ItemSubmissionFactory {
     this.ocr = ocr;
   }
 
+  @Override
   public ItemSubmission build(BufferedImage screenCapture) {
     var ocrResult = ocr.read(screenCapture);
     var location = extractLocation(screenCapture, ocrResult);
