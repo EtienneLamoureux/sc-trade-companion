@@ -6,10 +6,13 @@ import java.util.Collections;
 import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -44,8 +47,20 @@ public class SettingsTab extends GridPane {
     rowIndex = new IncrementingInt();
 
     setPadding(new Insets(10));
-    setHgap(10);
+    setHgap(16);
     setVgap(6);
+
+    ColumnConstraints col0 = new ColumnConstraints();
+    col0.setPercentWidth(50);
+    col0.setHgrow(Priority.ALWAYS);
+    col0.setHalignment(HPos.RIGHT);
+
+    ColumnConstraints col1 = new ColumnConstraints();
+    col1.setPercentWidth(50);
+    col1.setHgrow(Priority.ALWAYS);
+    col1.setHalignment(HPos.LEFT);
+
+    getColumnConstraints().addAll(col0, col1);
 
     buildUsernameField(userService);
     buildPrintscreenCommodityKeybindField(settings);
@@ -59,19 +74,19 @@ public class SettingsTab extends GridPane {
   }
 
   private void buildUsernameField(UserService userService) {
-    var usernameLabel = buildLabel(rowIndex.get(), LocalizationUtil.get("labelUsername"));
+    var usernameLabel = buildLabelWithHelp(rowIndex.get(), LocalizationUtil.get("labelUsername"),
+        LocalizationUtil.get("tooltipUsername"));
     var usernameField = buildTextField(rowIndex.getAndIncrement(), userService.get().label());
     usernameField.setPromptText(LocalizationUtil.get("textFieldUsernamePlaceholder"));
     usernameLabel.setLabelFor(usernameField);
     usernameField.textProperty()
         .addListener((observable, oldValue, newValue) -> userService.updateUsername(newValue));
-
-    buildTooltip(LocalizationUtil.get("tooltipUsername"));
   }
 
   private void buildStarCitizenLivePathField(GameLogPathSubject gameLogService) {
     var starCitizenLivePathLabel =
-        buildLabel(rowIndex.get(), LocalizationUtil.get("labelStarCitizenLivePath"));
+        buildLabelWithHelp(rowIndex.get(), LocalizationUtil.get("labelStarCitizenLivePath"),
+            LocalizationUtil.get("tooltipStarCitizenLivePath"));
     var starCitizenLivePathField = buildTextField(rowIndex.getAndIncrement(),
         gameLogService.getStarCitizenLivePath().orElse(null));
     starCitizenLivePathField
@@ -79,8 +94,6 @@ public class SettingsTab extends GridPane {
     starCitizenLivePathLabel.setLabelFor(starCitizenLivePathField);
     starCitizenLivePathField.textProperty().addListener(
         (observable, oldValue, newValue) -> gameLogService.setStarCitizenLivePath(newValue));
-
-    buildTooltip(LocalizationUtil.get("tooltipStarCitizenLivePath"));
   }
 
   private void buildStarCitizenMonitorComboBox(SettingRepository settings) {
@@ -111,7 +124,7 @@ public class SettingsTab extends GridPane {
 
   private void buildPrintscreenKeybindField(SettingRepository settings, Setting setting,
       int defaultKeybind, String keybindLabelText, String keybindFieldId, String tooltipText) {
-    var keybindLabel = buildLabel(rowIndex.get(), keybindLabelText);
+    var keybindLabel = buildLabelWithHelp(rowIndex.get(), keybindLabelText, tooltipText);
 
     String currentKeybind = formatKeybind(settings.get(setting, defaultKeybind));
     TextField keybindField = new TextField(currentKeybind);
@@ -164,8 +177,6 @@ public class SettingsTab extends GridPane {
 
       GlobalScreen.addNativeKeyListener(captureListener);
     });
-
-    buildTooltip(tooltipText);
   }
 
   private void buildTextRow(String label, String value) {
@@ -179,6 +190,19 @@ public class SettingsTab extends GridPane {
     Label label = new Label(text);
     add(label, 0, y);
     GridPane.setHalignment(label, HPos.RIGHT);
+    return label;
+  }
+
+  private Label buildLabelWithHelp(int y, String text, String helpText) {
+    Label label = new Label(text);
+    Label helpIcon = new Label("\u24d8");
+    helpIcon.getStyleClass().add("settings-help-icon");
+    helpIcon.setTooltip(new Tooltip(helpText));
+
+    HBox labelBox = new HBox(4, label, helpIcon);
+    labelBox.setAlignment(Pos.CENTER_RIGHT);
+    add(labelBox, 0, y);
+    GridPane.setHalignment(labelBox, HPos.RIGHT);
     return label;
   }
 
@@ -198,12 +222,6 @@ public class SettingsTab extends GridPane {
     comboBox.setValue(value);
     add(comboBox, 1, y);
     return comboBox;
-  }
-
-  private void buildTooltip(String text) {
-    Label tooltip = buildLabel(rowIndex.getAndIncrement(), text);
-    tooltip.setDisable(true);
-    buildLabel(rowIndex.getAndIncrement(), " ");
   }
 
   private String formatKeybind(int keyCode) {

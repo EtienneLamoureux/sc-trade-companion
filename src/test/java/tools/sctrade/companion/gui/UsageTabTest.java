@@ -1,11 +1,14 @@
 package tools.sctrade.companion.gui;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import javafx.scene.control.ScrollPane;
 import javafx.scene.web.WebView;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import tools.sctrade.companion.utils.LocalizationUtil;
 
 class UsageTabTest {
   @BeforeAll
@@ -19,5 +22,18 @@ class UsageTabTest {
 
     ScrollPane scrollPane = assertInstanceOf(ScrollPane.class, usageTab.getCenter());
     assertInstanceOf(WebView.class, scrollPane.getContent());
+  }
+
+  @Test
+  void givenEnglishBundleWhenReadingInstructionsThenNoSystemTrayMention() {
+    String instructions = LocalizationUtil.get("instructions");
+
+    assertFalse(instructions.toLowerCase().contains("system tray"),
+        "Instructions should not mention the system tray");
+  }
+
+  @Test
+  void givenEnglishBundleWhenReadingTabScreenshotsKeyThenReturnsScreenshots() {
+    assertEquals("Screenshots", LocalizationUtil.get("tabScreenshots"));
   }
 }

@@ -1,30 +1,24 @@
 package tools.sctrade.companion.gui;
 
 import java.awt.Desktop;
-import java.awt.Image;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Locale;
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.notification.NotificationLevel;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
@@ -45,6 +39,8 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
   private final String version;
   private Stage stage;
   private LogsTab logsTab;
+  private transient Hyperlink activeNavLink;
+  private transient FadeTransition currentTransition;
 
   /**
    * Creates a new instance of the companion GUI.
@@ -69,7 +65,6 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
    */
   public void initialize(Stage primaryStage) {
     stage = primaryStage;
-    Platform.setImplicitExit(false);
 
     stage.setTitle(
         String.format(Locale.ROOT, "%s %s", LocalizationUtil.get("applicationTitle"), version));
@@ -79,7 +74,6 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
     stage.getIcons().addAll(Arrays.asList("icon128", "icon64", "icon32", "icon16").stream()
         .map(this::getFxIcon).toList());
     centerStage();
-    setupTray();
     stage.setOnCloseRequest(event -> {
       Platform.exit();
       System.exit(0);
@@ -129,111 +123,79 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
 
   private Scene buildScene() {
     logsTab = new LogsTab();
+    UsageTab usageTab = new UsageTab();
+    SettingsTab settingsTab = new SettingsTab(userService, gameLogService, settings);
+    ScreenshotsTab screenshotsTab = new ScreenshotsTab();
 
-    VBox root = new VBox();
+    BorderPane root = new BorderPane();
     root.getStyleClass().add("companion-root");
-    root.getChildren().add(buildMenuBar());
-
-    BorderPane content = new BorderPane();
-    content.getStyleClass().add("companion-content");
-    content.setCenter(buildTabs());
-    VBox.setVgrow(content, Priority.ALWAYS);
-    root.getChildren().add(content);
+    root.setTop(buildNavBar(root, usageTab, settingsTab, screenshotsTab, logsTab));
+    root.setCenter(usageTab);
 
     Scene scene = new Scene(root, 600, 575);
     scene.getStylesheets().add(getClass().getResource("/styles/companion.css").toExternalForm());
     return scene;
   }
 
+  private HBox buildNavBar(BorderPane root, UsageTab usageTab, SettingsTab settingsTab,
+      ScreenshotsTab screenshotsTab, LogsTab logsTab) {
+    Hyperlink usageLink = buildNavLink("nav-usage", LocalizationUtil.get("tabUsage"),
+        () -> switchCenter(root, usageTab));
+    Hyperlink settingsLink = buildNavLink("nav-settings", LocalizationUtil.get("tabSettings"),
+        () -> switchCenter(root, settingsTab));
+    Hyperlink screenshotsLink = buildNavLink("nav-screenshots",
+        LocalizationUtil.get("tabScreenshots"), () -> switchCenter(root, screenshotsTab));
+    Hyperlink logsLink = buildNavLink("nav-logs", LocalizationUtil.get("tabLogs"),
+        () -> switchCenter(root, logsTab));
+
+    setActiveNavLink(usageLink);
+    HBox navBar = new HBox(usageLink, settingsLink, screenshotsLink, logsLink);
+    navBar.getStyleClass().add("companion-nav");
+    return navBar;
+  }
+
+  private Hyperlink buildNavLink(String id, String label, Runnable action) {
+    Hyperlink link = new Hyperlink(label);
+    link.setId(id);
+    link.getStyleClass().add("companion-nav-link");
+    link.setOnAction(e -> {
+      if (link == activeNavLink) {
+        return;
+      }
+      setActiveNavLink(link);
+      action.run();
+    });
+    return link;
+  }
+
+  private void setActiveNavLink(Hyperlink link) {
+    if (activeNavLink != null) {
+      activeNavLink.getStyleClass().remove("active");
+    }
+    activeNavLink = link;
+    activeNavLink.getStyleClass().add("active");
+  }
+
+  private void switchCenter(BorderPane root, Node node) {
+    if (node == root.getCenter()) {
+      return;
+    }
+    if (currentTransition != null) {
+      currentTransition.stop();
+    }
+    node.setOpacity(0);
+    root.setCenter(node);
+    currentTransition = new FadeTransition(Duration.millis(150), node);
+    currentTransition.setFromValue(0);
+    currentTransition.setToValue(1);
+    currentTransition.setOnFinished(e -> currentTransition = null);
+    currentTransition.play();
+  }
+
   private void centerStage() {
     Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
     stage.setX((bounds.getWidth() - stage.getWidth()) / 2);
     stage.setY((bounds.getHeight() - stage.getHeight()) / 2);
-  }
-
-  private MenuBar buildMenuBar() {
-    var menuBar = new MenuBar();
-    menuBar.getMenus().add(buildFileMenu());
-    return menuBar;
-  }
-
-  private Menu buildFileMenu() {
-    var fileMenu = new Menu(LocalizationUtil.get("menuFile"));
-
-    javafx.scene.control.MenuItem closeMenuItem =
-        new javafx.scene.control.MenuItem(LocalizationUtil.get("menuItemSendToTray"));
-    closeMenuItem.setOnAction(event -> stage.hide());
-    fileMenu.getItems().add(closeMenuItem);
-
-    javafx.scene.control.MenuItem exitMenuItem =
-        new javafx.scene.control.MenuItem(LocalizationUtil.get("menuItemExit"));
-    exitMenuItem.setOnAction(event -> {
-      Platform.exit();
-      System.exit(0);
-    });
-    fileMenu.getItems().add(exitMenuItem);
-    return fileMenu;
-  }
-
-  private TabPane buildTabs() {
-    var tabbedPane = new TabPane();
-    tabbedPane.getStyleClass().add("companion-tabs");
-    tabbedPane.getTabs().add(buildTab(LocalizationUtil.get("tabUsage"), new UsageTab()));
-    tabbedPane.getTabs().add(buildTab(LocalizationUtil.get("tabSettings"),
-        new SettingsTab(userService, gameLogService, settings)));
-    tabbedPane.getTabs().add(buildTab(LocalizationUtil.get("tabLogs"), logsTab));
-    return tabbedPane;
-  }
-
-  private Tab buildTab(String title, javafx.scene.Node content) {
-    Tab tab = new Tab(title, content);
-    tab.setClosable(false);
-    return tab;
-  }
-
-  private void setupTray() {
-    if (SystemTray.isSupported()) {
-      PopupMenu popupMenu = new PopupMenu();
-      popupMenu.add(buildOpenMenuItem());
-      popupMenu.add(buildExitMenuItem());
-
-      TrayIcon trayIcon = new TrayIcon(getIcon("icon16"));
-      trayIcon.setPopupMenu(popupMenu);
-      trayIcon.setImageAutoSize(true);
-      trayIcon.setToolTip(LocalizationUtil.get("applicationTitle"));
-
-      try {
-        SystemTray systemTray = SystemTray.getSystemTray();
-        systemTray.add(trayIcon);
-      } catch (Exception e) {
-        throw new IllegalStateException("Unable to initialize the system tray", e);
-      }
-    }
-  }
-
-  private MenuItem buildOpenMenuItem() {
-    MenuItem openMenuItem = new MenuItem(LocalizationUtil.get("menuItemOpen"));
-    openMenuItem.addActionListener(e -> Platform.runLater(() -> {
-      stage.show();
-      stage.toFront();
-    }));
-
-    return openMenuItem;
-  }
-
-  private MenuItem buildExitMenuItem() {
-    MenuItem exitMenuItem = new MenuItem(LocalizationUtil.get("menuItemExit"));
-    exitMenuItem.addActionListener(e -> Platform.runLater(() -> {
-      Platform.exit();
-      System.exit(0);
-    }));
-
-    return exitMenuItem;
-  }
-
-  private Image getIcon(String name) {
-    return java.awt.Toolkit.getDefaultToolkit()
-        .getImage(getClass().getResource(String.format(Locale.ROOT, "/images/icons/%s.png", name)));
   }
 
   private javafx.scene.image.Image getFxIcon(String name) {

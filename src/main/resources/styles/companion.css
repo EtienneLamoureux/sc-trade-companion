@@ -3,6 +3,33 @@
   -fx-background-color: -color-bg-default;
 }
 
+.companion-nav {
+  -fx-background-color: -color-bg-subtle;
+  -fx-border-color: transparent transparent -color-border-default transparent;
+  -fx-border-width: 0 0 1 0;
+  -fx-padding: 6 12 6 12;
+  -fx-max-width: 2147483647;
+  -fx-spacing: 4;
+  -fx-alignment: CENTER_LEFT;
+}
+
+.companion-nav-link {
+  -fx-text-fill: -color-fg-muted;
+  -fx-underline: false;
+  -fx-border-color: transparent;
+  -fx-padding: 4 8 4 8;
+}
+
+.companion-nav-link:hover {
+  -fx-text-fill: -color-fg-default;
+}
+
+.companion-nav-link.active {
+  -fx-text-fill: -color-fg-default;
+  -fx-border-color: transparent transparent -color-accent-emphasis transparent;
+  -fx-border-width: 0 0 2 0;
+}
+
 .companion-tabs {
   -fx-tab-min-width: 120px;
 }
@@ -18,4 +45,10 @@
 
 .logs-table {
   -fx-fixed-cell-size: 24px;
+}
+
+.settings-help-icon {
+  -fx-text-fill: -color-accent-emphasis;
+  -fx-cursor: hand;
+  -fx-font-size: 0.85em;
 }
