@@ -12,11 +12,17 @@ import java.nio.file.Path;
 import java.util.Optional;
 import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import atlantafx.base.controls.ModalPane;
+import atlantafx.base.controls.RingProgressIndicator;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
@@ -51,7 +57,8 @@ class CompanionGuiTest {
     assertEquals(575.0, stage.getHeight());
 
     Scene scene = stage.getScene();
-    BorderPane root = assertInstanceOf(BorderPane.class, scene.getRoot());
+    StackPane stackRoot = assertInstanceOf(StackPane.class, scene.getRoot());
+    BorderPane root = companionRoot(stackRoot);
     assertEquals(1, scene.getStylesheets().size());
 
     HBox navBar = assertInstanceOf(HBox.class, root.getTop(), "Top nav bar must be an HBox");
@@ -80,7 +87,7 @@ class CompanionGuiTest {
       Stage fxStage = new Stage();
       CompanionGui gui = new CompanionGui(userService, gameLogPathSubject, settings, "1.5.2");
       gui.initialize(fxStage);
-      BorderPane r = (BorderPane) fxStage.getScene().getRoot();
+      BorderPane r = companionRoot((StackPane) fxStage.getScene().getRoot());
 
       HBox navBar = (HBox) r.getTop();
       clickLink(navBar, "nav-settings");
@@ -103,7 +110,7 @@ class CompanionGuiTest {
   void givenGuiWhenInitializedThenNavBarHasCompanionNavStyleClass() {
     Stage stage = buildInitializedStage();
 
-    BorderPane root = (BorderPane) stage.getScene().getRoot();
+    BorderPane root = companionRoot((StackPane) stage.getScene().getRoot());
     HBox navBar = (HBox) root.getTop();
 
     assertTrue(navBar.getStyleClass().contains("companion-nav"),
@@ -114,7 +121,7 @@ class CompanionGuiTest {
   void givenGuiWhenInitializedThenNavLinksHaveCompanionNavLinkStyleClass() {
     Stage stage = buildInitializedStage();
 
-    BorderPane root = (BorderPane) stage.getScene().getRoot();
+    BorderPane root = companionRoot((StackPane) stage.getScene().getRoot());
     HBox navBar = (HBox) root.getTop();
 
     navBar.getChildren()
@@ -126,7 +133,7 @@ class CompanionGuiTest {
   void givenGuiWhenInitializedThenUsageLinkIsActive() {
     Stage stage = buildInitializedStage();
 
-    BorderPane root = (BorderPane) stage.getScene().getRoot();
+    BorderPane root = companionRoot((StackPane) stage.getScene().getRoot());
     HBox navBar = (HBox) root.getTop();
 
     assertTrue(navBar.getChildren().get(0).getStyleClass().contains("active"),
@@ -137,7 +144,7 @@ class CompanionGuiTest {
   void givenGuiWhenNavLinkClickedThenClickedLinkBecomesActive() {
     JavaFxTestUtil.runOnFxThreadAndWait(() -> {
       Stage fxStage = buildInitializedStage();
-      BorderPane root = (BorderPane) fxStage.getScene().getRoot();
+      BorderPane root = companionRoot((StackPane) fxStage.getScene().getRoot());
       HBox navBar = (HBox) root.getTop();
 
       clickLink(navBar, "nav-settings");
@@ -153,7 +160,7 @@ class CompanionGuiTest {
   void givenGuiWhenActiveNavLinkClickedThenContentDoesNotFlash() {
     JavaFxTestUtil.runOnFxThreadAndWait(() -> {
       Stage fxStage = buildInitializedStage();
-      BorderPane root = (BorderPane) fxStage.getScene().getRoot();
+      BorderPane root = companionRoot((StackPane) fxStage.getScene().getRoot());
       HBox navBar = (HBox) root.getTop();
 
       var initialCenter = root.getCenter();
@@ -165,6 +172,68 @@ class CompanionGuiTest {
           "Clicking the active nav link should keep the same center node");
       assertEquals(1.0, root.getCenter().getOpacity(),
           "Clicking the active nav link should not restart fade from opacity 0");
+    });
+  }
+
+  @Test
+  void givenGuiWhenInitializedThenClosingModalIsConfiguredAsPersistentCenteredOverlay() {
+    Stage stage = buildInitializedStage();
+
+    Scene scene = stage.getScene();
+    StackPane rootStack = assertInstanceOf(StackPane.class, scene.getRoot());
+    ModalPane modalPane = assertInstanceOf(ModalPane.class, rootStack.lookup("#closingModalPane"));
+    assertFalse(modalPane.getPersistent(), "Closing modal should be non-persistent until requested");
+    assertEquals(Double.MAX_VALUE, modalPane.getMaxWidth(),
+        "Closing modal should expand horizontally with window size");
+    assertEquals(Double.MAX_VALUE, modalPane.getMaxHeight(),
+        "Closing modal should expand vertically with window size");
+    assertEquals(null, modalPane.getContent(),
+        "Closing modal content should only be created when closing is requested");
+  }
+
+  @Test
+  void givenGuiWhenCloseRequestedThenClosingModalIsDisplayed() {
+    UserService userService = mock(UserService.class);
+    when(userService.get()).thenReturn(new User("id", "Pilot"));
+    GameLogPathSubject gameLogPathSubject = mock(GameLogPathSubject.class);
+    when(gameLogPathSubject.getStarCitizenLivePath()).thenReturn(Optional.of("LIVE"));
+    SettingRepository settings = new SettingRepository();
+    settings.set(Setting.MY_DATA_PATH, Path.of("my-data"));
+    settings.set(Setting.MY_IMAGES_PATH, Path.of("my-images"));
+
+    JavaFxTestUtil.runOnFxThreadAndWait(() -> {
+      Stage fxStage = new Stage();
+      CompanionGui gui = new CompanionGui(userService, gameLogPathSubject, settings, "1.5.2") {
+        @Override
+        protected void requestShutdown() {
+          // no-op for test
+        }
+      };
+      gui.initialize(fxStage);
+
+      fxStage.fireEvent(new WindowEvent(fxStage, WindowEvent.WINDOW_CLOSE_REQUEST));
+
+      StackPane stackRoot = (StackPane) fxStage.getScene().getRoot();
+      ModalPane modalPane = (ModalPane) stackRoot.lookup("#closingModalPane");
+      assertTrue(modalPane.isDisplay(), "Closing modal should be displayed on close request");
+      assertTrue(modalPane.getPersistent(), "Closing modal should be persistent while displayed");
+
+      VBox closingContent = assertInstanceOf(VBox.class, modalPane.getContent());
+      assertEquals(javafx.geometry.Pos.CENTER, closingContent.getAlignment(),
+          "Closing modal content should be centered");
+      assertTrue(closingContent.getStyleClass().contains("closing-modal-content"),
+          "Closing modal content should use solid background style class");
+      assertEquals(420.0, closingContent.getPrefWidth(),
+          "Closing modal content should have fixed width");
+      assertEquals(220.0, closingContent.getPrefHeight(),
+          "Closing modal content should have fixed height");
+
+      Label closingTitle = assertInstanceOf(Label.class, closingContent.lookup("#closingTitle"));
+      assertEquals("Closing...", closingTitle.getText());
+      assertTrue(closingTitle.getStyleClass().contains("title-2"),
+          "Closing label should use title-2 style");
+
+      assertInstanceOf(RingProgressIndicator.class, closingContent.lookup("#closingProgress"));
     });
   }
 
@@ -199,5 +268,10 @@ class CompanionGuiTest {
   private static void clickLink(HBox navBar, String id) {
     navBar.getChildren().stream().filter(n -> id.equals(n.getId())).map(n -> (Hyperlink) n)
         .findFirst().orElseThrow(() -> new AssertionError("Nav link not found: " + id)).fire();
+  }
+
+  private static BorderPane companionRoot(StackPane stackRoot) {
+    return stackRoot.getChildren().stream().filter(BorderPane.class::isInstance).map(BorderPane.class::cast)
+        .findFirst().orElseThrow(() -> new AssertionError("Companion root BorderPane not found"));
   }
 }

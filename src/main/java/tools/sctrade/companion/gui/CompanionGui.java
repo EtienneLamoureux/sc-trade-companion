@@ -1,12 +1,16 @@
 package tools.sctrade.companion.gui;
 
+import atlantafx.base.controls.ModalPane;
+import atlantafx.base.controls.RingProgressIndicator;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Locale;
 import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -14,8 +18,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -41,6 +48,7 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
   private LogsTab logsTab;
   private transient Hyperlink activeNavLink;
   private transient FadeTransition currentTransition;
+  private transient ModalPane closingModalPane;
 
   /**
    * Creates a new instance of the companion GUI.
@@ -75,8 +83,11 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
         .map(this::getFxIcon).toList());
     centerStage();
     stage.setOnCloseRequest(event -> {
-      Platform.exit();
-      System.exit(0);
+      event.consume();
+      showClosingModal();
+      PauseTransition closeDelay = new PauseTransition(closingModalDisplayDuration());
+      closeDelay.setOnFinished(e -> requestShutdown());
+      closeDelay.play();
     });
   }
 
@@ -132,9 +143,37 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
     root.setTop(buildNavBar(root, usageTab, settingsTab, screenshotsTab, logsTab));
     root.setCenter(usageTab);
 
-    Scene scene = new Scene(root, 600, 575);
+    closingModalPane = new ModalPane();
+    closingModalPane.setId("closingModalPane");
+    closingModalPane.setPersistent(false);
+    closingModalPane.setAlignment(Pos.CENTER);
+    closingModalPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+    StackPane stackRoot = new StackPane(root, closingModalPane);
+    StackPane.setAlignment(closingModalPane, Pos.CENTER);
+    closingModalPane.prefWidthProperty().bind(stackRoot.widthProperty());
+    closingModalPane.prefHeightProperty().bind(stackRoot.heightProperty());
+
+    Scene scene = new Scene(stackRoot, 600, 575);
     scene.getStylesheets().add(getClass().getResource("/styles/companion.css").toExternalForm());
     return scene;
+  }
+
+  private VBox buildClosingModalContent() {
+    Label title = new Label(LocalizationUtil.get("closingTitle"));
+    title.setId("closingTitle");
+    title.getStyleClass().add("title-2");
+
+    RingProgressIndicator progress = new RingProgressIndicator();
+    progress.setId("closingProgress");
+
+    VBox content = new VBox(10, title, progress);
+    content.setAlignment(Pos.CENTER);
+    content.getStyleClass().add("closing-modal-content");
+    content.setPrefSize(420, 220);
+    content.setMinSize(420, 220);
+    content.setMaxSize(420, 220);
+    return content;
   }
 
   private HBox buildNavBar(BorderPane root, UsageTab usageTab, SettingsTab settingsTab,
@@ -201,5 +240,21 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
   private javafx.scene.image.Image getFxIcon(String name) {
     return new javafx.scene.image.Image(
         getClass().getResourceAsStream(String.format(Locale.ROOT, "/images/icons/%s.png", name)));
+  }
+
+  private void showClosingModal() {
+    if (closingModalPane != null && !closingModalPane.isDisplay()) {
+      closingModalPane.setPersistent(true);
+      closingModalPane.show(buildClosingModalContent());
+    }
+  }
+
+  protected Duration closingModalDisplayDuration() {
+    return Duration.millis(220);
+  }
+
+  protected void requestShutdown() {
+    Platform.exit();
+    System.exit(0);
   }
 }
