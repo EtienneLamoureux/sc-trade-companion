@@ -14,6 +14,8 @@ import java.util.Set;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -156,5 +158,40 @@ class SettingsTabTest {
     });
 
     assertTrue(allHelpIconsHaveTooltip);
+  }
+
+  @Test
+  void whenBuildingSettingsTabThenUseTopAndBottomSpacersToCenterFormVertically() {
+    UserService userService = mock(UserService.class);
+    when(userService.get()).thenReturn(new User("id", "Pilot"));
+    GameLogPathSubject gameLogPathSubject = mock(GameLogPathSubject.class);
+    when(gameLogPathSubject.getStarCitizenLivePath()).thenReturn(Optional.of("LIVE"));
+
+    SettingRepository settings = mock(SettingRepository.class);
+    when(settings.get(Setting.MY_DATA_PATH)).thenReturn(Path.of("my-data"));
+    when(settings.get(Setting.MY_IMAGES_PATH)).thenReturn(Path.of("my-images"));
+    when(settings.get(Setting.PRINTSCREEN_COMMODITY_KEYBIND, NativeKeyEvent.VC_F3))
+        .thenReturn(NativeKeyEvent.VC_F3);
+    when(settings.get(Setting.PRINTSCREEN_ITEM_KEYBIND, NativeKeyEvent.VC_F3))
+        .thenReturn(NativeKeyEvent.VC_F3);
+    when(settings.get(eq(Setting.STAR_CITIZEN_MONITOR), anyString()))
+        .thenAnswer(invocation -> invocation.getArgument(1));
+
+    var vgrowValues = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
+      SettingsTab settingsTab = new SettingsTab(userService, gameLogPathSubject, settings);
+      Node topSpacer = settingsTab.lookup("#settingsTopSpacer");
+      Node bottomSpacer = settingsTab.lookup("#settingsBottomSpacer");
+      return new Object[] {
+          topSpacer != null,
+          bottomSpacer != null,
+          topSpacer == null ? null : GridPane.getVgrow(topSpacer),
+          bottomSpacer == null ? null : GridPane.getVgrow(bottomSpacer)
+      };
+    });
+
+    assertTrue((Boolean) vgrowValues[0], "Top spacer should exist");
+    assertTrue((Boolean) vgrowValues[1], "Bottom spacer should exist");
+    assertEquals(Priority.ALWAYS, vgrowValues[2], "Top spacer should absorb extra height");
+    assertEquals(Priority.ALWAYS, vgrowValues[3], "Bottom spacer should absorb extra height");
   }
 }

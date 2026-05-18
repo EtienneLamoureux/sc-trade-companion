@@ -16,6 +16,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -61,6 +62,7 @@ public class SettingsTab extends GridPane {
     col1.setHalignment(HPos.LEFT);
 
     getColumnConstraints().addAll(col0, col1);
+    addVerticalSpacer("settingsTopSpacer", rowIndex.getAndIncrement());
 
     buildUsernameField(userService);
     buildPrintscreenCommodityKeybindField(settings);
@@ -71,6 +73,7 @@ public class SettingsTab extends GridPane {
         settings.get(Setting.MY_DATA_PATH).toString());
     buildTextRow(LocalizationUtil.get("labelMyImages"),
         settings.get(Setting.MY_IMAGES_PATH).toString());
+    addVerticalSpacer("settingsBottomSpacer", rowIndex.getAndIncrement());
   }
 
   private void buildUsernameField(UserService userService) {
@@ -230,5 +233,13 @@ public class SettingsTab extends GridPane {
     }
 
     return NativeKeyEvent.getKeyText(keyCode);
+  }
+
+  private void addVerticalSpacer(String id, int row) {
+    Region spacer = new Region();
+    spacer.setId(id);
+    spacer.setMaxHeight(Double.MAX_VALUE);
+    add(spacer, 0, row, 2, 1);
+    GridPane.setVgrow(spacer, Priority.ALWAYS);
   }
 }
