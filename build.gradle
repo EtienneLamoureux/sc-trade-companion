@@ -68,6 +68,12 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+tasks.register('ci-tests', Test) {
+	useJUnitPlatform()
+	exclude '**/gui/**'
+	exclude '**/*ITest.class'
+}
+
 springBoot {
     buildInfo()
 }
