@@ -1,14 +1,13 @@
 package tools.sctrade.companion.gui;
 
-import java.awt.GridLayout;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.BorderPane;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
@@ -17,20 +16,23 @@ import tools.sctrade.companion.utils.LocalizationUtil;
  *
  * @see NotificationRepository
  */
-public class LogsTab extends JPanel {
-  private static final long serialVersionUID = 5664549029232335333L;
+public class LogsTab extends BorderPane {
+  static final int TIME_COLUMN_WIDTH = 175;
+  static final int LOG_TYPE_COLUMN_WIDTH = 75;
 
-  private DefaultTableModel model;
+  private final ObservableList<LogEntry> logs = FXCollections.observableArrayList();
+  private final TableView<LogEntry> table = new TableView<>();
+  private final SortedList<LogEntry> sortedLogs = new SortedList<>(logs);
 
   /**
    * Creates a new instance of the logs tab.
    */
   public LogsTab() {
-    super(new GridLayout());
-
-    buildModel();
-    var table = buildTable();
-    add(new JScrollPane(table));
+    table.getStyleClass().add("logs-table");
+    sortedLogs.comparatorProperty().bind(table.comparatorProperty());
+    table.setItems(sortedLogs);
+    buildTable();
+    setCenter(table);
   }
 
   /**
@@ -39,36 +41,73 @@ public class LogsTab extends JPanel {
    * @param row The row to add.
    */
   public void addLog(Object[] row) {
-    model.addRow(row);
+    logs.add(new LogEntry(String.valueOf(row[0]), String.valueOf(row[1]), String.valueOf(row[2])));
   }
 
-  private DefaultTableModel buildModel() {
-    model = new DefaultTableModel() {
-      private static final long serialVersionUID = 1L;
+  private void buildTable() {
+    TableColumn<LogEntry, String> timeColumn =
+        new TableColumn<>(LocalizationUtil.get("tableColumnTime"));
+    timeColumn.setCellValueFactory(cell -> cell.getValue().timeProperty());
+    timeColumn.setMinWidth(TIME_COLUMN_WIDTH);
+    timeColumn.setPrefWidth(TIME_COLUMN_WIDTH);
+    timeColumn.setMaxWidth(TIME_COLUMN_WIDTH);
+    timeColumn.setSortType(TableColumn.SortType.DESCENDING);
+    timeColumn.setReorderable(false);
+    timeColumn.setResizable(false);
 
-      @Override
-      public boolean isCellEditable(int row, int column) {
-        return false;
-      }
-    };
-    model.addColumn(LocalizationUtil.get("tableColumnTime"));
-    model.addColumn(LocalizationUtil.get("tableColumnType"));
-    model.addColumn(LocalizationUtil.get("tableColumnMessage"));
+    TableColumn<LogEntry, String> typeColumn =
+        new TableColumn<>(LocalizationUtil.get("tableColumnType"));
+    typeColumn.setCellValueFactory(cell -> cell.getValue().typeProperty());
+    typeColumn.setMinWidth(LOG_TYPE_COLUMN_WIDTH);
+    typeColumn.setPrefWidth(LOG_TYPE_COLUMN_WIDTH);
+    typeColumn.setMaxWidth(LOG_TYPE_COLUMN_WIDTH);
+    typeColumn.setReorderable(false);
+    typeColumn.setResizable(false);
 
-    return model;
+    TableColumn<LogEntry, String> messageColumn =
+        new TableColumn<>(LocalizationUtil.get("tableColumnMessage"));
+    messageColumn.setCellValueFactory(cell -> cell.getValue().messageProperty());
+    messageColumn.setMinWidth(0);
+    messageColumn.setReorderable(false);
+
+    table.getColumns().setAll(java.util.List.of(timeColumn, typeColumn, messageColumn));
+    synchronizeMessageColumnWidth(messageColumn);
+    table.getSortOrder().setAll(java.util.List.of(timeColumn));
+    table.sort();
   }
 
-  private JTable buildTable() {
-    var table = new JTable(model);
-    table.setAutoCreateRowSorter(true);
-    table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-    table.getColumnModel().getColumn(0).setMaxWidth(150);
-    table.getColumnModel().getColumn(1).setMaxWidth(50);
+  private void synchronizeMessageColumnWidth(TableColumn<LogEntry, String> messageColumn) {
+    table.widthProperty()
+        .addListener((observable, oldWidth, newWidth) -> updateMessageColumnWidth(messageColumn));
+    updateMessageColumnWidth(messageColumn);
+  }
 
-    TableRowSorter<TableModel> sorter = new TableRowSorter<>(model);
-    table.setRowSorter(sorter);
-    sorter.setSortKeys(java.util.List.of(new RowSorter.SortKey(0, SortOrder.DESCENDING)));
+  private void updateMessageColumnWidth(TableColumn<LogEntry, String> messageColumn) {
+    messageColumn
+        .setPrefWidth(Math.max(0, table.getWidth() - TIME_COLUMN_WIDTH - LOG_TYPE_COLUMN_WIDTH));
+  }
 
-    return table;
+  private static final class LogEntry {
+    private final StringProperty time;
+    private final StringProperty type;
+    private final StringProperty message;
+
+    private LogEntry(String time, String type, String message) {
+      this.time = new SimpleStringProperty(time);
+      this.type = new SimpleStringProperty(type);
+      this.message = new SimpleStringProperty(message);
+    }
+
+    private StringProperty timeProperty() {
+      return time;
+    }
+
+    private StringProperty typeProperty() {
+      return type;
+    }
+
+    private StringProperty messageProperty() {
+      return message;
+    }
   }
 }

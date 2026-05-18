@@ -20,6 +20,7 @@
 - Changes SHALL be unit tested.
 - Tests SHALL be named using `given X when Y then Z`; when setup is generic, `when Y then X` is acceptable.
 - Tests SHALL assert one thing.
+- Production code SHALL NOT expose test-only methods; when test-specific access is needed, use a test-package subclass that extends the real class.
 - Tests SHOULD be parameterized when possible.
 - Changes SHALL NOT reduce existing coverage.
 - Changes SHOULD respect the current project structure.
@@ -32,7 +33,7 @@
 - Prefer surgical changes over broad refactors.
 - Match existing naming, structure, and architectural patterns.
 - Use the Gradle wrapper instead of introducing alternate build tooling.
-- Use `gradlew spotlessApply` when formatting or import order updates are needed.
+- Run `gradlew spotlessApply` after edits instead of trying to fix Spotless issues manually.
 - Use `gradlew clean build` as the primary validation command for code changes.
 - Keep tests aligned with the repository's naming and structure rules.
 - Do not claim completion if local environment constraints prevent full validation.

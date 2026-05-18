@@ -38,7 +38,7 @@ Desktop companion application for Star Citizen.
     1. Scroll and repeat in order to capture all listings
 1. Repeat for the `Sell` tab
 1. Repeat throughout your play session
-1. Close the application (make sure you close it in the system tray)
+1. Close the application
 
 ### Equipment, gear and components
 1. When you get to an item kiosk, interact with it
@@ -47,7 +47,7 @@ Desktop companion application for Star Citizen.
 1. Press <kbd>F3</kbd>
 1. Scroll/change page and repeat in order to capture all listings
 1. Repeat throughout your play session
-1. Close the application (make sure you close it in the system tray)
+1. Close the application
 
 ### Best practices
 1. Align your character **as close and as straight** to the screen as possible

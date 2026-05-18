@@ -7,14 +7,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.awt.EventQueue;
-import java.lang.reflect.InvocationTargetException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import tools.sctrade.companion.domain.notification.NotificationService;
+import tools.sctrade.companion.gui.JavaFxTestUtil;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,93 +32,87 @@ class CompanionVersionCheckerTest {
 
   @BeforeEach
   void setUp() {
+    JavaFxTestUtil.startToolkit();
     checker = new CompanionVersionChecker(mockRepository, mockPopup, mockNotificationService,
         CURRENT_VERSION);
   }
 
   @Test
-  void givenVersionsDifferWhenCheckingThenShowsPopup()
-      throws InterruptedException, InvocationTargetException {
+  void givenVersionsDifferWhenCheckingThenShowsPopup() {
     when(mockRepository.fetchLatestVersion()).thenReturn(LATEST_VERSION);
 
     checker.check();
-    flushEdt();
+    flushJavaFx();
 
     verify(mockPopup).showUpdateAvailablePopup(CURRENT_VERSION, LATEST_VERSION);
   }
 
   @Test
-  void givenVersionsMatchWhenCheckingThenDoesNotShowPopup()
-      throws InterruptedException, InvocationTargetException {
+  void givenVersionsMatchWhenCheckingThenDoesNotShowPopup() {
     when(mockRepository.fetchLatestVersion()).thenReturn(CURRENT_VERSION);
 
     checker.check();
-    flushEdt();
+    flushJavaFx();
 
     verify(mockPopup, never()).showUpdateAvailablePopup(anyString(), anyString());
   }
 
   @Test
-  void givenPopupAlreadyShownWhenCheckingAgainThenDoesNotShowPopupAgain()
-      throws InterruptedException, InvocationTargetException {
+  void givenPopupAlreadyShownWhenCheckingAgainThenDoesNotShowPopupAgain() {
     when(mockRepository.fetchLatestVersion()).thenReturn(LATEST_VERSION);
     checker.check();
-    flushEdt();
+    flushJavaFx();
 
     checker.check();
-    flushEdt();
+    flushJavaFx();
 
     verify(mockPopup, times(1)).showUpdateAvailablePopup(eq(CURRENT_VERSION), eq(LATEST_VERSION));
   }
 
   @Test
-  void givenRepositoryFailsWhenCheckingThenWarns()
-      throws InterruptedException, InvocationTargetException {
+  void givenRepositoryFailsWhenCheckingThenWarns() {
     when(mockRepository.fetchLatestVersion()).thenThrow(new RuntimeException("network error"));
 
     checker.check();
-    flushEdt();
+    flushJavaFx();
 
     verify(mockNotificationService).warn(LocalizationUtil.get("warningUnableToCheckLatestVersion"));
   }
 
   @Test
-  void givenRepositoryFailsWhenCheckingThenDoesNotShowPopup()
-      throws InterruptedException, InvocationTargetException {
+  void givenRepositoryFailsWhenCheckingThenDoesNotShowPopup() {
     when(mockRepository.fetchLatestVersion()).thenThrow(new RuntimeException("network error"));
 
     checker.check();
-    flushEdt();
+    flushJavaFx();
 
     verify(mockPopup, never()).showUpdateAvailablePopup(anyString(), anyString());
   }
 
   @Test
-  void givenBlankVersionResponseWhenCheckingThenWarns()
-      throws InterruptedException, InvocationTargetException {
+  void givenBlankVersionResponseWhenCheckingThenWarns() {
     when(mockRepository.fetchLatestVersion())
         .thenThrow(new IllegalStateException("Received null or blank latest-version response"));
 
     checker.check();
-    flushEdt();
+    flushJavaFx();
 
     verify(mockNotificationService).warn(LocalizationUtil.get("warningUnableToCheckLatestVersion"));
   }
 
   @Test
-  void givenBlankVersionResponseWhenCheckingThenDoesNotShowPopup()
-      throws InterruptedException, InvocationTargetException {
+  void givenBlankVersionResponseWhenCheckingThenDoesNotShowPopup() {
     when(mockRepository.fetchLatestVersion())
         .thenThrow(new IllegalStateException("Received null or blank latest-version response"));
 
     checker.check();
-    flushEdt();
+    flushJavaFx();
 
     verify(mockPopup, never()).showUpdateAvailablePopup(anyString(), anyString());
   }
 
-  private static void flushEdt() throws InterruptedException, InvocationTargetException {
-    EventQueue.invokeAndWait(() -> {
+  private static void flushJavaFx() {
+    JavaFxTestUtil.runOnFxThreadAndWait(() -> {
     });
   }
 }

@@ -1,0 +1,63 @@
+.companion-root,
+.companion-content {
+  -fx-background-color: -color-bg-default;
+}
+
+.companion-nav {
+  -fx-background-color: -color-bg-subtle;
+  -fx-border-color: transparent transparent -color-border-default transparent;
+  -fx-border-width: 0 0 1 0;
+  -fx-padding: 6 12 6 12;
+  -fx-max-width: 2147483647;
+  -fx-spacing: 4;
+  -fx-alignment: CENTER_LEFT;
+}
+
+.companion-nav-link {
+  -fx-text-fill: -color-fg-muted;
+  -fx-underline: false;
+  -fx-border-color: transparent;
+  -fx-padding: 4 8 4 8;
+}
+
+.companion-nav-link:hover {
+  -fx-text-fill: -color-fg-default;
+}
+
+.companion-nav-link.active {
+  -fx-text-fill: -color-fg-default;
+  -fx-border-color: transparent transparent -color-accent-emphasis transparent;
+  -fx-border-width: 0 0 2 0;
+}
+
+.companion-tabs {
+  -fx-tab-min-width: 120px;
+}
+
+.usage-scroll-pane {
+  -fx-background-insets: 0;
+  -fx-padding: 0;
+}
+
+.usage-scroll-pane > .viewport {
+  -fx-background-color: transparent;
+}
+
+.logs-table {
+  -fx-fixed-cell-size: 24px;
+}
+
+.settings-help-icon {
+  -fx-text-fill: -color-accent-emphasis;
+  -fx-cursor: hand;
+  -fx-font-size: 0.85em;
+}
+
+.closing-modal-content {
+  -fx-background-color: -color-bg-default;
+  -fx-background-radius: 12;
+  -fx-border-color: -color-border-default;
+  -fx-border-radius: 12;
+  -fx-padding: 24 28 24 28;
+  -fx-spacing: 12;
+}

@@ -1,24 +1,31 @@
 package tools.sctrade.companion.gui;
 
-import com.formdev.flatlaf.FlatLaf;
-import com.formdev.flatlaf.intellijthemes.FlatArcDarkOrangeIJTheme;
-import java.awt.AWTException;
+import atlantafx.base.controls.ModalPane;
+import atlantafx.base.controls.RingProgressIndicator;
 import java.awt.Desktop;
-import java.awt.Image;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
-import java.awt.SystemTray;
-import java.awt.TrayIcon;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Locale;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
+import javafx.animation.FadeTransition;
+import javafx.animation.PauseTransition;
+import javafx.application.Platform;
+import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Label;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.notification.NotificationLevel;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
@@ -32,14 +39,16 @@ import tools.sctrade.companion.utils.TimeUtil;
 /**
  * The main GUI class for the companion application.
  */
-public class CompanionGui extends JFrame implements NotificationRepository, UpdateAvailablePopup {
-  private static final long serialVersionUID = -983766141308946535L;
-
+public class CompanionGui implements NotificationRepository, UpdateAvailablePopup {
   private transient UserService userService;
   private transient GameLogPathSubject gameLogService;
   private transient SettingRepository settings;
   private final String version;
+  private Stage stage;
   private LogsTab logsTab;
+  private transient Hyperlink activeNavLink;
+  private transient FadeTransition currentTransition;
+  private transient ModalPane closingModalPane;
 
   /**
    * Creates a new instance of the companion GUI.
@@ -58,37 +67,45 @@ public class CompanionGui extends JFrame implements NotificationRepository, Upda
   }
 
   /**
-   * Initializes the companion GUI.
+   * Initializes the companion GUI stage.
    *
-   * @throws AWTException If the system tray is not supported.
+   * @param primaryStage the primary JavaFX stage
    */
-  public void initialize() throws AWTException {
-    setLookAndFeel();
-    setIconImages();
+  public void initialize(Stage primaryStage) {
+    stage = primaryStage;
 
-    setTitle(
+    stage.setTitle(
         String.format(Locale.ROOT, "%s %s", LocalizationUtil.get("applicationTitle"), version));
-
-    setSize(600, 575);
-    setLocationRelativeTo(null);
-
-    buildMenuBar();
-    buildTabs();
-    setupTray();
+    stage.setWidth(600);
+    stage.setHeight(575);
+    stage.setScene(buildScene());
+    stage.getIcons().addAll(Arrays.asList("icon128", "icon64", "icon32", "icon16").stream()
+        .map(this::getFxIcon).toList());
+    centerStage();
+    stage.setOnCloseRequest(event -> {
+      event.consume();
+      showClosingModal();
+      PauseTransition closeDelay = new PauseTransition(closingModalDisplayDuration());
+      closeDelay.setOnFinished(e -> requestShutdown());
+      closeDelay.play();
+    });
   }
 
   @Override
   public void showUpdateAvailablePopup(String currentVersion, String latestVersion) {
-    Object[] options = {LocalizationUtil.get("updatePopupDownloadButton"),
-        LocalizationUtil.get("updatePopupCloseButton")};
     String message = String.format(Locale.ROOT, LocalizationUtil.get("updatePopupMessage"),
         currentVersion, latestVersion);
+    ButtonType downloadButton =
+        new ButtonType(LocalizationUtil.get("updatePopupDownloadButton"), ButtonData.OK_DONE);
+    ButtonType laterButton =
+        new ButtonType(LocalizationUtil.get("updatePopupCloseButton"), ButtonData.CANCEL_CLOSE);
 
-    int selection =
-        JOptionPane.showOptionDialog(this, message, LocalizationUtil.get("updatePopupTitle"),
-            JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]);
+    Alert alert = new Alert(Alert.AlertType.INFORMATION, message, downloadButton, laterButton);
+    alert.initOwner(stage);
+    alert.setTitle(LocalizationUtil.get("updatePopupTitle"));
+    alert.setHeaderText(null);
 
-    if (selection == JOptionPane.YES_OPTION) {
+    if (alert.showAndWait().orElse(laterButton) == downloadButton) {
       openReleasePage();
     }
   }
@@ -115,89 +132,129 @@ public class CompanionGui extends JFrame implements NotificationRepository, Upda
     }
   }
 
-  private void setLookAndFeel() {
-    FlatArcDarkOrangeIJTheme.setup();
-    FlatLaf.updateUI();
-  }
-
-  private void setIconImages() {
-    var iconPaths = Arrays.asList("icon128", "icon64", "icon32", "icon16");
-    var iconImages = iconPaths.parallelStream().map(this::getIcon).toList();
-
-    setIconImages(iconImages);
-  }
-
-  private void buildMenuBar() {
-    var menuBar = new JMenuBar();
-    menuBar.add(buildFileMenu());
-
-    setJMenuBar(menuBar);
-  }
-
-  private JMenu buildFileMenu() {
-    var fileMenu = new JMenu();
-    fileMenu.setText(LocalizationUtil.get("menuFile"));
-
-    JMenuItem closeMenuItem = new JMenuItem();
-    closeMenuItem.setText(LocalizationUtil.get("menuItemSendToTray"));
-    closeMenuItem.addActionListener(e -> setVisible(false));
-    fileMenu.add(closeMenuItem);
-
-    JMenuItem exitMenuItem = new JMenuItem();
-    exitMenuItem.setText(LocalizationUtil.get("menuItemExit"));
-    exitMenuItem.addActionListener(e -> System.exit(0));
-    fileMenu.add(exitMenuItem);
-    return fileMenu;
-  }
-
-  private void buildTabs() {
+  private Scene buildScene() {
     logsTab = new LogsTab();
+    UsageTab usageTab = new UsageTab();
+    SettingsTab settingsTab = new SettingsTab(userService, gameLogService, settings);
+    ScreenshotsTab screenshotsTab = new ScreenshotsTab();
 
-    var tabbedPane = new JTabbedPane();
-    tabbedPane.addTab(LocalizationUtil.get("tabUsage"), new UsageTab());
-    tabbedPane.addTab(LocalizationUtil.get("tabSettings"),
-        new SettingsTab(userService, gameLogService, settings));
-    tabbedPane.addTab(LocalizationUtil.get("tabLogs"), logsTab);
+    BorderPane root = new BorderPane();
+    root.getStyleClass().add("companion-root");
+    root.setTop(buildNavBar(root, usageTab, settingsTab, screenshotsTab, logsTab));
+    root.setCenter(usageTab);
 
-    add(tabbedPane);
+    closingModalPane = new ModalPane();
+    closingModalPane.setId("closingModalPane");
+    closingModalPane.setPersistent(false);
+    closingModalPane.setAlignment(Pos.CENTER);
+    closingModalPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+
+    StackPane stackRoot = new StackPane(root, closingModalPane);
+    StackPane.setAlignment(closingModalPane, Pos.CENTER);
+    closingModalPane.prefWidthProperty().bind(stackRoot.widthProperty());
+    closingModalPane.prefHeightProperty().bind(stackRoot.heightProperty());
+
+    Scene scene = new Scene(stackRoot, 600, 575);
+    scene.getStylesheets().add(getClass().getResource("/styles/companion.css").toExternalForm());
+    return scene;
   }
 
-  private void setupTray() throws AWTException {
-    if (SystemTray.isSupported()) {
-      setDefaultCloseOperation(HIDE_ON_CLOSE);
+  private VBox buildClosingModalContent() {
+    Label title = new Label(LocalizationUtil.get("closingTitle"));
+    title.setId("closingTitle");
+    title.getStyleClass().add("title-2");
 
-      PopupMenu popupMenu = new PopupMenu();
-      popupMenu.add(buildOpenMenuItem());
-      popupMenu.add(buildExitMenuItem());
+    RingProgressIndicator progress = new RingProgressIndicator();
+    progress.setId("closingProgress");
 
-      TrayIcon trayIcon = new TrayIcon(getIcon("icon16"));
-      trayIcon.setPopupMenu(popupMenu);
-      trayIcon.setImageAutoSize(true);
-      trayIcon.setToolTip(LocalizationUtil.get("applicationTitle"));
+    VBox content = new VBox(10, title, progress);
+    content.setAlignment(Pos.CENTER);
+    content.getStyleClass().add("closing-modal-content");
+    content.setPrefSize(420, 220);
+    content.setMinSize(420, 220);
+    content.setMaxSize(420, 220);
+    return content;
+  }
 
-      SystemTray systemTray = SystemTray.getSystemTray();
-      systemTray.add(trayIcon);
+  private HBox buildNavBar(BorderPane root, UsageTab usageTab, SettingsTab settingsTab,
+      ScreenshotsTab screenshotsTab, LogsTab logsTab) {
+    Hyperlink usageLink = buildNavLink("nav-usage", LocalizationUtil.get("tabUsage"),
+        () -> switchCenter(root, usageTab));
+    Hyperlink settingsLink = buildNavLink("nav-settings", LocalizationUtil.get("tabSettings"),
+        () -> switchCenter(root, settingsTab));
+    Hyperlink screenshotsLink = buildNavLink("nav-screenshots",
+        LocalizationUtil.get("tabScreenshots"), () -> switchCenter(root, screenshotsTab));
+    Hyperlink logsLink = buildNavLink("nav-logs", LocalizationUtil.get("tabLogs"),
+        () -> switchCenter(root, logsTab));
+
+    setActiveNavLink(usageLink);
+    HBox navBar = new HBox(usageLink, settingsLink, screenshotsLink, logsLink);
+    navBar.getStyleClass().add("companion-nav");
+    return navBar;
+  }
+
+  private Hyperlink buildNavLink(String id, String label, Runnable action) {
+    Hyperlink link = new Hyperlink(label);
+    link.setId(id);
+    link.getStyleClass().add("companion-nav-link");
+    link.setOnAction(e -> {
+      if (link == activeNavLink) {
+        return;
+      }
+      setActiveNavLink(link);
+      action.run();
+    });
+    return link;
+  }
+
+  private void setActiveNavLink(Hyperlink link) {
+    if (activeNavLink != null) {
+      activeNavLink.getStyleClass().remove("active");
     }
-
-    setDefaultCloseOperation(EXIT_ON_CLOSE);
+    activeNavLink = link;
+    activeNavLink.getStyleClass().add("active");
   }
 
-  private MenuItem buildOpenMenuItem() {
-    MenuItem openMenuItem = new MenuItem(LocalizationUtil.get("menuItemOpen"));
-    openMenuItem.addActionListener(e -> setVisible(true));
-
-    return openMenuItem;
+  private void switchCenter(BorderPane root, Node node) {
+    if (node == root.getCenter()) {
+      return;
+    }
+    if (currentTransition != null) {
+      currentTransition.stop();
+    }
+    node.setOpacity(0);
+    root.setCenter(node);
+    currentTransition = new FadeTransition(Duration.millis(150), node);
+    currentTransition.setFromValue(0);
+    currentTransition.setToValue(1);
+    currentTransition.setOnFinished(e -> currentTransition = null);
+    currentTransition.play();
   }
 
-  private MenuItem buildExitMenuItem() {
-    MenuItem exitMenuItem = new MenuItem(LocalizationUtil.get("menuItemExit"));
-    exitMenuItem.addActionListener(e -> System.exit(0));
-
-    return exitMenuItem;
+  private void centerStage() {
+    Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+    stage.setX((bounds.getWidth() - stage.getWidth()) / 2);
+    stage.setY((bounds.getHeight() - stage.getHeight()) / 2);
   }
 
-  private Image getIcon(String name) {
-    return getToolkit()
-        .getImage(getClass().getResource(String.format(Locale.ROOT, "/images/icons/%s.png", name)));
+  private javafx.scene.image.Image getFxIcon(String name) {
+    return new javafx.scene.image.Image(
+        getClass().getResourceAsStream(String.format(Locale.ROOT, "/images/icons/%s.png", name)));
+  }
+
+  private void showClosingModal() {
+    if (closingModalPane != null && !closingModalPane.isDisplay()) {
+      closingModalPane.setPersistent(true);
+      closingModalPane.show(buildClosingModalContent());
+    }
+  }
+
+  protected Duration closingModalDisplayDuration() {
+    return Duration.millis(220);
+  }
+
+  protected void requestShutdown() {
+    Platform.exit();
+    System.exit(0);
   }
 }

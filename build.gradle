@@ -22,13 +22,19 @@ dependencies {
 	// Spring boot
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	
+
+	// JavaFX
+	implementation 'org.openjfx:javafx-base:21.0.2:win'
+	implementation 'org.openjfx:javafx-controls:21.0.2:win'
+	implementation 'org.openjfx:javafx-graphics:21.0.2:win'
+	implementation 'org.openjfx:javafx-media:21.0.2:win'
+	implementation 'org.openjfx:javafx-web:21.0.2:win'
+
 	// Keybinds
 	implementation 'com.1stleg:jnativehook:2.1.0'
-	
+
 	// GUI look and feel
-	implementation 'com.formdev:flatlaf:3.5.2'
-	implementation 'com.formdev:flatlaf-intellij-themes:3.5.2'
+	implementation 'io.github.mkpaz:atlantafx-base:2.1.0'
 	
 	// Computer vision
 	implementation 'org.openpnp:opencv:4.9.0-0'
@@ -60,6 +66,13 @@ configurations.all {
 // Misc
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.register('ci-tests', Test) {
+	useJUnitPlatform()
+	exclude '**/gui/**'
+	exclude '**/*ITest.class'
+	exclude '**/CompanionApplicationContextTest.class'
 }
 
 springBoot {
