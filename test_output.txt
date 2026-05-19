@@ -1,0 +1,26 @@
+> Task :bootBuildInfo
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources UP-TO-DATE
+> Task :testClasses UP-TO-DATE
+
+> Task :test FAILED
+
+ScreenshotsTabTest > givenTabWhenRepositoryIsUpdatedThenUIRefreshes() FAILED
+    org.opentest4j.AssertionFailedError at ScreenshotsTabTest.java:201
+
+12 tests completed, 1 failed
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///C:/Prog/java/sc-trade-companion/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights.
+
+BUILD FAILED in 2s
+6 actionable tasks: 2 executed, 4 up-to-date

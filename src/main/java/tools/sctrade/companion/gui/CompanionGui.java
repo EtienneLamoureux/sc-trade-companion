@@ -29,6 +29,7 @@ import javafx.util.Duration;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.notification.NotificationLevel;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
+import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.gui.version.UpdateAvailablePopup;
@@ -43,6 +44,7 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
   private transient UserService userService;
   private transient GameLogPathSubject gameLogService;
   private transient SettingRepository settings;
+  private final transient ScreenshotRepository screenshotRepository;
   private final String version;
   private Stage stage;
   private LogsTab logsTab;
@@ -56,13 +58,15 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
    * @param userService The user service.
    * @param gameLogService The game log service.
    * @param settings The settings repository.
+   * @param screenshotRepository The screenshot repository.
    * @param version The version of the application.
    */
   public CompanionGui(UserService userService, GameLogPathSubject gameLogService,
-      SettingRepository settings, String version) {
+      SettingRepository settings, ScreenshotRepository screenshotRepository, String version) {
     this.userService = userService;
     this.gameLogService = gameLogService;
     this.settings = settings;
+    this.screenshotRepository = screenshotRepository;
     this.version = version;
   }
 
@@ -136,7 +140,7 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
     logsTab = new LogsTab();
     UsageTab usageTab = new UsageTab();
     SettingsTab settingsTab = new SettingsTab(userService, gameLogService, settings);
-    ScreenshotsTab screenshotsTab = new ScreenshotsTab();
+    ScreenshotsTab screenshotsTab = new ScreenshotsTab(screenshotRepository);
 
     BorderPane root = new BorderPane();
     root.getStyleClass().add("companion-root");
