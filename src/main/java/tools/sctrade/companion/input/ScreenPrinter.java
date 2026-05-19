@@ -13,17 +13,18 @@ import tools.sctrade.companion.domain.image.ImageManipulation;
 import tools.sctrade.companion.domain.image.ImageType;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.notification.NotificationService;
+import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
+import tools.sctrade.companion.domain.screenshot.ScreenshotType;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.utils.GraphicsDeviceUtil;
 import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.SoundUtil;
-import tools.sctrade.companion.utils.patterns.Producer;
 
 /**
  * Runnable that captures the configured screen and processes it. Plays a sound when doing so.
  */
-public class ScreenPrinter extends Producer<BufferedImage> implements Runnable {
+public class ScreenPrinter extends ScreenshotProducer implements Runnable {
   private static final String CAMERA_SHUTTER = "/sounds/camera-shutter.wav";
 
   private final Logger logger = LoggerFactory.getLogger(ScreenPrinter.class);
@@ -37,19 +38,26 @@ public class ScreenPrinter extends Producer<BufferedImage> implements Runnable {
   /**
    * Creates a new instance of the screen printer.
    *
+   * @param screenshotRepository The repository used to persist screenshot records.
+   * @param screenshotType The type of screenshot this printer produces.
    * @param imageWriter The image writer to save the screen capture.
    * @param soundPlayer The sound player to play a sound when capturing the screen.
    * @param notificationService The notification service to notify the user of the screen capture
    * @param settings The settings repository.
    */
-  public ScreenPrinter(BlockingQueue<BufferedImage> queue, ImageWriter<Optional<Path>> imageWriter,
-      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
-    this(queue, Collections.emptyList(), imageWriter, soundPlayer, notificationService, settings);
+  public ScreenPrinter(BlockingQueue<BufferedImage> queue,
+      ScreenshotRepository screenshotRepository, ScreenshotType screenshotType,
+      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
+      NotificationService notificationService, SettingRepository settings) {
+    this(queue, screenshotRepository, screenshotType, Collections.emptyList(), imageWriter,
+        soundPlayer, notificationService, settings);
   }
 
   /**
    * Creates a new instance of the screen printer.
    *
+   * @param screenshotRepository The repository used to persist screenshot records.
+   * @param screenshotType The type of screenshot this printer produces.
    * @param postprocessingManipulations The postprocessing manipulations to apply to the screen
    *        capture, after capturing it but before handing it over to the image processors.
    * @param imageWriter The image writer to save the screen capture.
@@ -58,9 +66,10 @@ public class ScreenPrinter extends Producer<BufferedImage> implements Runnable {
    * @param settings The settings repository.
    */
   public ScreenPrinter(BlockingQueue<BufferedImage> queue,
+      ScreenshotRepository screenshotRepository, ScreenshotType screenshotType,
       List<ImageManipulation> postprocessingManipulations, ImageWriter<Optional<Path>> imageWriter,
       SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
-    super(queue);
+    super(queue, screenshotRepository, screenshotType);
     this.postprocessingManipulations = postprocessingManipulations;
     this.imageWriter = imageWriter;
     this.soundPlayer = soundPlayer;

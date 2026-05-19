@@ -43,6 +43,8 @@ import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OneOcr;
+import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
+import tools.sctrade.companion.domain.screenshot.ScreenshotType;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserIdGenerator;
@@ -140,8 +142,9 @@ public class AppConfig {
 
   @Bean("CompanionGui")
   public CompanionGui buildCompanionGui(UserService userService, GameLogPathSubject gameLogService,
-      SettingRepository settings) {
-    return new CompanionGui(userService, gameLogService, settings, getVersion());
+      SettingRepository settings, ScreenshotRepository screenshotRepository) {
+    return new CompanionGui(userService, gameLogService, settings, screenshotRepository,
+        getVersion());
   }
 
   @Bean("NotificationService")
@@ -228,11 +231,12 @@ public class AppConfig {
   @Bean("CommoditySubmissionFactory")
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
       NotificationService notificationService, CommodityLocationReader commodityLocationReader,
-      CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter) {
+      CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter,
+      ScreenshotRepository screenshotRepository) {
     Ocr ocr = new OneOcr(List.of(), diskImageWriter);
 
-    return new CommoditySubmissionFactory(userService, notificationService, commodityLocationReader,
-        commodityListingFactory, ocr);
+    return new CommoditySubmissionFactory(screenshotRepository, ScreenshotType.COMMODITY_KIOSK,
+        userService, notificationService, commodityLocationReader, commodityListingFactory, ocr);
   }
 
   @Bean("ItemListingFactory")
@@ -255,11 +259,11 @@ public class AppConfig {
   public ItemSubmissionFactory buildItemSubmissionFactory(UserService userService,
       NotificationService notificationService, ItemListingFactory itemListingFactory,
       ItemLocationReader itemLocationReader, ItemShopReader itemShopReader,
-      DiskImageWriter diskImageWriter) {
+      DiskImageWriter diskImageWriter, ScreenshotRepository screenshotRepository) {
     Ocr ocr = new OneOcr(List.of(), diskImageWriter);
 
-    return new ItemSubmissionFactory(userService, notificationService, itemListingFactory,
-        itemLocationReader, itemShopReader, ocr);
+    return new ItemSubmissionFactory(screenshotRepository, ScreenshotType.ITEM_KIOSK, userService,
+        notificationService, itemListingFactory, itemLocationReader, itemShopReader, ocr);
   }
 
   @Bean("ItemService")
@@ -289,28 +293,36 @@ public class AppConfig {
   }
 
   @Bean
+  public ScreenshotRepository buildScreenshotRepository() {
+    return new ScreenshotRepository();
+  }
+
+  @Bean
   public SoundUtil buildSoundUtil() {
     return new SoundUtil();
   }
 
   @Bean("CommodityScreenPrinter")
-  public ScreenPrinter buildCommodityScreenPrinter(ImageWriter<Optional<Path>> imageWriter,
-      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
+  public ScreenPrinter buildCommodityScreenPrinter(ScreenshotRepository screenshotRepository,
+      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
+      NotificationService notificationService, SettingRepository settings) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
-    return new ScreenPrinter(commodityKioskImagesQueue, postprocessingManipulations, imageWriter,
-        soundPlayer, notificationService, settings);
+    return new ScreenPrinter(commodityKioskImagesQueue, screenshotRepository,
+        ScreenshotType.COMMODITY_KIOSK, postprocessingManipulations, imageWriter, soundPlayer,
+        notificationService, settings);
   }
 
   @Bean("ItemScreenPrinter")
-  public ScreenPrinter buildItemScreenPrinter(ImageWriter<Optional<Path>> imageWriter,
-      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
+  public ScreenPrinter buildItemScreenPrinter(ScreenshotRepository screenshotRepository,
+      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
+      NotificationService notificationService, SettingRepository settings) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
-    return new ScreenPrinter(itemKioskImagesQueue, postprocessingManipulations, imageWriter,
-        soundPlayer, notificationService, settings);
+    return new ScreenPrinter(itemKioskImagesQueue, screenshotRepository, ScreenshotType.ITEM_KIOSK,
+        postprocessingManipulations, imageWriter, soundPlayer, notificationService, settings);
   }
 
   @Bean("CommodityKeyListener")

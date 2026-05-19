@@ -24,6 +24,7 @@ import javafx.stage.WindowEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
+import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.User;
@@ -44,10 +45,12 @@ class CompanionGuiTest {
     SettingRepository settings = new SettingRepository();
     settings.set(Setting.MY_DATA_PATH, Path.of("my-data"));
     settings.set(Setting.MY_IMAGES_PATH, Path.of("my-images"));
+    ScreenshotRepository screenshotRepository = new ScreenshotRepository();
 
     Stage stage = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
       Stage fxStage = new Stage();
-      CompanionGui gui = new CompanionGui(userService, gameLogPathSubject, settings, "1.5.2");
+      CompanionGui gui = new CompanionGui(userService, gameLogPathSubject, settings,
+          screenshotRepository, "1.5.2");
       gui.initialize(fxStage);
       return fxStage;
     });
@@ -82,10 +85,12 @@ class CompanionGuiTest {
     SettingRepository settings = new SettingRepository();
     settings.set(Setting.MY_DATA_PATH, Path.of("my-data"));
     settings.set(Setting.MY_IMAGES_PATH, Path.of("my-images"));
+    ScreenshotRepository screenshotRepository = new ScreenshotRepository();
 
     BorderPane root = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
       Stage fxStage = new Stage();
-      CompanionGui gui = new CompanionGui(userService, gameLogPathSubject, settings, "1.5.2");
+      CompanionGui gui = new CompanionGui(userService, gameLogPathSubject, settings,
+          screenshotRepository, "1.5.2");
       gui.initialize(fxStage);
       BorderPane r = companionRoot((StackPane) fxStage.getScene().getRoot());
 
@@ -201,10 +206,12 @@ class CompanionGuiTest {
     SettingRepository settings = new SettingRepository();
     settings.set(Setting.MY_DATA_PATH, Path.of("my-data"));
     settings.set(Setting.MY_IMAGES_PATH, Path.of("my-images"));
+    ScreenshotRepository screenshotRepository = new ScreenshotRepository();
 
     JavaFxTestUtil.runOnFxThreadAndWait(() -> {
       Stage fxStage = new Stage();
-      CompanionGui gui = new CompanionGui(userService, gameLogPathSubject, settings, "1.5.2") {
+      CompanionGui gui = new CompanionGui(userService, gameLogPathSubject, settings,
+          screenshotRepository, "1.5.2") {
         @Override
         protected void requestShutdown() {
           // no-op for test
@@ -246,10 +253,12 @@ class CompanionGuiTest {
     SettingRepository settings = new SettingRepository();
     settings.set(Setting.MY_DATA_PATH, Path.of("my-data"));
     settings.set(Setting.MY_IMAGES_PATH, Path.of("my-images"));
+    ScreenshotRepository screenshotRepository = new ScreenshotRepository();
 
     return JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
       Stage fxStage = new Stage();
-      new CompanionGui(userService, gameLogPathSubject, settings, "1.5.2").initialize(fxStage);
+      new CompanionGui(userService, gameLogPathSubject, settings, screenshotRepository, "1.5.2")
+          .initialize(fxStage);
       return fxStage;
     });
   }
