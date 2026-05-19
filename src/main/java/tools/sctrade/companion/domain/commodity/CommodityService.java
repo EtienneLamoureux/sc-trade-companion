@@ -3,6 +3,7 @@ package tools.sctrade.companion.domain.commodity;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
@@ -10,12 +11,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
+import tools.sctrade.companion.utils.Consumer;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 /**
  * Service that processes images into commodity listings and publishes them.
  */
-public class CommodityService extends AsynchronousProcessor<BufferedImage> {
+public class CommodityService extends Consumer<BufferedImage> {
   private final Logger logger = LoggerFactory.getLogger(CommodityService.class);
 
   private CommoditySubmissionFactory submissionFactory;
@@ -32,10 +34,11 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
    * @param publishers Publishers that export commodity submissions.
    * @param notificationService Notification service.
    */
-  public CommodityService(CommoditySubmissionFactory submissionFactory,
+  public CommodityService(BlockingQueue<BufferedImage> queue,
+      CommoditySubmissionFactory submissionFactory,
       Collection<AsynchronousProcessor<CommoditySubmission>> publishers,
       NotificationService notificationService) {
-    super(notificationService);
+    super(queue, notificationService);
 
     this.submissionFactory = submissionFactory;
     this.publishers = publishers;
@@ -62,7 +65,7 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
    * @throws InterruptedException If the thread is interrupted
    */
   @Override
-  public void process(BufferedImage screenCapture) throws InterruptedException {
+  public void consume(BufferedImage screenCapture) throws Exception {
     CommoditySubmission submission = submissionFactory.build(screenCapture);
     notificationService.info(LocalizationUtil.get("infoCommodityListingsRead"));
 

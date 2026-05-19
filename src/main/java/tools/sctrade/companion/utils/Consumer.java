@@ -17,7 +17,7 @@ public abstract class Consumer<T> {
     this.notificationService = notificationService;
   }
 
-  protected void startConsuming() {
+  public void startConsuming() {
     while (true) {
       T item = waitForAndGetNextItem();
 
@@ -30,7 +30,7 @@ public abstract class Consumer<T> {
     }
   }
 
-  protected abstract void consume(T item);
+  protected abstract void consume(T item) throws Exception;
 
   private T waitForAndGetNextItem() {
     try {

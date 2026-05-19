@@ -3,10 +3,10 @@ package tools.sctrade.companion.input;
 import java.awt.Robot;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.image.ImageManipulation;
@@ -15,20 +15,19 @@ import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
-import tools.sctrade.companion.utils.AsynchronousProcessor;
 import tools.sctrade.companion.utils.GraphicsDeviceUtil;
 import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.SoundUtil;
+import tools.sctrade.companion.utils.patterns.Producer;
 
 /**
  * Runnable that captures the configured screen and processes it. Plays a sound when doing so.
  */
-public class ScreenPrinter implements Runnable {
+public class ScreenPrinter extends Producer<BufferedImage> implements Runnable {
   private static final String CAMERA_SHUTTER = "/sounds/camera-shutter.wav";
 
   private final Logger logger = LoggerFactory.getLogger(ScreenPrinter.class);
 
-  private Collection<AsynchronousProcessor<BufferedImage>> imageProcessors;
   private List<ImageManipulation> postprocessingManipulations;
   private ImageWriter<Optional<Path>> imageWriter;
   private SoundUtil soundPlayer;
@@ -38,23 +37,19 @@ public class ScreenPrinter implements Runnable {
   /**
    * Creates a new instance of the screen printer.
    *
-   * @param imageProcessors The image processors to call after capturing the screen.
    * @param imageWriter The image writer to save the screen capture.
    * @param soundPlayer The sound player to play a sound when capturing the screen.
    * @param notificationService The notification service to notify the user of the screen capture
    * @param settings The settings repository.
    */
-  public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
-      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
-      NotificationService notificationService, SettingRepository settings) {
-    this(imageProcessors, Collections.emptyList(), imageWriter, soundPlayer, notificationService,
-        settings);
+  public ScreenPrinter(BlockingQueue<BufferedImage> queue, ImageWriter<Optional<Path>> imageWriter,
+      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
+    this(queue, Collections.emptyList(), imageWriter, soundPlayer, notificationService, settings);
   }
 
   /**
    * Creates a new instance of the screen printer.
    *
-   * @param imageProcessors The image processors to call after capturing the screen.
    * @param postprocessingManipulations The postprocessing manipulations to apply to the screen
    *        capture, after capturing it but before handing it over to the image processors.
    * @param imageWriter The image writer to save the screen capture.
@@ -62,10 +57,10 @@ public class ScreenPrinter implements Runnable {
    * @param notificationService The notification service to notify the user of the screen capture
    * @param settings The settings repository.
    */
-  public ScreenPrinter(Collection<AsynchronousProcessor<BufferedImage>> imageProcessors,
+  public ScreenPrinter(BlockingQueue<BufferedImage> queue,
       List<ImageManipulation> postprocessingManipulations, ImageWriter<Optional<Path>> imageWriter,
       SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
-    this.imageProcessors = imageProcessors;
+    super(queue);
     this.postprocessingManipulations = postprocessingManipulations;
     this.imageWriter = imageWriter;
     this.soundPlayer = soundPlayer;
@@ -84,9 +79,9 @@ public class ScreenPrinter implements Runnable {
       var screenCapture = postProcess(new Robot(monitor).createScreenCapture(screenRectangle));
       logger.debug("Printed screen");
 
-      logger.debug("Calling image processors...");
-      imageProcessors.stream().forEach(n -> n.processAsynchronously(screenCapture));
-      logger.debug("Called image processors");
+      logger.debug("Queueing image...");
+      produce(screenCapture);
+      logger.debug("Queued image");
       notificationService.info(LocalizationUtil.get("infoProcessingScreenshot"));
 
       imageWriter.write(screenCapture, ImageType.SCREENSHOT);
