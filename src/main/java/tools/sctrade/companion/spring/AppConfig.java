@@ -1,11 +1,15 @@
 package tools.sctrade.companion.spring;
 
+import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.LinkedBlockingDeque;
 import org.apache.commons.io.input.TailerListener;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +82,10 @@ public class AppConfig {
   private String outputIntermediaryImages;
   @Value("${tools.sctrade.root-url:https://sc-trade.tools}")
   private String scTradeToolsRootUrl;
+
+  private final BlockingQueue<BufferedImage> itemKioskImagesQueue = new LinkedBlockingDeque<>();
+  private final BlockingQueue<BufferedImage> commodityKioskImagesQueue =
+      new LinkedBlockingDeque<>();
 
   @Bean("SettingRepository")
   public SettingRepository buildSettingRepository() {
@@ -259,8 +267,11 @@ public class AppConfig {
       @Qualifier("ItemCsvWriter") ItemCsvWriter itemCsvWriter,
       ScTradeToolsItemPublisher scTradeToolsItemPublisher,
       NotificationService notificationService) {
-    return new ItemService(notificationService, itemSubmissionFactory,
-        Arrays.asList(itemCsvWriter, scTradeToolsItemPublisher));
+    ItemService itemService = new ItemService(itemKioskImagesQueue, notificationService,
+        itemSubmissionFactory, Arrays.asList(itemCsvWriter, scTradeToolsItemPublisher));
+    CompletableFuture.runAsync(itemService::startConsuming);
+
+    return itemService;
   }
 
   @Bean("CommodityService")
@@ -269,8 +280,12 @@ public class AppConfig {
       @Qualifier("CommodityCsvWriter") CommodityCsvWriter commodityCsvLogger,
       ScTradeToolsCommodityPublisher scTradeToolsCommodityPublisher,
       NotificationService notificationService) {
-    return new CommodityService(commoditySubmissionFactory,
-        Arrays.asList(commodityCsvLogger, scTradeToolsCommodityPublisher), notificationService);
+    CommodityService commodityService =
+        new CommodityService(commodityKioskImagesQueue, commoditySubmissionFactory,
+            Arrays.asList(commodityCsvLogger, scTradeToolsCommodityPublisher), notificationService);
+    CompletableFuture.runAsync(commodityService::startConsuming);
+
+    return commodityService;
   }
 
   @Bean
@@ -279,25 +294,22 @@ public class AppConfig {
   }
 
   @Bean("CommodityScreenPrinter")
-  public ScreenPrinter buildCommodityScreenPrinter(
-      @Qualifier("CommodityService") CommodityService commodityService,
-      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
-      NotificationService notificationService, SettingRepository settings) {
+  public ScreenPrinter buildCommodityScreenPrinter(ImageWriter<Optional<Path>> imageWriter,
+      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
-    return new ScreenPrinter(Arrays.asList(commodityService), postprocessingManipulations,
-        imageWriter, soundPlayer, notificationService, settings);
+    return new ScreenPrinter(commodityKioskImagesQueue, postprocessingManipulations, imageWriter,
+        soundPlayer, notificationService, settings);
   }
 
   @Bean("ItemScreenPrinter")
-  public ScreenPrinter buildItemScreenPrinter(@Qualifier("ItemService") ItemService itemService,
-      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
-      NotificationService notificationService, SettingRepository settings) {
+  public ScreenPrinter buildItemScreenPrinter(ImageWriter<Optional<Path>> imageWriter,
+      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
-    return new ScreenPrinter(Arrays.asList(itemService), postprocessingManipulations, imageWriter,
+    return new ScreenPrinter(itemKioskImagesQueue, postprocessingManipulations, imageWriter,
         soundPlayer, notificationService, settings);
   }
 
