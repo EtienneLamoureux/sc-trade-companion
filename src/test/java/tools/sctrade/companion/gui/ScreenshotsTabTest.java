@@ -265,7 +265,7 @@ class ScreenshotsTabTest {
     assertEquals("Capture screenshots and see their status here",
         JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getEmptyStateText(tab)));
     assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getEmptyStateStyleClasses(tab))
-        .contains("title2"));
+        .contains("title-2"));
     assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getEmptyStateStyleClasses(tab))
         .contains("screenshot-empty-state"));
   }

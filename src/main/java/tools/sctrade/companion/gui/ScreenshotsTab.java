@@ -201,7 +201,7 @@ public class ScreenshotsTab extends BorderPane {
     Label label = new Label(EMPTY_STATE_TEXT);
     label.setWrapText(true);
     label.setAlignment(Pos.CENTER);
-    label.getStyleClass().addAll("title2", "screenshot-empty-state");
+    label.getStyleClass().addAll("title-2", "screenshot-empty-state");
     BorderPane.setAlignment(label, Pos.CENTER);
     return label;
   }
