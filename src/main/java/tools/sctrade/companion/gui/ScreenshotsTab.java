@@ -21,7 +21,6 @@ import javafx.scene.layout.VBox;
 import org.imgscalr.Scalr;
 import tools.sctrade.companion.gui.screenshot.Screenshot;
 import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
-
 import tools.sctrade.companion.utils.patterns.Observer;
 
 /**
@@ -73,10 +72,11 @@ public class ScreenshotsTab extends BorderPane {
   }
 
   private void refreshCards(List<Screenshot> screenshots) {
-    Platform.runLater(() -> {
-      var safeScreenshots = screenshots == null ? List.<Screenshot>of() : screenshots;
-      refreshCardsIncrementally(safeScreenshots);
-    });
+    if (screenshots == null) {
+      return;
+    }
+
+    Platform.runLater(() -> refreshCardsIncrementally(screenshots));
   }
 
   private void refreshCardsIncrementally(List<Screenshot> screenshots) {
@@ -94,8 +94,8 @@ public class ScreenshotsTab extends BorderPane {
 
     for (Screenshot screenshot : screenshots) {
       String id = screenshot.id();
-      CardRenderState newState = CardRenderState.from(screenshot,
-          screenshot.type().label(), getStatusText(screenshot));
+      CardRenderState newState =
+          CardRenderState.from(screenshot, screenshot.type().label(), getStatusText(screenshot));
       CardRenderState currentState = renderedStateById.get(id);
 
       if (!cardsById.containsKey(id) || !newState.equals(currentState)) {
