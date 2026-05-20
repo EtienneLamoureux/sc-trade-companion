@@ -56,7 +56,7 @@ class ScreenshotRepositoryTest {
   }
 
   @Test
-  void givenExistingIdNotAtHead_whenUpserting_thenItMovesToHead() {
+  void givenExistingIdNotAtHead_whenUpserting_thenItStaysInPlace() {
     repository.upsert(SCREENSHOT_A);
     repository.upsert(SCREENSHOT_B);
     var updatedA = new Screenshot("id-a", null, "Orison", ScreenshotStatus.PROCESSING, null, null,
@@ -64,7 +64,8 @@ class ScreenshotRepositoryTest {
 
     repository.upsert(updatedA);
 
-    assertEquals("id-a", repository.getSnapshot().get(0).id());
+    assertEquals("id-b", repository.getSnapshot().get(0).id());
+    assertEquals("id-a", repository.getSnapshot().get(1).id());
   }
 
   @Test
