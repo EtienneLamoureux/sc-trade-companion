@@ -1,4 +1,4 @@
-package tools.sctrade.companion.domain.screenshot;
+package tools.sctrade.companion.gui.screenshot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -17,6 +17,10 @@ import tools.sctrade.companion.domain.commodity.CommoditySubmission;
 import tools.sctrade.companion.domain.commodity.TransactionType;
 import tools.sctrade.companion.domain.item.ItemListing;
 import tools.sctrade.companion.domain.item.ItemSubmission;
+import tools.sctrade.companion.gui.screenshot.Screenshot;
+import tools.sctrade.companion.gui.screenshot.ScreenshotFactory;
+import tools.sctrade.companion.gui.screenshot.ScreenshotStatus;
+import tools.sctrade.companion.gui.screenshot.ScreenshotType;
 
 @ExtendWith(MockitoExtension.class)
 class ScreenshotFactoryTest {

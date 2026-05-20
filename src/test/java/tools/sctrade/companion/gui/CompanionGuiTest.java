@@ -24,11 +24,11 @@ import javafx.stage.WindowEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
-import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.User;
 import tools.sctrade.companion.domain.user.UserService;
+import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
 
 class CompanionGuiTest {
   @BeforeAll

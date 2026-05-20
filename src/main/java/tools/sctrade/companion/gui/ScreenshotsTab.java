@@ -13,10 +13,10 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.imgscalr.Scalr;
-import tools.sctrade.companion.domain.screenshot.Screenshot;
-import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.domain.screenshot.ScreenshotStatus;
-import tools.sctrade.companion.domain.screenshot.ScreenshotType;
+import tools.sctrade.companion.gui.screenshot.Screenshot;
+import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
+import tools.sctrade.companion.gui.screenshot.ScreenshotStatus;
+import tools.sctrade.companion.gui.screenshot.ScreenshotType;
 
 /**
  * The screenshots tab for the companion GUI. Displays screenshot cards in a 3-column grid layout,

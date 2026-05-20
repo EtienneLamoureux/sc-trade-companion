@@ -1,4 +1,4 @@
-package tools.sctrade.companion.domain.screenshot;
+package tools.sctrade.companion.gui.screenshot;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

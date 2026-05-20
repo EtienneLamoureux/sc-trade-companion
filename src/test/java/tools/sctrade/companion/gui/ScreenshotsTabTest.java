@@ -8,10 +8,10 @@ import java.util.List;
 import javafx.scene.layout.GridPane;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import tools.sctrade.companion.domain.screenshot.Screenshot;
-import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.domain.screenshot.ScreenshotStatus;
-import tools.sctrade.companion.domain.screenshot.ScreenshotType;
+import tools.sctrade.companion.gui.screenshot.Screenshot;
+import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
+import tools.sctrade.companion.gui.screenshot.ScreenshotStatus;
+import tools.sctrade.companion.gui.screenshot.ScreenshotType;
 
 class ScreenshotsTabTest {
   @BeforeAll
