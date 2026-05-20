@@ -1,4 +1,4 @@
-package tools.sctrade.companion.domain.screenshot;
+package tools.sctrade.companion.gui.screenshot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,6 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tools.sctrade.companion.gui.screenshot.Screenshot;
+import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
+import tools.sctrade.companion.gui.screenshot.ScreenshotStatus;
+import tools.sctrade.companion.gui.screenshot.ScreenshotType;
 
 class ScreenshotRepositoryTest {
 

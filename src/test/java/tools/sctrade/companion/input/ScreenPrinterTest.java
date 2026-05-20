@@ -11,10 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.notification.NotificationService;
-import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.domain.screenshot.ScreenshotStatus;
-import tools.sctrade.companion.domain.screenshot.ScreenshotType;
 import tools.sctrade.companion.domain.setting.SettingRepository;
+import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
+import tools.sctrade.companion.gui.screenshot.ScreenshotStatus;
+import tools.sctrade.companion.gui.screenshot.ScreenshotType;
 import tools.sctrade.companion.utils.SoundUtil;
 
 class ScreenPrinterTest {

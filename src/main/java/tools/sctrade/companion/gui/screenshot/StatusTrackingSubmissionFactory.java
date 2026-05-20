@@ -1,9 +1,7 @@
-package tools.sctrade.companion.domain;
+package tools.sctrade.companion.gui.screenshot;
 
 import java.awt.image.BufferedImage;
-import tools.sctrade.companion.domain.screenshot.ScreenshotFactory;
-import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.domain.screenshot.ScreenshotType;
+import tools.sctrade.companion.domain.SubmissionFactory;
 import tools.sctrade.companion.utils.HashUtil;
 
 /**

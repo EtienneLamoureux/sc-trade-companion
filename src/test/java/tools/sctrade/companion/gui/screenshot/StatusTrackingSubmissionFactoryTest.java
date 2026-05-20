@@ -1,4 +1,4 @@
-package tools.sctrade.companion.domain;
+package tools.sctrade.companion.gui.screenshot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -6,10 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.awt.image.BufferedImage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import tools.sctrade.companion.domain.screenshot.ScreenshotFactory;
-import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.domain.screenshot.ScreenshotStatus;
-import tools.sctrade.companion.domain.screenshot.ScreenshotType;
+import tools.sctrade.companion.domain.SubmissionFactory;
+import tools.sctrade.companion.gui.screenshot.ScreenshotFactory;
+import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
+import tools.sctrade.companion.gui.screenshot.ScreenshotStatus;
+import tools.sctrade.companion.gui.screenshot.ScreenshotType;
+import tools.sctrade.companion.gui.screenshot.StatusTrackingSubmissionFactory;
 
 class StatusTrackingSubmissionFactoryTest {
 
