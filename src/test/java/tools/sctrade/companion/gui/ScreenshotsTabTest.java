@@ -2,10 +2,13 @@ package tools.sctrade.companion.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -195,21 +198,89 @@ class ScreenshotsTabTest {
   }
 
   @Test
-  void givenTabWhenConstructedThenHasGridPaneLayout() {
+  void givenNonEmptyRepositoryWhenConstructedThenHasGridPaneLayout() {
+    ScreenshotRepository repository = new ScreenshotRepository();
+    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+    repository.upsert(new Screenshot("id-1", image, "Area18", ScreenshotStatus.SUCCESS, null, null,
+        ScreenshotType.COMMODITY_KIOSK));
+    ScreenshotsTab tab =
+        JavaFxTestUtil.supplyOnFxThreadAndWait(() -> new ScreenshotsTab(repository));
+    JavaFxTestUtil.runOnFxThreadAndWait(() -> {
+      // Wait for queued UI refresh.
+    });
+    assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> tab.getCenter() instanceof GridPane));
+  }
+
+  @Test
+  void givenTabAlreadyConstructedWhenRepositoryUpsertThenCardsRefreshWithoutReconstructingTab() {
     ScreenshotRepository repository = new ScreenshotRepository();
     ScreenshotsTab tab =
         JavaFxTestUtil.supplyOnFxThreadAndWait(() -> new ScreenshotsTab(repository));
-    GridPane grid = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> (GridPane) tab.getCenter());
-    assertNotNull(grid);
+    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+
+    repository.upsert(new Screenshot("id-1", image, "Area18", ScreenshotStatus.SUCCESS, null, null,
+        ScreenshotType.COMMODITY_KIOSK));
+    JavaFxTestUtil.runOnFxThreadAndWait(() -> {
+      // Wait for queued UI refresh.
+    });
+
+    int cardCount = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardCount(tab));
+    assertEquals(1, cardCount);
+  }
+
+  @Test
+  void givenOneUnchangedCardWhenRefreshingThenItsNodeIsReused() {
+    ScreenshotRepository repository = new ScreenshotRepository();
+    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+    Screenshot unchanged = new Screenshot("id-unchanged", image, "Orison", ScreenshotStatus.SUCCESS,
+        null, null, ScreenshotType.COMMODITY_KIOSK);
+    Screenshot changing = new Screenshot("id-changing", image, null, ScreenshotStatus.PROCESSING,
+        null, null, ScreenshotType.ITEM_KIOSK);
+    repository.upsert(unchanged);
+    repository.upsert(changing);
+
+    ScreenshotsTab tab =
+        JavaFxTestUtil.supplyOnFxThreadAndWait(() -> new ScreenshotsTab(repository));
+    Node unchangedCardBefore = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardNode(tab, 1));
+
+    repository.upsert(new Screenshot("id-changing", image, null, ScreenshotStatus.ERROR,
+        "OCR failed", null, ScreenshotType.ITEM_KIOSK));
+    JavaFxTestUtil.runOnFxThreadAndWait(() -> {
+      // Wait for queued UI refresh.
+    });
+
+    Node unchangedCardAfter = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardNode(tab, 1));
+    String topCardStatusText =
+        JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusText(tab, 0));
+    assertSame(unchangedCardBefore, unchangedCardAfter);
+    assertEquals("OCR failed", topCardStatusText);
+  }
+
+  @Test
+  void givenNoScreenshotsWhenConstructedThenShowCenteredMutedTitle2EmptyStateMessage() {
+    ScreenshotRepository repository = new ScreenshotRepository();
+    ScreenshotsTab tab =
+        JavaFxTestUtil.supplyOnFxThreadAndWait(() -> new ScreenshotsTab(repository));
+
+    assertEquals("Capture screenshots and see their status here",
+        JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getEmptyStateText(tab)));
+    assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getEmptyStateStyleClasses(tab))
+        .contains("title2"));
+    assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getEmptyStateStyleClasses(tab))
+        .contains("screenshot-empty-state"));
   }
 
   private int getCardCount(ScreenshotsTab tab) {
-    GridPane grid = (GridPane) tab.getCenter();
-    return grid == null ? 0 : grid.getChildren().size();
+    if (!(tab.getCenter() instanceof GridPane grid)) {
+      return 0;
+    }
+    return grid.getChildren().size();
   }
 
   private List<String> getCardTitles(ScreenshotsTab tab) {
-    GridPane grid = (GridPane) tab.getCenter();
+    if (!(tab.getCenter() instanceof GridPane grid)) {
+      return java.util.Collections.emptyList();
+    }
     if (grid == null || grid.getChildren().isEmpty()) {
       return java.util.Collections.emptyList();
     }
@@ -229,7 +300,9 @@ class ScreenshotsTabTest {
   }
 
   private String getCardStatusText(ScreenshotsTab tab, int cardIndex) {
-    GridPane grid = (GridPane) tab.getCenter();
+    if (!(tab.getCenter() instanceof GridPane grid)) {
+      return "";
+    }
     if (grid == null || cardIndex >= grid.getChildren().size()) {
       return "";
     }
@@ -250,7 +323,9 @@ class ScreenshotsTabTest {
   }
 
   private String getCardDescription(ScreenshotsTab tab, int cardIndex) {
-    GridPane grid = (GridPane) tab.getCenter();
+    if (!(tab.getCenter() instanceof GridPane grid)) {
+      return "";
+    }
     if (grid == null || cardIndex >= grid.getChildren().size()) {
       return "";
     }
@@ -267,7 +342,9 @@ class ScreenshotsTabTest {
   }
 
   private List<String> getCardStatusIconClasses(ScreenshotsTab tab, int cardIndex) {
-    GridPane grid = (GridPane) tab.getCenter();
+    if (!(tab.getCenter() instanceof GridPane grid)) {
+      return java.util.Collections.emptyList();
+    }
     if (grid == null || cardIndex >= grid.getChildren().size()) {
       return java.util.Collections.emptyList();
     }
@@ -287,7 +364,9 @@ class ScreenshotsTabTest {
   }
 
   private List<String> getCardStatusBodyClasses(ScreenshotsTab tab, int cardIndex) {
-    GridPane grid = (GridPane) tab.getCenter();
+    if (!(tab.getCenter() instanceof GridPane grid)) {
+      return java.util.Collections.emptyList();
+    }
     if (grid == null || cardIndex >= grid.getChildren().size()) {
       return java.util.Collections.emptyList();
     }
@@ -298,6 +377,30 @@ class ScreenshotsTabTest {
       if (statusBody instanceof javafx.scene.layout.VBox statusVBox) {
         return statusVBox.getStyleClass();
       }
+    }
+    return java.util.Collections.emptyList();
+  }
+
+  private Node getCardNode(ScreenshotsTab tab, int cardIndex) {
+    if (!(tab.getCenter() instanceof GridPane grid)) {
+      return null;
+    }
+    if (cardIndex >= grid.getChildren().size()) {
+      return null;
+    }
+    return grid.getChildren().get(cardIndex);
+  }
+
+  private String getEmptyStateText(ScreenshotsTab tab) {
+    if (tab.getCenter() instanceof Label label) {
+      return label.getText();
+    }
+    return "";
+  }
+
+  private List<String> getEmptyStateStyleClasses(ScreenshotsTab tab) {
+    if (tab.getCenter() instanceof Label label) {
+      return label.getStyleClass();
     }
     return java.util.Collections.emptyList();
   }
