@@ -1,11 +1,7 @@
-package tools.sctrade.companion.input;
+package tools.sctrade.companion.gui.screenshot;
 
 import java.awt.image.BufferedImage;
 import java.util.concurrent.BlockingQueue;
-import tools.sctrade.companion.gui.screenshot.Screenshot;
-import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.gui.screenshot.ScreenshotStatus;
-import tools.sctrade.companion.gui.screenshot.ScreenshotType;
 import tools.sctrade.companion.utils.HashUtil;
 import tools.sctrade.companion.utils.patterns.Producer;
 
