@@ -7,11 +7,6 @@ import java.awt.image.BufferedImage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.domain.SubmissionFactory;
-import tools.sctrade.companion.gui.screenshot.ScreenshotFactory;
-import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.gui.screenshot.ScreenshotStatus;
-import tools.sctrade.companion.gui.screenshot.ScreenshotType;
-import tools.sctrade.companion.gui.screenshot.StatusTrackingSubmissionFactory;
 
 class StatusTrackingSubmissionFactoryTest {
 

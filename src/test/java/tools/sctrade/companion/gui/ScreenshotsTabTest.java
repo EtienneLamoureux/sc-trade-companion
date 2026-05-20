@@ -2,6 +2,7 @@ package tools.sctrade.companion.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -110,6 +111,24 @@ class ScreenshotsTabTest {
 
     String statusText = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusText(tab, 0));
     assertEquals("In queue", statusText);
+  }
+
+  @Test
+  void givenCardWhenStatusIsQueuedThenIconUsesMaterialClassAndBodyUsesMutedClass() {
+    ScreenshotRepository repository = new ScreenshotRepository();
+    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+    Screenshot screenshot = new Screenshot("id-1", image, null, ScreenshotStatus.QUEUED, null, null,
+        ScreenshotType.COMMODITY_KIOSK);
+
+    ScreenshotsTab tab = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
+      repository.upsert(screenshot);
+      return new ScreenshotsTab(repository);
+    });
+
+    assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusIconClasses(tab, 0))
+        .contains("mdoal-access_time"));
+    assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusBodyClasses(tab, 0))
+        .contains("screenshot-status-muted"));
   }
 
   @Test
@@ -245,5 +264,41 @@ class ScreenshotsTabTest {
       }
     }
     return "";
+  }
+
+  private List<String> getCardStatusIconClasses(ScreenshotsTab tab, int cardIndex) {
+    GridPane grid = (GridPane) tab.getCenter();
+    if (grid == null || cardIndex >= grid.getChildren().size()) {
+      return java.util.Collections.emptyList();
+    }
+
+    var card = grid.getChildren().get(cardIndex);
+    if (card instanceof javafx.scene.layout.VBox vbox && vbox.getChildren().size() > 2) {
+      var statusBody = vbox.getChildren().get(vbox.getChildren().size() - 1);
+      if (statusBody instanceof javafx.scene.layout.VBox statusVBox
+          && !statusVBox.getChildren().isEmpty()) {
+        var iconNode = statusVBox.getChildren().get(0);
+        if (iconNode instanceof javafx.scene.control.Label iconLabel) {
+          return iconLabel.getStyleClass();
+        }
+      }
+    }
+    return java.util.Collections.emptyList();
+  }
+
+  private List<String> getCardStatusBodyClasses(ScreenshotsTab tab, int cardIndex) {
+    GridPane grid = (GridPane) tab.getCenter();
+    if (grid == null || cardIndex >= grid.getChildren().size()) {
+      return java.util.Collections.emptyList();
+    }
+
+    var card = grid.getChildren().get(cardIndex);
+    if (card instanceof javafx.scene.layout.VBox vbox && vbox.getChildren().size() > 2) {
+      var statusBody = vbox.getChildren().get(vbox.getChildren().size() - 1);
+      if (statusBody instanceof javafx.scene.layout.VBox statusVBox) {
+        return statusVBox.getStyleClass();
+      }
+    }
+    return java.util.Collections.emptyList();
   }
 }

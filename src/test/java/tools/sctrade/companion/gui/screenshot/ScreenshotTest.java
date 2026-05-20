@@ -6,9 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.awt.image.BufferedImage;
 import org.junit.jupiter.api.Test;
-import tools.sctrade.companion.gui.screenshot.Screenshot;
-import tools.sctrade.companion.gui.screenshot.ScreenshotStatus;
-import tools.sctrade.companion.gui.screenshot.ScreenshotType;
 
 class ScreenshotTest {
 

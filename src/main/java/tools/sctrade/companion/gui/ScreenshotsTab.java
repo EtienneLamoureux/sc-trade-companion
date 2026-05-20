@@ -15,7 +15,6 @@ import javafx.scene.layout.VBox;
 import org.imgscalr.Scalr;
 import tools.sctrade.companion.gui.screenshot.Screenshot;
 import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.gui.screenshot.ScreenshotStatus;
 import tools.sctrade.companion.gui.screenshot.ScreenshotType;
 
 /**
@@ -25,7 +24,6 @@ import tools.sctrade.companion.gui.screenshot.ScreenshotType;
 public class ScreenshotsTab extends BorderPane {
   private static final int GRID_COLUMNS = 3;
   private static final int MAX_IMAGE_SIZE = 200;
-  private static final String MUTED_STYLE = "-fx-text-fill: -fx-text-base-color;";
 
   private final ScreenshotRepository repository;
   private final GridPane gridPane;
@@ -129,18 +127,15 @@ public class ScreenshotsTab extends BorderPane {
   private VBox createStatusBody(Screenshot screenshot) {
     VBox body = new VBox(5);
     body.setAlignment(Pos.CENTER);
-    body.setStyle(MUTED_STYLE);
+    body.getStyleClass().add("screenshot-card-status-body");
+    body.getStyleClass().add(screenshot.status().styleClass());
 
-    String statusText = getStatusText(screenshot);
-    String icon = getStatusIcon(screenshot.status());
+    Label iconLabel = new Label();
+    iconLabel.getStyleClass().add("screenshot-card-status-icon");
+    iconLabel.getStyleClass().add(screenshot.status().iconClass());
+    body.getChildren().add(iconLabel);
 
-    if (!icon.isEmpty()) {
-      Label iconLabel = new Label(icon);
-      iconLabel.getStyleClass().add("screenshot-card-status-icon");
-      body.getChildren().add(iconLabel);
-    }
-
-    Label statusLabel = new Label(statusText);
+    Label statusLabel = new Label(getStatusText(screenshot));
     statusLabel.getStyleClass().add("screenshot-card-status-text");
     statusLabel.setWrapText(true);
     body.getChildren().add(statusLabel);
@@ -150,20 +145,12 @@ public class ScreenshotsTab extends BorderPane {
 
   private String getStatusText(Screenshot screenshot) {
     return switch (screenshot.status()) {
-      case QUEUED -> "In queue";
-      case PROCESSING -> "Processing...";
       case SUCCESS -> screenshot.location() != null ? screenshot.location()
-          : (screenshot.content() != null ? screenshot.content() : "Success");
-      case ERROR -> screenshot.error() != null ? screenshot.error() : "Error";
-    };
-  }
-
-  private String getStatusIcon(ScreenshotStatus status) {
-    return switch (status) {
-      case QUEUED -> "⏱"; // access_time emoji
-      case PROCESSING -> "🔄"; // sync emoji
-      case SUCCESS -> "✓"; // check_circle emoji
-      case ERROR -> "✕"; // error emoji
+          : (screenshot.content() != null ? screenshot.content()
+              : screenshot.status().defaultText());
+      case ERROR -> screenshot.error() != null ? screenshot.error()
+          : screenshot.status().defaultText();
+      default -> screenshot.status().defaultText();
     };
   }
 }

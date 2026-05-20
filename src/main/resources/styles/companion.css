@@ -61,3 +61,19 @@
   -fx-padding: 24 28 24 28;
   -fx-spacing: 12;
 }
+
+.screenshot-card-status-body.screenshot-status-muted {
+  -fx-text-fill: -color-fg-muted;
+}
+
+.screenshot-card-status-body.screenshot-status-normal {
+  -fx-text-fill: -color-fg-default;
+}
+
+.screenshot-card-status-body.screenshot-status-success {
+  -fx-text-fill: -color-accent-emphasis;
+}
+
+.screenshot-card-status-body.screenshot-status-danger {
+  -fx-text-fill: #cf222e;
+}

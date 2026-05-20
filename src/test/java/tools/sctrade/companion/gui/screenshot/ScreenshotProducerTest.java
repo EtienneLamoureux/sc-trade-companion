@@ -9,10 +9,6 @@ import java.util.concurrent.BlockingQueue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.exceptions.ThreadingException;
-import tools.sctrade.companion.gui.screenshot.ScreenshotProducer;
-import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.gui.screenshot.ScreenshotSta
-import tools.sctrade.companion.gui.screenshot.ScreenshotType;
 
 class ScreenshotProducerTest {
 
