@@ -27,4 +27,30 @@ public record Screenshot(String id, BufferedImage image, String location, Screen
       image = copy;
     }
   }
+
+  /**
+   * Returns a new {@link Screenshot} that merges {@code update} into this record.
+   *
+   * <p>
+   * Each field of {@code update} replaces the corresponding field of this record when the update
+   * value is non-{@code null}; otherwise the existing value is kept. The {@code id} must match.
+   *
+   * @param update Partial update to apply. Must carry the same {@code id} as this record.
+   * @return A fresh {@link Screenshot} with the merged field values.
+   * @throws IllegalArgumentException if {@code update.id()} differs from this record's {@code id}.
+   */
+  public Screenshot updateUsing(Screenshot update) {
+    if (!this.id.equals(update.id())) {
+      throw new IllegalArgumentException(
+          "Cannot update screenshot '%s' using screenshot with different id '%s'"
+              .formatted(this.id, update.id()));
+    }
+
+    return new Screenshot(this.id, update.image() != null ? update.image() : this.image,
+        update.location() != null ? update.location() : this.location,
+        update.status() != null ? update.status() : this.status,
+        update.error() != null ? update.error() : this.error,
+        update.content() != null ? update.content() : this.content,
+        update.type() != null ? update.type() : this.type);
+  }
 }

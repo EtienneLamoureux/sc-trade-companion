@@ -9,9 +9,9 @@ import java.util.List;
  * Thread-safe, in-memory ordered repository for {@link Screenshot} instances.
  *
  * <p>
- * Entries are kept in insertion order with the most-recently upserted screenshot at the head. The
- * repository is capped at {@value #MAX_SIZE} entries; any entries beyond that limit are silently
- * dropped from the tail.
+ * New screenshots are inserted at the head; updates to existing entries are applied in-place,
+ * preserving their current position. The repository is capped at {@value #MAX_SIZE} entries; any
+ * entries beyond that limit are silently dropped from the tail.
  */
 public class ScreenshotRepository {
 
@@ -24,17 +24,27 @@ public class ScreenshotRepository {
    *
    * <p>
    * If no entry with the same {@code id} exists the screenshot is inserted at the head. If an entry
-   * with the same {@code id} already exists it is replaced with the supplied value and moved to the
-   * head. Entries beyond {@value #MAX_SIZE} are dropped from the tail.
+   * with the same {@code id} already exists it is replaced in-place, preserving its current
+   * position. Entries beyond {@value #MAX_SIZE} are dropped from the tail.
    *
    * @param screenshot Screenshot to insert or replace.
    */
   public synchronized void upsert(Screenshot screenshot) {
-    screenshots.removeIf(s -> s.id().equals(screenshot.id()));
-    screenshots.addFirst(screenshot);
+    int index = -1;
+    for (int i = 0; i < screenshots.size(); i++) {
+      if (screenshots.get(i).id().equals(screenshot.id())) {
+        index = i;
+        break;
+      }
+    }
 
-    while (screenshots.size() > MAX_SIZE) {
-      screenshots.removeLast();
+    if (index >= 0) {
+      screenshots.set(index, screenshots.get(index).updateUsing(screenshot));
+    } else {
+      screenshots.addFirst(screenshot);
+      while (screenshots.size() > MAX_SIZE) {
+        screenshots.removeLast();
+      }
     }
   }
 
