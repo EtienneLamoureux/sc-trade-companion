@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
+import tools.sctrade.companion.domain.SubmissionFactory;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
 import tools.sctrade.companion.utils.Consumer;
@@ -20,7 +21,7 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 public class CommodityService extends Consumer<BufferedImage> {
   private final Logger logger = LoggerFactory.getLogger(CommodityService.class);
 
-  private CommoditySubmissionFactory submissionFactory;
+  private SubmissionFactory<CommoditySubmission> submissionFactory;
   private Collection<AsynchronousProcessor<CommoditySubmission>> publishers;
 
   private Semaphore mutex = new Semaphore(1, true);
@@ -35,7 +36,7 @@ public class CommodityService extends Consumer<BufferedImage> {
    * @param notificationService Notification service.
    */
   public CommodityService(BlockingQueue<BufferedImage> queue,
-      CommoditySubmissionFactory submissionFactory,
+      SubmissionFactory<CommoditySubmission> submissionFactory,
       Collection<AsynchronousProcessor<CommoditySubmission>> publishers,
       NotificationService notificationService) {
     super(queue, notificationService);
@@ -53,7 +54,8 @@ public class CommodityService extends Consumer<BufferedImage> {
    * @throws InterruptedException If the thread is interrupted.
    */
   public void process(CommodityListing commodityListing) throws InterruptedException {
-    CommoditySubmission submission = submissionFactory.build(commodityListing);
+    CommoditySubmission submission =
+        ((CommoditySubmissionFactory) submissionFactory).build(commodityListing);
 
     process(submission);
   }

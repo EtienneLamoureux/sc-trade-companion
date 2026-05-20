@@ -5,11 +5,9 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.sctrade.companion.domain.StatusTrackingSubmissionFactory;
+import tools.sctrade.companion.domain.SubmissionFactory;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
-import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.domain.screenshot.ScreenshotType;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.exceptions.NoListingsException;
 import tools.sctrade.companion.utils.LocalizationUtil;
@@ -17,8 +15,7 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 /**
  * Factory for building commodity submissions.
  */
-public class CommoditySubmissionFactory
-    extends StatusTrackingSubmissionFactory<CommoditySubmission> {
+public class CommoditySubmissionFactory implements SubmissionFactory<CommoditySubmission> {
 
   private final Logger logger = LoggerFactory.getLogger(CommoditySubmissionFactory.class);
 
@@ -31,19 +28,15 @@ public class CommoditySubmissionFactory
   /**
    * Constructor.
    *
-   * @param screenshotRepository repository used to track screenshot processing status
-   * @param screenshotType kiosk type to associate with tracked screenshots
    * @param userService the user service
    * @param notificationService the notification service
    * @param commodityLocationReader the commodity location reader
    * @param commodityListingFactory the commodity listing factory
    * @param ocr the OCR service
    */
-  public CommoditySubmissionFactory(ScreenshotRepository screenshotRepository,
-      ScreenshotType screenshotType, UserService userService,
+  public CommoditySubmissionFactory(UserService userService,
       NotificationService notificationService, CommodityLocationReader commodityLocationReader,
       CommodityListingFactory commodityListingFactory, Ocr ocr) {
-    super(screenshotRepository, screenshotType);
     this.userService = userService;
     this.notificationService = notificationService;
     this.commodityLocationReader = commodityLocationReader;
@@ -52,7 +45,7 @@ public class CommoditySubmissionFactory
   }
 
   @Override
-  protected CommoditySubmission doBuild(BufferedImage screenCapture) {
+  public CommoditySubmission build(BufferedImage screenCapture) {
     var ocrResult = ocr.read(screenCapture);
     var location = commodityLocationReader.read(screenCapture, ocrResult);
 
@@ -70,17 +63,6 @@ public class CommoditySubmissionFactory
     }
 
     return new CommoditySubmission(userService.get(), listings);
-  }
-
-  @Override
-  protected String extractLocation(CommoditySubmission result) {
-    return result.getListings().stream().map(CommodityListing::location).filter(l -> l != null)
-        .findFirst().orElse(null);
-  }
-
-  @Override
-  protected String extractContent(CommoditySubmission result) {
-    return result.getListings().size() + " listings processed";
   }
 
   /**

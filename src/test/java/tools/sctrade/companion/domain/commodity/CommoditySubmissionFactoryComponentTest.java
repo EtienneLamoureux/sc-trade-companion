@@ -20,8 +20,6 @@ import tools.sctrade.companion.domain.notification.ConsoleNotificationRepository
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OneOcr;
-import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.domain.screenshot.ScreenshotType;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.output.DiskImageWriter;
 import tools.sctrade.companion.utils.ProcessRunner;
@@ -54,9 +52,8 @@ class CommoditySubmissionFactoryComponentTest {
     commodityListingFactory = new CommodityListingFactory(commodityRepository);
     notificationService = new NotificationService(new ConsoleNotificationRepository());
 
-    submissionFactory = new CommoditySubmissionFactory(new ScreenshotRepository(),
-        ScreenshotType.COMMODITY_KIOSK, userService, notificationService, commodityLocationReader,
-        commodityListingFactory, ocr);
+    submissionFactory = new CommoditySubmissionFactory(userService, notificationService,
+        commodityLocationReader, commodityListingFactory, ocr);
   }
 
   @Test
