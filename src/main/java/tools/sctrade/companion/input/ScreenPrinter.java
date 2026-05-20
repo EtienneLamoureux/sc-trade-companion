@@ -15,6 +15,7 @@ import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
+import tools.sctrade.companion.gui.screenshot.ScreenshotProducer;
 import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
 import tools.sctrade.companion.gui.screenshot.ScreenshotType;
 import tools.sctrade.companion.utils.GraphicsDeviceUtil;
