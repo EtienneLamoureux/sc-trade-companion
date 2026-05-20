@@ -31,14 +31,6 @@ public class ScreenshotsTab extends BorderPane {
   private final GridPane gridPane;
 
   /**
-   * Creates a new instance of the screenshots tab with no repository. This constructor is provided
-   * for backward compatibility and will display an empty grid until a repository is provided.
-   */
-  public ScreenshotsTab() {
-    this(new ScreenshotRepository());
-  }
-
-  /**
    * Creates a new instance of the screenshots tab.
    *
    * @param repository The screenshot repository.

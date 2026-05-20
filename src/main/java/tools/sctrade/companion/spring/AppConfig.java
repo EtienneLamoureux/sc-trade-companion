@@ -21,10 +21,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 import tools.sctrade.companion.domain.LocationRepository;
+import tools.sctrade.companion.domain.StatusTrackingSubmissionFactory;
+import tools.sctrade.companion.domain.SubmissionFactory;
 import tools.sctrade.companion.domain.commodity.CommodityListingFactory;
 import tools.sctrade.companion.domain.commodity.CommodityLocationReader;
 import tools.sctrade.companion.domain.commodity.CommodityRepository;
 import tools.sctrade.companion.domain.commodity.CommodityService;
+import tools.sctrade.companion.domain.commodity.CommoditySubmission;
 import tools.sctrade.companion.domain.commodity.CommoditySubmissionFactory;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
 import tools.sctrade.companion.domain.gamelog.lineprocessors.FallbackLogLineProcessor;
@@ -38,11 +41,13 @@ import tools.sctrade.companion.domain.item.ItemLocationReader;
 import tools.sctrade.companion.domain.item.ItemService;
 import tools.sctrade.companion.domain.item.ItemShopReader;
 import tools.sctrade.companion.domain.item.ItemShopRepository;
+import tools.sctrade.companion.domain.item.ItemSubmission;
 import tools.sctrade.companion.domain.item.ItemSubmissionFactory;
 import tools.sctrade.companion.domain.notification.NotificationRepository;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OneOcr;
+import tools.sctrade.companion.domain.screenshot.ScreenshotFactory;
 import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
 import tools.sctrade.companion.domain.screenshot.ScreenshotType;
 import tools.sctrade.companion.domain.setting.Setting;
@@ -228,15 +233,22 @@ public class AppConfig {
     return new CommodityListingFactory(commodityRepository);
   }
 
-  @Bean("CommoditySubmissionFactory")
+  @Bean("RawCommoditySubmissionFactory")
   public CommoditySubmissionFactory buildCommoditySubmissionFactory(UserService userService,
       NotificationService notificationService, CommodityLocationReader commodityLocationReader,
-      CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter,
-      ScreenshotRepository screenshotRepository) {
+      CommodityListingFactory commodityListingFactory, DiskImageWriter diskImageWriter) {
     Ocr ocr = new OneOcr(List.of(), diskImageWriter);
 
-    return new CommoditySubmissionFactory(screenshotRepository, ScreenshotType.COMMODITY_KIOSK,
-        userService, notificationService, commodityLocationReader, commodityListingFactory, ocr);
+    return new CommoditySubmissionFactory(userService, notificationService, commodityLocationReader,
+        commodityListingFactory, ocr);
+  }
+
+  @Bean("CommoditySubmissionFactory")
+  public SubmissionFactory<CommoditySubmission> buildTrackedCommoditySubmissionFactory(
+      @Qualifier("RawCommoditySubmissionFactory") CommoditySubmissionFactory commoditySubmissionFactory,
+      ScreenshotRepository screenshotRepository, ScreenshotFactory screenshotFactory) {
+    return new StatusTrackingSubmissionFactory<>(commoditySubmissionFactory, screenshotRepository,
+        ScreenshotType.COMMODITY_KIOSK, screenshotFactory);
   }
 
   @Bean("ItemListingFactory")
@@ -255,19 +267,28 @@ public class AppConfig {
     return new ItemShopReader(itemShopRepository);
   }
 
-  @Bean("ItemSubmissionFactory")
+  @Bean("RawItemSubmissionFactory")
   public ItemSubmissionFactory buildItemSubmissionFactory(UserService userService,
       NotificationService notificationService, ItemListingFactory itemListingFactory,
       ItemLocationReader itemLocationReader, ItemShopReader itemShopReader,
-      DiskImageWriter diskImageWriter, ScreenshotRepository screenshotRepository) {
+      DiskImageWriter diskImageWriter) {
     Ocr ocr = new OneOcr(List.of(), diskImageWriter);
 
-    return new ItemSubmissionFactory(screenshotRepository, ScreenshotType.ITEM_KIOSK, userService,
-        notificationService, itemListingFactory, itemLocationReader, itemShopReader, ocr);
+    return new ItemSubmissionFactory(userService, notificationService, itemListingFactory,
+        itemLocationReader, itemShopReader, ocr);
+  }
+
+  @Bean("ItemSubmissionFactory")
+  public SubmissionFactory<ItemSubmission> buildTrackedItemSubmissionFactory(
+      @Qualifier("RawItemSubmissionFactory") ItemSubmissionFactory itemSubmissionFactory,
+      ScreenshotRepository screenshotRepository, ScreenshotFactory screenshotFactory) {
+    return new StatusTrackingSubmissionFactory<>(itemSubmissionFactory, screenshotRepository,
+        ScreenshotType.ITEM_KIOSK, screenshotFactory);
   }
 
   @Bean("ItemService")
-  public ItemService buildItemService(ItemSubmissionFactory itemSubmissionFactory,
+  public ItemService buildItemService(
+      @Qualifier("ItemSubmissionFactory") SubmissionFactory<ItemSubmission> itemSubmissionFactory,
       @Qualifier("ItemCsvWriter") ItemCsvWriter itemCsvWriter,
       ScTradeToolsItemPublisher scTradeToolsItemPublisher,
       NotificationService notificationService) {
@@ -280,7 +301,7 @@ public class AppConfig {
 
   @Bean("CommodityService")
   public CommodityService buildCommodityService(
-      CommoditySubmissionFactory commoditySubmissionFactory,
+      @Qualifier("CommoditySubmissionFactory") SubmissionFactory<CommoditySubmission> commoditySubmissionFactory,
       @Qualifier("CommodityCsvWriter") CommodityCsvWriter commodityCsvLogger,
       ScTradeToolsCommodityPublisher scTradeToolsCommodityPublisher,
       NotificationService notificationService) {
@@ -295,6 +316,11 @@ public class AppConfig {
   @Bean
   public ScreenshotRepository buildScreenshotRepository() {
     return new ScreenshotRepository();
+  }
+
+  @Bean
+  public ScreenshotFactory buildScreenshotFactory() {
+    return new ScreenshotFactory();
   }
 
   @Bean

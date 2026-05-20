@@ -3,17 +3,18 @@ package tools.sctrade.companion.domain.item;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.concurrent.BlockingQueue;
+import tools.sctrade.companion.domain.SubmissionFactory;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.utils.AsynchronousProcessor;
 import tools.sctrade.companion.utils.Consumer;
 
 public class ItemService extends Consumer<BufferedImage> {
 
-  private ItemSubmissionFactory submissionFactory;
+  private SubmissionFactory<ItemSubmission> submissionFactory;
   private Collection<AsynchronousProcessor<ItemSubmission>> publishers;
 
   public ItemService(BlockingQueue<BufferedImage> queue, NotificationService notificationService,
-      ItemSubmissionFactory submissionFactory,
+      SubmissionFactory<ItemSubmission> submissionFactory,
       Collection<AsynchronousProcessor<ItemSubmission>> publishers) {
     super(queue, notificationService);
 

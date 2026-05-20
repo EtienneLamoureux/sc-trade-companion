@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.sctrade.companion.domain.StatusTrackingSubmissionFactory;
+import tools.sctrade.companion.domain.SubmissionFactory;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OcrResult;
-import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.domain.screenshot.ScreenshotType;
 import tools.sctrade.companion.domain.user.UserService;
 import tools.sctrade.companion.exceptions.NoListingsException;
 import tools.sctrade.companion.utils.LocalizationUtil;
@@ -18,7 +16,7 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 /**
  * Factory for building item submissions from screen captures.
  */
-public class ItemSubmissionFactory extends StatusTrackingSubmissionFactory<ItemSubmission> {
+public class ItemSubmissionFactory implements SubmissionFactory<ItemSubmission> {
 
   private final Logger logger = LoggerFactory.getLogger(ItemSubmissionFactory.class);
 
@@ -32,8 +30,6 @@ public class ItemSubmissionFactory extends StatusTrackingSubmissionFactory<ItemS
   /**
    * Constructor.
    *
-   * @param screenshotRepository repository used to track screenshot processing status
-   * @param screenshotType kiosk type to associate with tracked screenshots
    * @param userService the user service
    * @param notificationService the notification service
    * @param itemListingFactory the item listing factory
@@ -41,11 +37,9 @@ public class ItemSubmissionFactory extends StatusTrackingSubmissionFactory<ItemS
    * @param itemShopReader the item shop reader
    * @param ocr the OCR service
    */
-  public ItemSubmissionFactory(ScreenshotRepository screenshotRepository,
-      ScreenshotType screenshotType, UserService userService,
-      NotificationService notificationService, ItemListingFactory itemListingFactory,
-      ItemLocationReader itemLocationReader, ItemShopReader itemShopReader, Ocr ocr) {
-    super(screenshotRepository, screenshotType);
+  public ItemSubmissionFactory(UserService userService, NotificationService notificationService,
+      ItemListingFactory itemListingFactory, ItemLocationReader itemLocationReader,
+      ItemShopReader itemShopReader, Ocr ocr) {
     this.userService = userService;
     this.notificationService = notificationService;
     this.itemListingFactory = itemListingFactory;
@@ -55,7 +49,7 @@ public class ItemSubmissionFactory extends StatusTrackingSubmissionFactory<ItemS
   }
 
   @Override
-  protected ItemSubmission doBuild(BufferedImage screenCapture) {
+  public ItemSubmission build(BufferedImage screenCapture) {
     var ocrResult = ocr.read(screenCapture);
     var location = readLocation(screenCapture, ocrResult);
     var shop = readShop(screenCapture, ocrResult);
@@ -71,17 +65,6 @@ public class ItemSubmissionFactory extends StatusTrackingSubmissionFactory<ItemS
     }
 
     return new ItemSubmission(userService.get(), listings);
-  }
-
-  @Override
-  protected String extractLocation(ItemSubmission result) {
-    return result.getListings().stream().map(ItemListing::location).filter(l -> l != null)
-        .findFirst().orElse(null);
-  }
-
-  @Override
-  protected String extractContent(ItemSubmission result) {
-    return result.getListings().size() + " listings processed";
   }
 
   private Optional<String> readLocation(BufferedImage screenCapture, OcrResult ocrResult) {

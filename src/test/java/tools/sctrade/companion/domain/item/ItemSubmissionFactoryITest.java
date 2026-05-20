@@ -27,8 +27,6 @@ import tools.sctrade.companion.domain.notification.ConsoleNotificationRepository
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.ocr.Ocr;
 import tools.sctrade.companion.domain.ocr.OneOcr;
-import tools.sctrade.companion.domain.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.domain.screenshot.ScreenshotType;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.UserService;
@@ -68,9 +66,8 @@ class ItemSubmissionFactoryITest {
     List<ImageManipulation> imageManipulations = List.of();
     ocr = new OneOcr(imageManipulations, diskImageWriter);
 
-    submissionFactory = new ItemSubmissionFactory(new ScreenshotRepository(),
-        ScreenshotType.ITEM_KIOSK, userService, notificationService, itemListingFactory,
-        itemLocationReader, itemShopReader, ocr);
+    submissionFactory = new ItemSubmissionFactory(userService, notificationService,
+        itemListingFactory, itemLocationReader, itemShopReader, ocr);
   }
 
   @Test

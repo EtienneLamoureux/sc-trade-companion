@@ -42,8 +42,8 @@ public record Screenshot(String id, BufferedImage image, String location, Screen
   public Screenshot updateUsing(Screenshot update) {
     if (!this.id.equals(update.id())) {
       throw new IllegalArgumentException(
-          "Cannot update screenshot '%s' using screenshot with different id '%s'"
-              .formatted(this.id, update.id()));
+          "Cannot update screenshot '%s' using screenshot with different id '%s'".formatted(this.id,
+              update.id()));
     }
 
     return new Screenshot(this.id, update.image() != null ? update.image() : this.image,
