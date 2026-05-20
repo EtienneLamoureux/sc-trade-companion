@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import tools.sctrade.companion.utils.patterns.Subject;
 
 /**
  * Thread-safe, in-memory ordered repository for {@link Screenshot} instances.
@@ -13,11 +14,19 @@ import java.util.List;
  * preserving their current position. The repository is capped at {@value #MAX_SIZE} entries; any
  * entries beyond that limit are silently dropped from the tail.
  */
-public class ScreenshotRepository {
+public class ScreenshotRepository extends Subject<List<Screenshot>> {
 
   private static final int MAX_SIZE = 36;
 
   private final LinkedList<Screenshot> screenshots = new LinkedList<>();
+
+  /**
+   * Creates a new screenshot repository.
+   */
+  public ScreenshotRepository() {
+    this.observers = new ArrayList<>();
+    this.state = Collections.unmodifiableList(new ArrayList<>());
+  }
 
   /**
    * Inserts or replaces a {@link Screenshot} by its {@code id}.
@@ -46,6 +55,8 @@ public class ScreenshotRepository {
         screenshots.removeLast();
       }
     }
+
+    setState();
   }
 
   /**
@@ -56,5 +67,11 @@ public class ScreenshotRepository {
    */
   public synchronized List<Screenshot> getSnapshot() {
     return Collections.unmodifiableList(new ArrayList<>(screenshots));
+  }
+
+  @Override
+  protected synchronized void setState() {
+    this.state = getSnapshot();
+    notifyObservers();
   }
 }

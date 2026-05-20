@@ -77,3 +77,8 @@
 .screenshot-card-status-body.screenshot-status-danger {
   -fx-text-fill: #cf222e;
 }
+
+.screenshot-empty-state {
+  -fx-text-fill: -color-fg-muted;
+  -fx-alignment: CENTER;
+}
