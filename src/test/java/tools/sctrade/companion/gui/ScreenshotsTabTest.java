@@ -13,6 +13,7 @@ import javafx.scene.layout.GridPane;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.gui.screenshot.Screenshot;
+import tools.sctrade.companion.gui.screenshot.ScreenshotCardFactory;
 import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
 import tools.sctrade.companion.gui.screenshot.ScreenshotStatus;
 import tools.sctrade.companion.gui.screenshot.ScreenshotType;
@@ -28,6 +29,15 @@ class ScreenshotsTabTest {
     ScreenshotRepository repository = new ScreenshotRepository();
     ScreenshotsTab tab =
         JavaFxTestUtil.supplyOnFxThreadAndWait(() -> new ScreenshotsTab(repository));
+    assertNotNull(tab);
+  }
+
+  @Test
+  void givenTypedCardFactoryWhenConstructedThenAcceptsCardFactoryDependency() {
+    ScreenshotRepository repository = new ScreenshotRepository();
+    CardFactory<Screenshot> cardFactory = new ScreenshotCardFactory(repository);
+    ScreenshotsTab tab =
+        JavaFxTestUtil.supplyOnFxThreadAndWait(() -> new ScreenshotsTab(repository, cardFactory));
     assertNotNull(tab);
   }
 

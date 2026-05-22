@@ -103,4 +103,9 @@ class ScreenshotRepositoryTest {
     assertThrows(UnsupportedOperationException.class,
         () -> repository.getSnapshot().add(SCREENSHOT_B));
   }
+
+  @Test
+  void whenGettingCapacity_thenReturnsMaxSize() {
+    assertEquals(36, repository.getCapacity());
+  }
 }

@@ -69,6 +69,15 @@ public class ScreenshotRepository extends Subject<List<Screenshot>> {
     return Collections.unmodifiableList(new ArrayList<>(screenshots));
   }
 
+  /**
+   * Returns repository capacity.
+   *
+   * @return maximum number of screenshots kept in repository
+   */
+  public int getCapacity() {
+    return MAX_SIZE;
+  }
+
   @Override
   protected synchronized void setState() {
     this.state = getSnapshot();
