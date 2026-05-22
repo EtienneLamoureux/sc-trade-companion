@@ -8,7 +8,9 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Locale;
 import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
 import javafx.animation.PauseTransition;
+import javafx.animation.RotateTransition;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.geometry.Rectangle2D;
@@ -47,6 +49,7 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
   private final transient ScreenshotRepository screenshotRepository;
   private final String version;
   private Stage stage;
+  private BorderPane mainRoot;
   private LogsTab logsTab;
   private transient Hyperlink activeNavLink;
   private transient FadeTransition currentTransition;
@@ -143,8 +146,9 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
     ScreenshotsTab screenshotsTab = new ScreenshotsTab(screenshotRepository);
 
     BorderPane root = new BorderPane();
+    mainRoot = root;
     root.getStyleClass().add("companion-root");
-    root.setTop(buildNavBar(root, usageTab, settingsTab, screenshotsTab, logsTab));
+    root.setTop(buildNavBar(usageTab, settingsTab, screenshotsTab, logsTab));
     root.setCenter(usageTab);
 
     closingModalPane = new ModalPane();
@@ -170,6 +174,15 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
 
     RingProgressIndicator progress = new RingProgressIndicator();
     progress.setId("closingProgress");
+    progress.setPrefSize(48, 48);
+    progress.setMinSize(48, 48);
+    progress.setMaxSize(48, 48);
+
+    RotateTransition spinnerRotation = new RotateTransition(Duration.millis(220), progress);
+    spinnerRotation.setByAngle(360);
+    spinnerRotation.setCycleCount(javafx.animation.Animation.INDEFINITE);
+    spinnerRotation.setInterpolator(Interpolator.LINEAR);
+    spinnerRotation.play();
 
     VBox content = new VBox(10, title, progress);
     content.setAlignment(Pos.CENTER);
@@ -180,16 +193,16 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
     return content;
   }
 
-  private HBox buildNavBar(BorderPane root, UsageTab usageTab, SettingsTab settingsTab,
+  private HBox buildNavBar(UsageTab usageTab, SettingsTab settingsTab,
       ScreenshotsTab screenshotsTab, LogsTab logsTab) {
-    Hyperlink usageLink = buildNavLink("nav-usage", LocalizationUtil.get("tabUsage"),
-        () -> switchCenter(root, usageTab));
+    Hyperlink usageLink =
+        buildNavLink("nav-usage", LocalizationUtil.get("tabUsage"), () -> switchCenter(usageTab));
     Hyperlink settingsLink = buildNavLink("nav-settings", LocalizationUtil.get("tabSettings"),
-        () -> switchCenter(root, settingsTab));
+        () -> switchCenter(settingsTab));
     Hyperlink screenshotsLink = buildNavLink("nav-screenshots",
-        LocalizationUtil.get("tabScreenshots"), () -> switchCenter(root, screenshotsTab));
-    Hyperlink logsLink = buildNavLink("nav-logs", LocalizationUtil.get("tabLogs"),
-        () -> switchCenter(root, logsTab));
+        LocalizationUtil.get("tabScreenshots"), () -> switchCenter(screenshotsTab));
+    Hyperlink logsLink =
+        buildNavLink("nav-logs", LocalizationUtil.get("tabLogs"), () -> switchCenter(logsTab));
 
     setActiveNavLink(usageLink);
     HBox navBar = new HBox(usageLink, settingsLink, screenshotsLink, logsLink);
@@ -219,15 +232,15 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
     activeNavLink.getStyleClass().add("active");
   }
 
-  private void switchCenter(BorderPane root, Node node) {
-    if (node == root.getCenter()) {
+  private void switchCenter(Node node) {
+    if (node == mainRoot.getCenter()) {
       return;
     }
     if (currentTransition != null) {
       currentTransition.stop();
     }
     node.setOpacity(0);
-    root.setCenter(node);
+    mainRoot.setCenter(node);
     currentTransition = new FadeTransition(Duration.millis(150), node);
     currentTransition.setFromValue(0);
     currentTransition.setToValue(1);

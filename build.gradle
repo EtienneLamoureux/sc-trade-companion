@@ -36,6 +36,8 @@ dependencies {
 
 	// GUI look and feel
 	implementation 'io.github.mkpaz:atlantafx-base:2.1.0'
+	implementation 'org.kordamp.ikonli:ikonli-javafx:12.4.0'
+	implementation 'org.kordamp.ikonli:ikonli-materialdesign-pack:12.4.0'
 	
 	// Computer vision
 	implementation 'org.openpnp:opencv:4.9.0-0'

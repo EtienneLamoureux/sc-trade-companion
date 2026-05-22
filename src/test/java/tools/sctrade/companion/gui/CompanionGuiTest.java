@@ -71,7 +71,6 @@ class CompanionGuiTest {
     assertNavLink(navBar, 2, "nav-screenshots");
     assertNavLink(navBar, 3, "nav-logs");
 
-    assertNotNull(root.getCenter(), "Scene center must not be empty");
     assertInstanceOf(UsageTab.class, root.getCenter(),
         "Default center must be the usage/instructions view");
   }

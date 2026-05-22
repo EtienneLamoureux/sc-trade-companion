@@ -7,9 +7,9 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import org.imgscalr.Scalr;
+import org.kordamp.ikonli.javafx.FontIcon;
 import tools.sctrade.companion.gui.CardFactory;
 
 /**
@@ -42,19 +42,28 @@ public class ScreenshotCardFactory implements CardFactory<Screenshot> {
   public VBox build(Screenshot screenshot) {
     VBox card = new VBox(5);
     card.getStyleClass().add("screenshot-card");
-    card.setPrefWidth(200);
+    card.setMinWidth(240);
+    card.setPrefWidth(240);
+    card.setMaxWidth(240);
 
     var title = new javafx.scene.control.Label(screenshot.type().label());
     title.getStyleClass().add("screenshot-card-title");
+    title.setMaxWidth(Double.MAX_VALUE);
+    title.setAlignment(Pos.CENTER_LEFT);
 
-    var description = new javafx.scene.control.Label(
-        screenshot.location() == null ? "..." : screenshot.location());
-    description.getStyleClass().add("screenshot-card-description");
-    description.setWrapText(true);
+    VBox header = new VBox(2);
+    header.getChildren().add(title);
+    header.setFillWidth(true);
 
-    BorderPane header = new BorderPane();
-    header.setCenter(title);
-    header.setBottom(description);
+    if (screenshot.location() != null) {
+      var description = new javafx.scene.control.Label(screenshot.location());
+      description.getStyleClass().add("screenshot-card-description");
+      description.setWrapText(true);
+      description.setMaxWidth(Double.MAX_VALUE);
+      description.setAlignment(Pos.CENTER_LEFT);
+      header.getChildren().add(description);
+    }
+
     card.getChildren().add(header);
 
     if (screenshot.image() != null) {
@@ -95,10 +104,10 @@ public class ScreenshotCardFactory implements CardFactory<Screenshot> {
     body.getStyleClass().add("screenshot-card-status-body");
     body.getStyleClass().add(screenshot.status().styleClass());
 
-    var iconLabel = new javafx.scene.control.Label();
-    iconLabel.getStyleClass().add("screenshot-card-status-icon");
-    iconLabel.getStyleClass().add(screenshot.status().iconClass());
-    body.getChildren().add(iconLabel);
+    FontIcon icon = FontIcon.of(screenshot.status().icon());
+    icon.getStyleClass().add("screenshot-card-status-icon");
+    icon.getStyleClass().add(screenshot.status().styleClass());
+    body.getChildren().add(icon);
 
     var statusLabel = new javafx.scene.control.Label(getStatusText(screenshot));
     statusLabel.getStyleClass().add("screenshot-card-status-text");
