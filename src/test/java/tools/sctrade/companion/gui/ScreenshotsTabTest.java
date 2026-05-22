@@ -9,9 +9,12 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.FlowPane;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.kordamp.ikonli.Ikon;
+import org.kordamp.ikonli.javafx.FontIcon;
 import tools.sctrade.companion.gui.screenshot.Screenshot;
 import tools.sctrade.companion.gui.screenshot.ScreenshotCardFactory;
 import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
@@ -138,8 +141,8 @@ class ScreenshotsTabTest {
       return new ScreenshotsTab(repository);
     });
 
-    assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusIconClasses(tab, 0))
-        .contains("mdoal-access_time"));
+    assertEquals(tools.sctrade.companion.gui.screenshot.ScreenshotStatus.QUEUED.icon(),
+        JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusIcon(tab, 0)));
     assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusBodyClasses(tab, 0))
         .contains("screenshot-status-muted"));
   }
@@ -177,7 +180,7 @@ class ScreenshotsTabTest {
   }
 
   @Test
-  void givenCardWhenLocationNotAvailableThenShowsEllipsis() {
+  void givenCardWhenLocationNotAvailableThenHidesSubtitle() {
     ScreenshotRepository repository = new ScreenshotRepository();
     BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
     Screenshot screenshot = new Screenshot("id-1", image, null, ScreenshotStatus.SUCCESS, null,
@@ -189,7 +192,7 @@ class ScreenshotsTabTest {
     });
 
     String description = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardDescription(tab, 0));
-    assertEquals("...", description);
+    assertEquals("", description);
   }
 
   @Test
@@ -208,7 +211,7 @@ class ScreenshotsTabTest {
   }
 
   @Test
-  void givenNonEmptyRepositoryWhenConstructedThenHasGridPaneLayout() {
+  void givenNonEmptyRepositoryWhenConstructedThenHasScrollableLayout() {
     ScreenshotRepository repository = new ScreenshotRepository();
     BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
     repository.upsert(new Screenshot("id-1", image, "Area18", ScreenshotStatus.SUCCESS, null, null,
@@ -218,7 +221,7 @@ class ScreenshotsTabTest {
     JavaFxTestUtil.runOnFxThreadAndWait(() -> {
       // Wait for queued UI refresh.
     });
-    assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> tab.getCenter() instanceof GridPane));
+    assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> tab.getCenter() instanceof ScrollPane));
   }
 
   @Test
@@ -281,28 +284,29 @@ class ScreenshotsTabTest {
   }
 
   private int getCardCount(ScreenshotsTab tab) {
-    if (!(tab.getCenter() instanceof GridPane grid)) {
+    FlowPane flowPane = getFlowPane(tab);
+    if (flowPane == null) {
       return 0;
     }
-    return grid.getChildren().size();
+    return flowPane.getChildren().size();
   }
 
   private List<String> getCardTitles(ScreenshotsTab tab) {
-    if (!(tab.getCenter() instanceof GridPane grid)) {
+    FlowPane flowPane = getFlowPane(tab);
+    if (flowPane == null) {
       return java.util.Collections.emptyList();
     }
-    if (grid == null || grid.getChildren().isEmpty()) {
+    if (flowPane.getChildren().isEmpty()) {
       return java.util.Collections.emptyList();
     }
 
     var titles = new java.util.ArrayList<String>();
-    for (var child : grid.getChildren()) {
+    for (var child : flowPane.getChildren()) {
       if (child instanceof javafx.scene.layout.VBox vbox) {
         if (!vbox.getChildren().isEmpty()
-            && vbox.getChildren().get(0) instanceof javafx.scene.layout.BorderPane header) {
-          if (header.getCenter() instanceof javafx.scene.control.Label titleLabel) {
-            titles.add(titleLabel.getText());
-          }
+            && vbox.getChildren().get(0) instanceof javafx.scene.layout.VBox header
+            && header.getChildren().get(0) instanceof javafx.scene.control.Label titleLabel) {
+          titles.add(titleLabel.getText());
         }
       }
     }
@@ -310,14 +314,15 @@ class ScreenshotsTabTest {
   }
 
   private String getCardStatusText(ScreenshotsTab tab, int cardIndex) {
-    if (!(tab.getCenter() instanceof GridPane grid)) {
+    FlowPane flowPane = getFlowPane(tab);
+    if (flowPane == null) {
       return "";
     }
-    if (grid == null || cardIndex >= grid.getChildren().size()) {
+    if (cardIndex >= flowPane.getChildren().size()) {
       return "";
     }
 
-    var card = grid.getChildren().get(cardIndex);
+    var card = flowPane.getChildren().get(cardIndex);
     if (card instanceof javafx.scene.layout.VBox vbox && vbox.getChildren().size() > 2) {
       var statusBody = vbox.getChildren().get(vbox.getChildren().size() - 1);
       if (statusBody instanceof javafx.scene.layout.VBox statusVBox) {
@@ -333,55 +338,58 @@ class ScreenshotsTabTest {
   }
 
   private String getCardDescription(ScreenshotsTab tab, int cardIndex) {
-    if (!(tab.getCenter() instanceof GridPane grid)) {
+    FlowPane flowPane = getFlowPane(tab);
+    if (flowPane == null) {
       return "";
     }
-    if (grid == null || cardIndex >= grid.getChildren().size()) {
+    if (cardIndex >= flowPane.getChildren().size()) {
       return "";
     }
 
-    var card = grid.getChildren().get(cardIndex);
+    var card = flowPane.getChildren().get(cardIndex);
     if (card instanceof javafx.scene.layout.VBox vbox && !vbox.getChildren().isEmpty()) {
-      if (vbox.getChildren().get(0) instanceof javafx.scene.layout.BorderPane header) {
-        if (header.getBottom() instanceof javafx.scene.control.Label descLabel) {
-          return descLabel.getText();
-        }
+      if (vbox.getChildren().get(0) instanceof javafx.scene.layout.VBox header
+          && header.getChildren().size() > 1
+          && header.getChildren().get(1) instanceof javafx.scene.control.Label descLabel) {
+        return descLabel.getText();
       }
     }
     return "";
   }
 
-  private List<String> getCardStatusIconClasses(ScreenshotsTab tab, int cardIndex) {
-    if (!(tab.getCenter() instanceof GridPane grid)) {
-      return java.util.Collections.emptyList();
+  private Ikon getCardStatusIcon(ScreenshotsTab tab, int cardIndex) {
+    FlowPane flowPane = getFlowPane(tab);
+    if (flowPane == null) {
+      return null;
     }
-    if (grid == null || cardIndex >= grid.getChildren().size()) {
-      return java.util.Collections.emptyList();
+    if (cardIndex >= flowPane.getChildren().size()) {
+      return null;
     }
 
-    var card = grid.getChildren().get(cardIndex);
+    var card = flowPane.getChildren().get(cardIndex);
     if (card instanceof javafx.scene.layout.VBox vbox && vbox.getChildren().size() > 2) {
       var statusBody = vbox.getChildren().get(vbox.getChildren().size() - 1);
       if (statusBody instanceof javafx.scene.layout.VBox statusVBox
           && !statusVBox.getChildren().isEmpty()) {
         var iconNode = statusVBox.getChildren().get(0);
-        if (iconNode instanceof javafx.scene.control.Label iconLabel) {
-          return iconLabel.getStyleClass();
+        if (iconNode instanceof FontIcon icon) {
+          return icon.getIconCode();
         }
       }
     }
-    return java.util.Collections.emptyList();
+    return null;
   }
 
   private List<String> getCardStatusBodyClasses(ScreenshotsTab tab, int cardIndex) {
-    if (!(tab.getCenter() instanceof GridPane grid)) {
+    FlowPane flowPane = getFlowPane(tab);
+    if (flowPane == null) {
       return java.util.Collections.emptyList();
     }
-    if (grid == null || cardIndex >= grid.getChildren().size()) {
+    if (cardIndex >= flowPane.getChildren().size()) {
       return java.util.Collections.emptyList();
     }
 
-    var card = grid.getChildren().get(cardIndex);
+    var card = flowPane.getChildren().get(cardIndex);
     if (card instanceof javafx.scene.layout.VBox vbox && vbox.getChildren().size() > 2) {
       var statusBody = vbox.getChildren().get(vbox.getChildren().size() - 1);
       if (statusBody instanceof javafx.scene.layout.VBox statusVBox) {
@@ -392,13 +400,14 @@ class ScreenshotsTabTest {
   }
 
   private Node getCardNode(ScreenshotsTab tab, int cardIndex) {
-    if (!(tab.getCenter() instanceof GridPane grid)) {
+    FlowPane flowPane = getFlowPane(tab);
+    if (flowPane == null) {
       return null;
     }
-    if (cardIndex >= grid.getChildren().size()) {
+    if (cardIndex >= flowPane.getChildren().size()) {
       return null;
     }
-    return grid.getChildren().get(cardIndex);
+    return flowPane.getChildren().get(cardIndex);
   }
 
   private String getEmptyStateText(ScreenshotsTab tab) {
@@ -413,5 +422,16 @@ class ScreenshotsTabTest {
       return label.getStyleClass();
     }
     return java.util.Collections.emptyList();
+  }
+
+  private FlowPane getFlowPane(ScreenshotsTab tab) {
+    if (tab.getCenter() instanceof ScrollPane scrollPane
+        && scrollPane.getContent() instanceof FlowPane flowPane) {
+      return flowPane;
+    }
+    if (tab.getCenter() instanceof FlowPane flowPane) {
+      return flowPane;
+    }
+    return null;
   }
 }

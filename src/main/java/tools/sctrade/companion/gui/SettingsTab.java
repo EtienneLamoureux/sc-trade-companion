@@ -17,6 +17,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.util.Duration;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
@@ -200,7 +201,9 @@ public class SettingsTab extends GridPane {
     Label label = new Label(text);
     Label helpIcon = new Label("\u24d8");
     helpIcon.getStyleClass().add("settings-help-icon");
-    helpIcon.setTooltip(new Tooltip(helpText));
+    Tooltip tooltip = new Tooltip(helpText);
+    tooltip.setShowDelay(Duration.millis(75));
+    helpIcon.setTooltip(tooltip);
 
     HBox labelBox = new HBox(4, label, helpIcon);
     labelBox.setAlignment(Pos.CENTER_RIGHT);

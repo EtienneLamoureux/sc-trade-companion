@@ -14,6 +14,7 @@ import java.util.Set;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import org.jnativehook.keyboard.NativeKeyEvent;
@@ -153,8 +154,11 @@ class SettingsTabTest {
     boolean allHelpIconsHaveTooltip = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
       SettingsTab settingsTab = new SettingsTab(userService, gameLogPathSubject, settings);
       return settingsTab.lookupAll(".settings-help-icon").stream().filter(Label.class::isInstance)
-          .map(Label.class::cast)
-          .allMatch(icon -> icon.getTooltip() != null && !icon.getTooltip().getText().isBlank());
+          .map(Label.class::cast).allMatch(icon -> {
+            Tooltip tooltip = icon.getTooltip();
+            return tooltip != null && !tooltip.getText().isBlank()
+                && tooltip.getShowDelay().toMillis() <= 100.0;
+          });
     });
 
     assertTrue(allHelpIconsHaveTooltip);
