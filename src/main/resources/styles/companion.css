@@ -62,14 +62,12 @@
   -fx-spacing: 12;
 }
 
-.screenshot-card {
-  -fx-background-color: -color-bg-default;
-  -fx-background-radius: 0;
-  -fx-border-color: -color-border-default;
-  -fx-border-radius: 0;
-  -fx-border-width: 1;
-  -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.18), 12, 0.15, 0, 3);
-  -fx-padding: 12;
+.screenshots-tile-list {
+  -fx-background-color: transparent;
+}
+
+.screenshot-tile-separator {
+  -fx-padding: 0 0 0 0;
 }
 
 .screenshots-scroll-pane {
@@ -82,44 +80,25 @@
   -fx-background-color: transparent;
 }
 
-.screenshot-card-status-icon {
-  -fx-icon-size: 20px;
+.screenshot-tile-status {
+  -fx-font-size: 1.05em;
+  -fx-font-weight: bold;
 }
 
-.screenshot-card-status-body.screenshot-status-muted {
-  -fx-text-fill: -color-fg-muted;
+.screenshot-tile-status.screenshot-status-muted {
+  -fx-fill: -color-fg-muted;
 }
 
-.screenshot-card-status-body.screenshot-status-normal {
-  -fx-text-fill: -color-fg-default;
+.screenshot-tile-status.screenshot-status-normal {
+  -fx-fill: -color-fg-default;
 }
 
-.screenshot-card-status-body.screenshot-status-success {
-  -fx-text-fill: -color-accent-emphasis;
+.screenshot-tile-status.screenshot-status-success {
+  -fx-fill: -color-accent-emphasis;
 }
 
-.screenshot-card-status-body.screenshot-status-danger {
-  -fx-text-fill: #cf222e;
-}
-
-.screenshot-card-status-icon.screenshot-status-muted,
-.screenshot-card-status-body.screenshot-status-muted .ikonli-font-icon {
-  -fx-icon-color: -color-fg-muted;
-}
-
-.screenshot-card-status-icon.screenshot-status-normal,
-.screenshot-card-status-body.screenshot-status-normal .ikonli-font-icon {
-  -fx-icon-color: -color-fg-default;
-}
-
-.screenshot-card-status-icon.screenshot-status-success,
-.screenshot-card-status-body.screenshot-status-success .ikonli-font-icon {
-  -fx-icon-color: -color-accent-emphasis;
-}
-
-.screenshot-card-status-icon.screenshot-status-danger,
-.screenshot-card-status-body.screenshot-status-danger .ikonli-font-icon {
-  -fx-icon-color: #cf222e;
+.screenshot-tile-status.screenshot-status-danger {
+  -fx-fill: #cf222e;
 }
 
 .screenshot-empty-state {

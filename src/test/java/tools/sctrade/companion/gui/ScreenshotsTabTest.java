@@ -5,20 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import atlantafx.base.controls.Tile;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.VBox;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.kordamp.ikonli.Ikon;
 import org.kordamp.ikonli.javafx.FontIcon;
 import tools.sctrade.companion.gui.screenshot.Screenshot;
-import tools.sctrade.companion.gui.screenshot.ScreenshotCardFactory;
 import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
 import tools.sctrade.companion.gui.screenshot.ScreenshotStatus;
+import tools.sctrade.companion.gui.screenshot.ScreenshotTileFactory;
 import tools.sctrade.companion.gui.screenshot.ScreenshotType;
 
 class ScreenshotsTabTest {
@@ -36,52 +36,59 @@ class ScreenshotsTabTest {
   }
 
   @Test
-  void givenTypedCardFactoryWhenConstructedThenAcceptsCardFactoryDependency() {
+  void givenTileFactoryWhenConstructedThenAcceptsTileFactoryDependency() {
     ScreenshotRepository repository = new ScreenshotRepository();
-    CardFactory<Screenshot> cardFactory = new ScreenshotCardFactory(repository);
+    TileFactory<Screenshot> tileFactory = new ScreenshotTileFactory(repository);
     ScreenshotsTab tab =
-        JavaFxTestUtil.supplyOnFxThreadAndWait(() -> new ScreenshotsTab(repository, cardFactory));
+        JavaFxTestUtil.supplyOnFxThreadAndWait(() -> new ScreenshotsTab(repository, tileFactory));
     assertNotNull(tab);
   }
 
   @Test
-  void givenEmptyRepositoryWhenRenderedThenDisplaysNoCards() {
+  void givenEmptyRepositoryWhenRenderedThenDisplaysNoTiles() {
     ScreenshotRepository repository = new ScreenshotRepository();
     ScreenshotsTab tab =
         JavaFxTestUtil.supplyOnFxThreadAndWait(() -> new ScreenshotsTab(repository));
-    int cardCount = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardCount(tab));
-    assertEquals(0, cardCount);
+
+    assertEquals(0, JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getTileCount(tab)));
   }
 
   @Test
-  void givenRepositoryWithOneScreenshotWhenRenderedThenDisplaysOneCard() {
+  void givenRepositoryWithOneScreenshotWhenRenderedThenDisplaysOneTile() {
     ScreenshotRepository repository = new ScreenshotRepository();
-    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-    Screenshot screenshot = new Screenshot("id-1", image, "Commodity Exchange",
-        ScreenshotStatus.SUCCESS, null, null, ScreenshotType.COMMODITY_KIOSK);
+    Screenshot screenshot = screenshot("id-1", "Commodity Exchange", ScreenshotStatus.SUCCESS);
 
     ScreenshotsTab tab = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
       repository.upsert(screenshot);
       return new ScreenshotsTab(repository);
     });
 
-    int cardCount = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardCount(tab));
-    assertEquals(1, cardCount);
+    assertEquals(1, JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getTileCount(tab)));
   }
 
   @Test
-  void givenRepositoryWithMultipleScreenshotsWhenRenderedThenCardsAreInNewestFirstOrder() {
+  void givenRenderedTileWhenMeasuredThenUsesBoundWidthProperties() {
     ScreenshotRepository repository = new ScreenshotRepository();
-    BufferedImage image1 = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-    BufferedImage image2 = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-    BufferedImage image3 = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+    Screenshot screenshot = screenshot("id-1", "Commodity Exchange", ScreenshotStatus.SUCCESS);
 
-    Screenshot old = new Screenshot("id-old", image1, "Location A", ScreenshotStatus.SUCCESS, null,
-        null, ScreenshotType.COMMODITY_KIOSK);
-    Screenshot middle = new Screenshot("id-middle", image2, "Location B", ScreenshotStatus.SUCCESS,
-        null, null, ScreenshotType.ITEM_KIOSK);
-    Screenshot newest = new Screenshot("id-newest", image3, "Location C", ScreenshotStatus.SUCCESS,
-        null, null, ScreenshotType.COMMODITY_KIOSK);
+    ScreenshotsTab tab = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
+      repository.upsert(screenshot);
+      return new ScreenshotsTab(repository);
+    });
+
+    Tile tile = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getTileNode(tab, 0));
+    assertTrue(tile.prefWidthProperty().isBound());
+    assertTrue(tile.maxWidthProperty().isBound());
+  }
+
+  @Test
+  void givenRepositoryWithMultipleScreenshotsWhenRenderedThenTilesAreInNewestFirstOrder() {
+    ScreenshotRepository repository = new ScreenshotRepository();
+    Screenshot old = screenshot("id-old", "Location A", ScreenshotStatus.SUCCESS);
+    Screenshot middle =
+        new Screenshot("id-middle", new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB),
+            "Location B", ScreenshotStatus.SUCCESS, null, null, ScreenshotType.ITEM_KIOSK);
+    Screenshot newest = screenshot("id-newest", "Location C", ScreenshotStatus.SUCCESS);
 
     ScreenshotsTab tab = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
       repository.upsert(old);
@@ -90,113 +97,62 @@ class ScreenshotsTabTest {
       return new ScreenshotsTab(repository);
     });
 
-    List<String> titles = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardTitles(tab));
-    assertEquals(3, titles.size());
-    assertEquals("Commodity kiosk", titles.get(0)); // newest
-    assertEquals("Item kiosk", titles.get(1)); // middle
-    assertEquals("Commodity kiosk", titles.get(2)); // old
+    List<String> titles = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getTileTitles(tab));
+    assertEquals(List.of("Commodity kiosk", "Item kiosk", "Commodity kiosk"), titles);
   }
 
   @Test
-  void givenCardWhenStatusIsSuccessThenDisplaysLocationInBody() {
+  void givenRepositoryWithMultipleScreenshotsWhenRenderedThenSeparatorsSplitTiles() {
     ScreenshotRepository repository = new ScreenshotRepository();
-    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-    Screenshot screenshot = new Screenshot("id-1", image, "Test Location", ScreenshotStatus.SUCCESS,
-        null, null, ScreenshotType.COMMODITY_KIOSK);
+    repository.upsert(screenshot("id-1", "Location A", ScreenshotStatus.SUCCESS));
+    repository.upsert(screenshot("id-2", "Location B", ScreenshotStatus.SUCCESS));
+
+    ScreenshotsTab tab =
+        JavaFxTestUtil.supplyOnFxThreadAndWait(() -> new ScreenshotsTab(repository));
+
+    assertEquals(1, JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getSeparatorCount(tab)));
+  }
+
+  @Test
+  void givenTileWhenStatusIsSuccessThenShowsSuccessDescription() {
+    ScreenshotRepository repository = new ScreenshotRepository();
+    Screenshot screenshot = screenshot("id-1", "Commodity Exchange", ScreenshotStatus.SUCCESS);
 
     ScreenshotsTab tab = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
       repository.upsert(screenshot);
       return new ScreenshotsTab(repository);
     });
 
-    String statusText = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusText(tab, 0));
-    assertEquals("Test Location", statusText);
+    String description = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getTileDescription(tab, 0));
+    assertTrue(description.contains("Success"));
+    assertTrue(description.contains("[span class=\"screenshot-tile-status"));
+    assertTrue(description.contains("[size=150%]"));
+    assertTrue(description.contains("[font="));
+    assertTrue(description.contains(new FontIcon(ScreenshotStatus.SUCCESS.icon()).getText()));
   }
 
   @Test
-  void givenCardWhenStatusIsQueuedThenDisplaysInQueueMessage() {
+  void givenTileWhenStatusIsErrorThenShowsErrorDescription() {
     ScreenshotRepository repository = new ScreenshotRepository();
-    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-    Screenshot screenshot = new Screenshot("id-1", image, null, ScreenshotStatus.QUEUED, null, null,
-        ScreenshotType.COMMODITY_KIOSK);
+    Screenshot screenshot =
+        new Screenshot("id-1", new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB), null,
+            ScreenshotStatus.ERROR, "Image too small", null, ScreenshotType.COMMODITY_KIOSK);
 
     ScreenshotsTab tab = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
       repository.upsert(screenshot);
       return new ScreenshotsTab(repository);
     });
 
-    String statusText = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusText(tab, 0));
-    assertEquals("In queue", statusText);
+    String description = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getTileDescription(tab, 0));
+    assertTrue(description.contains("Image too small"));
+    assertTrue(description.contains("[span class=\"screenshot-tile-status"));
+    assertTrue(description.contains("[size=150%]"));
+    assertTrue(description.contains("[font="));
+    assertTrue(description.contains(new FontIcon(ScreenshotStatus.ERROR.icon()).getText()));
   }
 
   @Test
-  void givenCardWhenStatusIsQueuedThenIconUsesMaterialClassAndBodyUsesMutedClass() {
-    ScreenshotRepository repository = new ScreenshotRepository();
-    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-    Screenshot screenshot = new Screenshot("id-1", image, null, ScreenshotStatus.QUEUED, null, null,
-        ScreenshotType.COMMODITY_KIOSK);
-
-    ScreenshotsTab tab = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
-      repository.upsert(screenshot);
-      return new ScreenshotsTab(repository);
-    });
-
-    assertEquals(tools.sctrade.companion.gui.screenshot.ScreenshotStatus.QUEUED.icon(),
-        JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusIcon(tab, 0)));
-    assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusBodyClasses(tab, 0))
-        .contains("screenshot-status-muted"));
-  }
-
-  @Test
-  void givenCardWhenStatusIsProcessingThenDisplaysProcessingMessage() {
-    ScreenshotRepository repository = new ScreenshotRepository();
-    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-    Screenshot screenshot = new Screenshot("id-1", image, null, ScreenshotStatus.PROCESSING, null,
-        null, ScreenshotType.COMMODITY_KIOSK);
-
-    ScreenshotsTab tab = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
-      repository.upsert(screenshot);
-      return new ScreenshotsTab(repository);
-    });
-
-    String statusText = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusText(tab, 0));
-    assertEquals("Processing...", statusText);
-  }
-
-  @Test
-  void givenCardWhenStatusIsErrorThenDisplaysErrorMessage() {
-    ScreenshotRepository repository = new ScreenshotRepository();
-    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-    Screenshot screenshot = new Screenshot("id-1", image, null, ScreenshotStatus.ERROR,
-        "Image too small", null, ScreenshotType.COMMODITY_KIOSK);
-
-    ScreenshotsTab tab = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
-      repository.upsert(screenshot);
-      return new ScreenshotsTab(repository);
-    });
-
-    String statusText = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusText(tab, 0));
-    assertEquals("Image too small", statusText);
-  }
-
-  @Test
-  void givenCardWhenLocationNotAvailableThenHidesSubtitle() {
-    ScreenshotRepository repository = new ScreenshotRepository();
-    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-    Screenshot screenshot = new Screenshot("id-1", image, null, ScreenshotStatus.SUCCESS, null,
-        null, ScreenshotType.COMMODITY_KIOSK);
-
-    ScreenshotsTab tab = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
-      repository.upsert(screenshot);
-      return new ScreenshotsTab(repository);
-    });
-
-    String description = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardDescription(tab, 0));
-    assertEquals("", description);
-  }
-
-  @Test
-  void givenCardWhenImageIsNullThenStillRendersCard() {
+  void givenTileWhenImageIsNullThenStillRendersTile() {
     ScreenshotRepository repository = new ScreenshotRepository();
     Screenshot screenshot = new Screenshot("id-1", null, "Test Location", ScreenshotStatus.SUCCESS,
         null, null, ScreenshotType.COMMODITY_KIOSK);
@@ -206,67 +162,50 @@ class ScreenshotsTabTest {
       return new ScreenshotsTab(repository);
     });
 
-    int cardCount = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardCount(tab));
-    assertEquals(1, cardCount);
+    assertEquals(1, JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getTileCount(tab)));
   }
 
   @Test
   void givenNonEmptyRepositoryWhenConstructedThenHasScrollableLayout() {
     ScreenshotRepository repository = new ScreenshotRepository();
-    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-    repository.upsert(new Screenshot("id-1", image, "Area18", ScreenshotStatus.SUCCESS, null, null,
-        ScreenshotType.COMMODITY_KIOSK));
+    repository.upsert(screenshot("id-1", "Area18", ScreenshotStatus.SUCCESS));
+
     ScreenshotsTab tab =
         JavaFxTestUtil.supplyOnFxThreadAndWait(() -> new ScreenshotsTab(repository));
     JavaFxTestUtil.runOnFxThreadAndWait(() -> {
       // Wait for queued UI refresh.
     });
+
     assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> tab.getCenter() instanceof ScrollPane));
+    assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(
+        () -> ((ScrollPane) tab.getCenter()).getContent() instanceof VBox));
   }
 
   @Test
-  void givenTabAlreadyConstructedWhenRepositoryUpsertThenCardsRefreshWithoutReconstructingTab() {
+  void givenOneUnchangedTileWhenRefreshingThenItsNodeIsReused() {
     ScreenshotRepository repository = new ScreenshotRepository();
-    ScreenshotsTab tab =
-        JavaFxTestUtil.supplyOnFxThreadAndWait(() -> new ScreenshotsTab(repository));
-    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-
-    repository.upsert(new Screenshot("id-1", image, "Area18", ScreenshotStatus.SUCCESS, null, null,
-        ScreenshotType.COMMODITY_KIOSK));
-    JavaFxTestUtil.runOnFxThreadAndWait(() -> {
-      // Wait for queued UI refresh.
-    });
-
-    int cardCount = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardCount(tab));
-    assertEquals(1, cardCount);
-  }
-
-  @Test
-  void givenOneUnchangedCardWhenRefreshingThenItsNodeIsReused() {
-    ScreenshotRepository repository = new ScreenshotRepository();
-    BufferedImage image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-    Screenshot unchanged = new Screenshot("id-unchanged", image, "Orison", ScreenshotStatus.SUCCESS,
-        null, null, ScreenshotType.COMMODITY_KIOSK);
-    Screenshot changing = new Screenshot("id-changing", image, null, ScreenshotStatus.PROCESSING,
-        null, null, ScreenshotType.ITEM_KIOSK);
+    Screenshot unchanged = screenshot("id-unchanged", "Orison", ScreenshotStatus.SUCCESS);
+    Screenshot changing =
+        new Screenshot("id-changing", new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB), null,
+            ScreenshotStatus.PROCESSING, null, null, ScreenshotType.ITEM_KIOSK);
     repository.upsert(unchanged);
     repository.upsert(changing);
 
     ScreenshotsTab tab =
         JavaFxTestUtil.supplyOnFxThreadAndWait(() -> new ScreenshotsTab(repository));
-    Node unchangedCardBefore = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardNode(tab, 1));
+    Tile unchangedTileBefore = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getTileNode(tab, 1));
 
-    repository.upsert(new Screenshot("id-changing", image, null, ScreenshotStatus.ERROR,
-        "OCR failed", null, ScreenshotType.ITEM_KIOSK));
+    repository.upsert(
+        new Screenshot("id-changing", new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB), null,
+            ScreenshotStatus.ERROR, "OCR failed", null, ScreenshotType.ITEM_KIOSK));
     JavaFxTestUtil.runOnFxThreadAndWait(() -> {
       // Wait for queued UI refresh.
     });
 
-    Node unchangedCardAfter = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardNode(tab, 1));
-    String topCardStatusText =
-        JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getCardStatusText(tab, 0));
-    assertSame(unchangedCardBefore, unchangedCardAfter);
-    assertEquals("OCR failed", topCardStatusText);
+    Tile unchangedTileAfter = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getTileNode(tab, 1));
+    assertSame(unchangedTileBefore, unchangedTileAfter);
+    assertTrue(JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getTileDescription(tab, 0))
+        .contains("OCR failed"));
   }
 
   @Test
@@ -283,155 +222,72 @@ class ScreenshotsTabTest {
         .contains("screenshot-empty-state"));
   }
 
-  private int getCardCount(ScreenshotsTab tab) {
-    FlowPane flowPane = getFlowPane(tab);
-    if (flowPane == null) {
+  private Screenshot screenshot(String id, String location, ScreenshotStatus status) {
+    return new Screenshot(id, new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB), location,
+        status, null, null, ScreenshotType.COMMODITY_KIOSK);
+  }
+
+  private int getTileCount(ScreenshotsTab tab) {
+    VBox tileList = getTileList(tab);
+    return tileList == null ? 0
+        : (int) tileList.getChildren().stream().filter(Tile.class::isInstance).count();
+  }
+
+  private List<String> getTileTitles(ScreenshotsTab tab) {
+    VBox tileList = getTileList(tab);
+    if (tileList == null) {
+      return java.util.Collections.emptyList();
+    }
+
+    return tileList.getChildren().stream().filter(Tile.class::isInstance).map(Tile.class::cast)
+        .map(Tile::getTitle).toList();
+  }
+
+  private String getTileDescription(ScreenshotsTab tab, int tileIndex) {
+    Tile tile = getTileNode(tab, tileIndex);
+    return tile != null ? tile.getDescription() : "";
+  }
+
+  private Tile getTileNode(ScreenshotsTab tab, int tileIndex) {
+    VBox tileList = getTileList(tab);
+    List<Tile> tiles = getTiles(tileList);
+    if (tiles == null || tileIndex >= tiles.size()) {
+      return null;
+    }
+
+    return tiles.get(tileIndex);
+  }
+
+  private int getSeparatorCount(ScreenshotsTab tab) {
+    VBox tileList = getTileList(tab);
+    if (tileList == null) {
       return 0;
     }
-    return flowPane.getChildren().size();
+    return (int) tileList.getChildren().stream().filter(Separator.class::isInstance).count();
   }
 
-  private List<String> getCardTitles(ScreenshotsTab tab) {
-    FlowPane flowPane = getFlowPane(tab);
-    if (flowPane == null) {
-      return java.util.Collections.emptyList();
+  private VBox getTileList(ScreenshotsTab tab) {
+    if (tab.getCenter() instanceof ScrollPane scrollPane
+        && scrollPane.getContent() instanceof VBox tileList) {
+      return tileList;
     }
-    if (flowPane.getChildren().isEmpty()) {
-      return java.util.Collections.emptyList();
-    }
-
-    var titles = new java.util.ArrayList<String>();
-    for (var child : flowPane.getChildren()) {
-      if (child instanceof javafx.scene.layout.VBox vbox) {
-        if (!vbox.getChildren().isEmpty()
-            && vbox.getChildren().get(0) instanceof javafx.scene.layout.VBox header
-            && header.getChildren().get(0) instanceof javafx.scene.control.Label titleLabel) {
-          titles.add(titleLabel.getText());
-        }
-      }
-    }
-    return titles;
+    return tab.getCenter() instanceof VBox tileList ? tileList : null;
   }
 
-  private String getCardStatusText(ScreenshotsTab tab, int cardIndex) {
-    FlowPane flowPane = getFlowPane(tab);
-    if (flowPane == null) {
-      return "";
-    }
-    if (cardIndex >= flowPane.getChildren().size()) {
-      return "";
-    }
-
-    var card = flowPane.getChildren().get(cardIndex);
-    if (card instanceof javafx.scene.layout.VBox vbox && vbox.getChildren().size() > 2) {
-      var statusBody = vbox.getChildren().get(vbox.getChildren().size() - 1);
-      if (statusBody instanceof javafx.scene.layout.VBox statusVBox) {
-        for (var child : statusVBox.getChildren()) {
-          if (child instanceof javafx.scene.control.Label label
-              && !label.getStyleClass().contains("screenshot-card-status-icon")) {
-            return label.getText();
-          }
-        }
-      }
-    }
-    return "";
-  }
-
-  private String getCardDescription(ScreenshotsTab tab, int cardIndex) {
-    FlowPane flowPane = getFlowPane(tab);
-    if (flowPane == null) {
-      return "";
-    }
-    if (cardIndex >= flowPane.getChildren().size()) {
-      return "";
-    }
-
-    var card = flowPane.getChildren().get(cardIndex);
-    if (card instanceof javafx.scene.layout.VBox vbox && !vbox.getChildren().isEmpty()) {
-      if (vbox.getChildren().get(0) instanceof javafx.scene.layout.VBox header
-          && header.getChildren().size() > 1
-          && header.getChildren().get(1) instanceof javafx.scene.control.Label descLabel) {
-        return descLabel.getText();
-      }
-    }
-    return "";
-  }
-
-  private Ikon getCardStatusIcon(ScreenshotsTab tab, int cardIndex) {
-    FlowPane flowPane = getFlowPane(tab);
-    if (flowPane == null) {
+  private List<Tile> getTiles(VBox tileList) {
+    if (tileList == null) {
       return null;
     }
-    if (cardIndex >= flowPane.getChildren().size()) {
-      return null;
-    }
-
-    var card = flowPane.getChildren().get(cardIndex);
-    if (card instanceof javafx.scene.layout.VBox vbox && vbox.getChildren().size() > 2) {
-      var statusBody = vbox.getChildren().get(vbox.getChildren().size() - 1);
-      if (statusBody instanceof javafx.scene.layout.VBox statusVBox
-          && !statusVBox.getChildren().isEmpty()) {
-        var iconNode = statusVBox.getChildren().get(0);
-        if (iconNode instanceof FontIcon icon) {
-          return icon.getIconCode();
-        }
-      }
-    }
-    return null;
-  }
-
-  private List<String> getCardStatusBodyClasses(ScreenshotsTab tab, int cardIndex) {
-    FlowPane flowPane = getFlowPane(tab);
-    if (flowPane == null) {
-      return java.util.Collections.emptyList();
-    }
-    if (cardIndex >= flowPane.getChildren().size()) {
-      return java.util.Collections.emptyList();
-    }
-
-    var card = flowPane.getChildren().get(cardIndex);
-    if (card instanceof javafx.scene.layout.VBox vbox && vbox.getChildren().size() > 2) {
-      var statusBody = vbox.getChildren().get(vbox.getChildren().size() - 1);
-      if (statusBody instanceof javafx.scene.layout.VBox statusVBox) {
-        return statusVBox.getStyleClass();
-      }
-    }
-    return java.util.Collections.emptyList();
-  }
-
-  private Node getCardNode(ScreenshotsTab tab, int cardIndex) {
-    FlowPane flowPane = getFlowPane(tab);
-    if (flowPane == null) {
-      return null;
-    }
-    if (cardIndex >= flowPane.getChildren().size()) {
-      return null;
-    }
-    return flowPane.getChildren().get(cardIndex);
+    return tileList.getChildren().stream().filter(Tile.class::isInstance).map(Tile.class::cast)
+        .toList();
   }
 
   private String getEmptyStateText(ScreenshotsTab tab) {
-    if (tab.getCenter() instanceof Label label) {
-      return label.getText();
-    }
-    return "";
+    return tab.getCenter() instanceof Label label ? label.getText() : "";
   }
 
   private List<String> getEmptyStateStyleClasses(ScreenshotsTab tab) {
-    if (tab.getCenter() instanceof Label label) {
-      return label.getStyleClass();
-    }
-    return java.util.Collections.emptyList();
-  }
-
-  private FlowPane getFlowPane(ScreenshotsTab tab) {
-    if (tab.getCenter() instanceof ScrollPane scrollPane
-        && scrollPane.getContent() instanceof FlowPane flowPane) {
-      return flowPane;
-    }
-    if (tab.getCenter() instanceof FlowPane flowPane) {
-      return flowPane;
-    }
-    return null;
+    return tab.getCenter() instanceof Label label ? label.getStyleClass()
+        : java.util.Collections.emptyList();
   }
 }
