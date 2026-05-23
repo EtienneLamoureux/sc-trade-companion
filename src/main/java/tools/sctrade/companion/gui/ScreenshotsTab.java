@@ -1,37 +1,39 @@
 package tools.sctrade.companion.gui;
 
+import atlantafx.base.controls.Tile;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 import tools.sctrade.companion.gui.screenshot.Screenshot;
-import tools.sctrade.companion.gui.screenshot.ScreenshotCardFactory;
 import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
+import tools.sctrade.companion.gui.screenshot.ScreenshotTileFactory;
 import tools.sctrade.companion.utils.patterns.Observer;
 
 /**
- * The screenshots tab for the companion GUI. Displays screenshot cards in a responsive wrapping
- * layout, with newest-first ordering.
+ * The screenshots tab for the companion GUI. Displays screenshot tiles in a single scrollable list,
+ * with newest-first ordering.
  */
-public class ScreenshotsTab extends BorderPane {
+public class ScreenshotsTab extends javafx.scene.layout.BorderPane {
   private static final String EMPTY_STATE_TEXT = "Capture screenshots and see their status here";
+  private static final double TILE_WIDTH_RATIO = 0.8d;
 
-  private final FlowPane flowPane;
+  private final VBox tileList;
   private final ScrollPane scrollPane;
   private final Label emptyStateLabel;
   private final Observer<List<Screenshot>> repositoryObserver;
-  private final CardFactory<Screenshot> screenshotCardFactory;
-  private final Map<Integer, VBox> cardsByHash = new HashMap<>();
+  private final TileFactory<Screenshot> screenshotTileFactory;
+  private final Map<Integer, Tile> tilesByHash = new HashMap<>();
 
   /**
    * Creates a new instance of the screenshots tab.
@@ -39,40 +41,39 @@ public class ScreenshotsTab extends BorderPane {
    * @param repository The screenshot repository.
    */
   public ScreenshotsTab(ScreenshotRepository repository) {
-    this(repository, new ScreenshotCardFactory(repository));
+    this(repository, new ScreenshotTileFactory(repository));
   }
 
   /**
-   * Creates a new instance of the screenshots tab with an explicit typed card factory dependency.
+   * Creates a new instance of the screenshots tab with an explicit tile factory dependency.
    *
    * @param repository The screenshot repository.
-   * @param screenshotCardFactory typed screenshot card factory dependency.
+   * @param screenshotTileFactory tile factory dependency.
    */
   public ScreenshotsTab(ScreenshotRepository repository,
-      CardFactory<Screenshot> screenshotCardFactory) {
-    this.flowPane = new FlowPane();
-    this.scrollPane = new ScrollPane(flowPane);
+      TileFactory<Screenshot> screenshotTileFactory) {
+    this.tileList = new VBox(12);
+    this.scrollPane = new ScrollPane(tileList);
     this.emptyStateLabel = createEmptyStateLabel();
-    this.screenshotCardFactory = screenshotCardFactory;
+    this.screenshotTileFactory = screenshotTileFactory;
     this.repositoryObserver = new Observer<>(repository) {
       @Override
       protected void update() {
         super.update();
-        ScreenshotsTab.this.refreshCards(this.state);
+        ScreenshotsTab.this.refreshTiles(this.state);
       }
     };
-    setupFlowLayout();
+    setupTileLayout();
     setCenter(emptyStateLabel);
     repository.attach(repositoryObserver);
   }
 
-  private void setupFlowLayout() {
-    flowPane.setHgap(12);
-    flowPane.setVgap(12);
-    flowPane.setPadding(new Insets(16));
-    flowPane.setAlignment(Pos.TOP_CENTER);
-    flowPane.getStyleClass().add("screenshots-flow");
-    flowPane.prefWrapLengthProperty().bind(Bindings.max(0, widthProperty().subtract(32)));
+  private void setupTileLayout() {
+    tileList.setPadding(new Insets(16));
+    tileList.setAlignment(Pos.TOP_CENTER);
+    tileList.setFillWidth(true);
+    tileList.setSpacing(0);
+    tileList.getStyleClass().add("screenshots-tile-list");
 
     scrollPane.getStyleClass().add("screenshots-scroll-pane");
     scrollPane.setFitToWidth(true);
@@ -82,23 +83,23 @@ public class ScreenshotsTab extends BorderPane {
     scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
   }
 
-  private void refreshCards(List<Screenshot> screenshots) {
+  private void refreshTiles(List<Screenshot> screenshots) {
     if (screenshots == null) {
       return;
     }
 
     if (Platform.isFxApplicationThread()) {
-      refreshCardsIncrementally(screenshots);
+      refreshTilesIncrementally(screenshots);
       return;
     }
 
-    Platform.runLater(() -> refreshCardsIncrementally(screenshots));
+    Platform.runLater(() -> refreshTilesIncrementally(screenshots));
   }
 
-  private void refreshCardsIncrementally(List<Screenshot> screenshots) {
+  private void refreshTilesIncrementally(List<Screenshot> screenshots) {
     if (screenshots.isEmpty()) {
-      cardsByHash.clear();
-      flowPane.getChildren().clear();
+      tilesByHash.clear();
+      tileList.getChildren().clear();
       setCenter(emptyStateLabel);
       return;
     }
@@ -107,19 +108,40 @@ public class ScreenshotsTab extends BorderPane {
     List<Node> orderedNodes = new java.util.ArrayList<>();
     HashSet<Integer> activeHashes = new HashSet<>();
 
-    for (Screenshot screenshot : screenshots) {
+    for (int i = 0; i < screenshots.size(); i++) {
+      Screenshot screenshot = screenshots.get(i);
       Integer hash = screenshot.hashCode();
-      if (!cardsByHash.containsKey(hash)) {
-        cardsByHash.put(hash, screenshotCardFactory.build(screenshot));
+      if (!tilesByHash.containsKey(hash)) {
+        Tile tile = screenshotTileFactory.build(screenshot);
+        configureTileWidth(tile);
+        tilesByHash.put(hash, tile);
       }
 
-      orderedNodes.add(cardsByHash.get(hash));
+      orderedNodes.add(tilesByHash.get(hash));
       activeHashes.add(hash);
+      if (i < screenshots.size() - 1) {
+        orderedNodes.add(createSeparator());
+      }
     }
 
-    cardsByHash.keySet().removeIf(hash -> !activeHashes.contains(hash));
+    tilesByHash.keySet().removeIf(hash -> !activeHashes.contains(hash));
+    tileList.getChildren().setAll(orderedNodes);
+  }
 
-    flowPane.getChildren().setAll(orderedNodes);
+  private void configureTileWidth(Tile tile) {
+    DoubleBinding tileWidth = Bindings.createDoubleBinding(
+        () -> Math.max(0d, scrollPane.getViewportBounds().getWidth() * TILE_WIDTH_RATIO),
+        scrollPane.viewportBoundsProperty());
+    tile.setMinWidth(0d);
+    tile.prefWidthProperty().bind(tileWidth);
+    tile.maxWidthProperty().bind(tileWidth);
+  }
+
+  private Separator createSeparator() {
+    Separator separator = new Separator();
+    separator.getStyleClass().add("screenshot-tile-separator");
+    separator.setPadding(new Insets(8, 0, 8, 0));
+    return separator;
   }
 
   private Label createEmptyStateLabel() {
@@ -127,7 +149,7 @@ public class ScreenshotsTab extends BorderPane {
     label.setWrapText(true);
     label.setAlignment(Pos.CENTER);
     label.getStyleClass().addAll("title-2", "screenshot-empty-state");
-    BorderPane.setAlignment(label, Pos.CENTER);
+    javafx.scene.layout.BorderPane.setAlignment(label, Pos.CENTER);
     return label;
   }
 }
