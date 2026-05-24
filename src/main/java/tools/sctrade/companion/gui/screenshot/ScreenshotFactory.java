@@ -5,6 +5,7 @@ import tools.sctrade.companion.domain.commodity.CommodityListing;
 import tools.sctrade.companion.domain.commodity.CommoditySubmission;
 import tools.sctrade.companion.domain.item.ItemListing;
 import tools.sctrade.companion.domain.item.ItemSubmission;
+import tools.sctrade.companion.utils.LocalizationUtil;
 
 /**
  * Builds screenshot records for processing lifecycle events.
@@ -19,7 +20,7 @@ public class ScreenshotFactory {
    * @param type screenshot type
    * @return processing-status screenshot record
    */
-  public Screenshot buildProcessing(String id, BufferedImage image, ScreenshotType type) {
+  public Screenshot build(String id, BufferedImage image, ScreenshotType type) {
     return new Screenshot(id, image, null, ScreenshotStatus.PROCESSING, null, null, type);
   }
 
@@ -32,8 +33,11 @@ public class ScreenshotFactory {
    * @param type screenshot type
    * @return success-status screenshot record
    */
-  public Screenshot buildSuccess(String id, BufferedImage image, Object submission,
-      ScreenshotType type) {
+  public Screenshot build(String id, BufferedImage image, Object submission, ScreenshotType type) {
+    if (submission instanceof ItemSubmission itemSubmission) {
+      return buildFromItemSubmission(id, image, itemSubmission, type);
+    }
+
     return new Screenshot(id, image, extractLocation(submission), ScreenshotStatus.SUCCESS, null,
         extractContent(submission), type);
   }
@@ -47,10 +51,36 @@ public class ScreenshotFactory {
    * @param type screenshot type
    * @return error-status screenshot record
    */
-  public Screenshot buildError(String id, BufferedImage image, RuntimeException exception,
+  public Screenshot build(String id, BufferedImage image, RuntimeException exception,
       ScreenshotType type) {
     return new Screenshot(id, image, null, ScreenshotStatus.ERROR, exception.getMessage(), null,
         type);
+  }
+
+  private Screenshot buildFromItemSubmission(String id, BufferedImage image,
+      ItemSubmission itemSubmission, ScreenshotType type) {
+    if (itemSubmission.isEmpty() || hasMissingLocation(itemSubmission)) {
+      return new Screenshot(id, image, null, ScreenshotStatus.ERROR,
+          LocalizationUtil.get("warnNoLocation"), null, type);
+    }
+
+    if (hasMissingShop(itemSubmission)) {
+      return new Screenshot(id, image, null, ScreenshotStatus.ERROR,
+          LocalizationUtil.get("warnNoShop"), null, type);
+    }
+
+    return new Screenshot(id, image, extractLocation(itemSubmission), ScreenshotStatus.SUCCESS,
+        null, extractContent(itemSubmission), type);
+  }
+
+  private boolean hasMissingLocation(ItemSubmission itemSubmission) {
+    return itemSubmission.getListings().stream().map(ItemListing::location)
+        .anyMatch(location -> location == null || location.isBlank());
+  }
+
+  private boolean hasMissingShop(ItemSubmission itemSubmission) {
+    return itemSubmission.getListings().stream().map(ItemListing::shop)
+        .anyMatch(shop -> shop == null || shop.isBlank());
   }
 
   private String extractLocation(Object submission) {
@@ -69,11 +99,13 @@ public class ScreenshotFactory {
 
   private String extractContent(Object submission) {
     if (submission instanceof CommoditySubmission commoditySubmission) {
-      return commoditySubmission.getListings().size() + " listings processed";
+      return LocalizationUtil.get("infoScreenshotListingsRead")
+          .formatted(commoditySubmission.getListings().size());
     }
 
     if (submission instanceof ItemSubmission itemSubmission) {
-      return itemSubmission.getListings().size() + " listings processed";
+      return LocalizationUtil.get("infoScreenshotListingsRead")
+          .formatted(itemSubmission.getListings().size());
     }
 
     return null;

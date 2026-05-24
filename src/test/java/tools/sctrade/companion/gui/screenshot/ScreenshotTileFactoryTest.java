@@ -24,7 +24,8 @@ class ScreenshotTileFactoryTest {
   @Test
   void givenScreenshotInput_whenBuildingTile_thenTileContainsExpectedStyleAndContent() {
     ScreenshotTileFactory factory = new ScreenshotTileFactory(new ScreenshotRepository());
-    Screenshot screenshot = screenshot("id-1", "Area18", ScreenshotStatus.SUCCESS);
+    Screenshot screenshot = new Screenshot("id-1", screenshotImage(), "Area18",
+        ScreenshotStatus.SUCCESS, null, "Read 1 listings", ScreenshotType.COMMODITY_KIOSK);
 
     Tile tile = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> factory.build(screenshot));
 
@@ -32,7 +33,7 @@ class ScreenshotTileFactoryTest {
     assertTrue(tile.getStyleClass().contains("screenshot-tile"));
     assertEquals(ScreenshotType.COMMODITY_KIOSK.label(), tile.getTitle());
     assertTrue(tile.getGraphic() instanceof ImageView);
-    assertTrue(tile.getDescription().contains("Success"));
+    assertTrue(tile.getDescription().contains("Read 1 listings"));
     assertTrue(tile.getDescription().contains("[span class=\"screenshot-tile-status"));
     assertTrue(tile.getDescription().contains(ScreenshotStatus.SUCCESS.glyph()));
   }

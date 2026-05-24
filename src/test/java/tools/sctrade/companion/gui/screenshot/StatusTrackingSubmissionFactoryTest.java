@@ -4,9 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.awt.image.BufferedImage;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.domain.SubmissionFactory;
+import tools.sctrade.companion.domain.item.ItemSubmission;
+import tools.sctrade.companion.domain.user.User;
+import tools.sctrade.companion.utils.LocalizationUtil;
 
 class StatusTrackingSubmissionFactoryTest {
 
@@ -78,5 +82,19 @@ class StatusTrackingSubmissionFactoryTest {
     factory.build(image);
 
     assertEquals(TYPE, screenshotRepository.getSnapshot().get(0).type());
+  }
+
+  @Test
+  void whenItemSubmissionIsEmpty_thenRepositoryHasErrorStatusWithNoLocationWarning() {
+    SubmissionFactory<ItemSubmission> delegate =
+        screenCapture -> new ItemSubmission(new User("id", "label"), List.of());
+    var factory = new StatusTrackingSubmissionFactory<>(delegate, screenshotRepository,
+        ScreenshotType.ITEM_KIOSK, new ScreenshotFactory());
+
+    factory.build(image);
+
+    assertEquals(ScreenshotStatus.ERROR, screenshotRepository.getSnapshot().get(0).status());
+    assertEquals(LocalizationUtil.get("warnNoLocation"),
+        screenshotRepository.getSnapshot().get(0).error());
   }
 }

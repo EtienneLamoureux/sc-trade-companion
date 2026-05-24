@@ -59,6 +59,7 @@ public class ScreenshotTileFactory implements TileFactory<Screenshot> {
   private String createDescription(Screenshot screenshot) {
     ScreenshotStatus status = screenshot.status();
     String statusText = switch (status) {
+      case SUCCESS -> screenshot.content() != null ? screenshot.content() : status.defaultText();
       case ERROR -> screenshot.error() != null ? screenshot.error() : status.defaultText();
       default -> status.defaultText();
     };
