@@ -17,6 +17,8 @@ import tools.sctrade.companion.domain.commodity.CommoditySubmission;
 import tools.sctrade.companion.domain.commodity.TransactionType;
 import tools.sctrade.companion.domain.item.ItemListing;
 import tools.sctrade.companion.domain.item.ItemSubmission;
+import tools.sctrade.companion.domain.user.User;
+import tools.sctrade.companion.utils.LocalizationUtil;
 
 @ExtendWith(MockitoExtension.class)
 class ScreenshotFactoryTest {
@@ -37,21 +39,22 @@ class ScreenshotFactoryTest {
 
   @Test
   void givenAnyInput_whenBuildingProcessingScreenshot_thenStatusIsProcessing() {
-    Screenshot screenshot =
-        screenshotFactory.buildProcessing("id", image, ScreenshotType.COMMODITY_KIOSK);
+    Screenshot screenshot = screenshotFactory.build("id", image, ScreenshotType.COMMODITY_KIOSK);
 
     assertEquals(ScreenshotStatus.PROCESSING, screenshot.status());
   }
 
   @Test
-  void givenCommoditySubmission_whenBuildingSuccessScreenshot_thenExtractsLocation() {
+  void givenCommoditySubmission_whenBuildingSuccessScreenshot_thenExtractsLocationAndContent() {
     when(commoditySubmission.getListings()).thenReturn(List.of(new CommodityListing("Area18",
         TransactionType.SELLS, "Aluminum", List.of(1), "batch", Instant.now())));
 
-    Screenshot screenshot = screenshotFactory.buildSuccess("id", image, commoditySubmission,
-        ScreenshotType.COMMODITY_KIOSK);
+    Screenshot screenshot =
+        screenshotFactory.build("id", image, commoditySubmission, ScreenshotType.COMMODITY_KIOSK);
 
     assertEquals("Area18", screenshot.location());
+    assertEquals(LocalizationUtil.get("infoScreenshotListingsRead").formatted(1),
+        screenshot.content());
   }
 
   @Test
@@ -60,15 +63,40 @@ class ScreenshotFactoryTest {
         .thenReturn(List.of(new ItemListing("item", 1.0, "Orison", "shop")));
 
     Screenshot screenshot =
-        screenshotFactory.buildSuccess("id", image, itemSubmission, ScreenshotType.ITEM_KIOSK);
+        screenshotFactory.build("id", image, itemSubmission, ScreenshotType.ITEM_KIOSK);
 
     assertEquals("Orison", screenshot.location());
+    assertEquals(LocalizationUtil.get("infoScreenshotListingsRead").formatted(1),
+        screenshot.content());
+  }
+
+  @Test
+  void givenEmptyItemSubmission_whenBuildingSuccessScreenshot_thenBuildsErrorWithNoLocationWarning() {
+    ItemSubmission emptyItemSubmission = new ItemSubmission(new User("id", "label"), List.of());
+
+    Screenshot screenshot =
+        screenshotFactory.build("id", image, emptyItemSubmission, ScreenshotType.ITEM_KIOSK);
+
+    assertEquals(ScreenshotStatus.ERROR, screenshot.status());
+    assertEquals(LocalizationUtil.get("warnNoLocation"), screenshot.error());
+  }
+
+  @Test
+  void givenItemSubmissionMissingShop_whenBuildingSuccessScreenshot_thenBuildsErrorWithNoShopWarning() {
+    ItemSubmission itemSubmissionWithoutShop = new ItemSubmission(new User("id", "label"),
+        List.of(new ItemListing("item", 1.0, "Orison", null)));
+
+    Screenshot screenshot =
+        screenshotFactory.build("id", image, itemSubmissionWithoutShop, ScreenshotType.ITEM_KIOSK);
+
+    assertEquals(ScreenshotStatus.ERROR, screenshot.status());
+    assertEquals(LocalizationUtil.get("warnNoShop"), screenshot.error());
   }
 
   @Test
   void givenUnknownSubmissionType_whenBuildingSuccessScreenshot_thenLocationAndContentAreNull() {
     Screenshot screenshot =
-        screenshotFactory.buildSuccess("id", image, "unknown", ScreenshotType.COMMODITY_KIOSK);
+        screenshotFactory.build("id", image, "unknown", ScreenshotType.COMMODITY_KIOSK);
 
     assertNull(screenshot.location());
     assertNull(screenshot.content());
@@ -76,7 +104,7 @@ class ScreenshotFactoryTest {
 
   @Test
   void givenRuntimeException_whenBuildingErrorScreenshot_thenStatusAndErrorAreSet() {
-    Screenshot screenshot = screenshotFactory.buildError("id", image, new RuntimeException("boom"),
+    Screenshot screenshot = screenshotFactory.build("id", image, new RuntimeException("boom"),
         ScreenshotType.ITEM_KIOSK);
 
     assertEquals(ScreenshotStatus.ERROR, screenshot.status());

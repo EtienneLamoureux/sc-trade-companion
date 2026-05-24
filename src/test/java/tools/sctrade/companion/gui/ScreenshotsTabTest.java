@@ -123,7 +123,7 @@ class ScreenshotsTabTest {
     });
 
     String description = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getTileDescription(tab, 0));
-    assertTrue(description.contains("Success"));
+    assertTrue(description.contains("Read 1 listings"));
     assertTrue(description.contains("[span class=\"screenshot-tile-status"));
     assertTrue(description.contains(ScreenshotStatus.SUCCESS.glyph()));
   }
@@ -218,8 +218,9 @@ class ScreenshotsTabTest {
   }
 
   private Screenshot screenshot(String id, String location, ScreenshotStatus status) {
+    String content = status == ScreenshotStatus.SUCCESS ? "Read 1 listings" : null;
     return new Screenshot(id, new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB), location,
-        status, null, null, ScreenshotType.COMMODITY_KIOSK);
+        status, null, content, ScreenshotType.COMMODITY_KIOSK);
   }
 
   private int getTileCount(ScreenshotsTab tab) {
