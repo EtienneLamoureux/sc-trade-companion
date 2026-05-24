@@ -14,7 +14,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.kordamp.ikonli.javafx.FontIcon;
 import tools.sctrade.companion.gui.screenshot.Screenshot;
 import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
 import tools.sctrade.companion.gui.screenshot.ScreenshotStatus;
@@ -126,9 +125,7 @@ class ScreenshotsTabTest {
     String description = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getTileDescription(tab, 0));
     assertTrue(description.contains("Success"));
     assertTrue(description.contains("[span class=\"screenshot-tile-status"));
-    assertTrue(description.contains("[size=150%]"));
-    assertTrue(description.contains("[font="));
-    assertTrue(description.contains(new FontIcon(ScreenshotStatus.SUCCESS.icon()).getText()));
+    assertTrue(description.contains(ScreenshotStatus.SUCCESS.glyph()));
   }
 
   @Test
@@ -146,9 +143,7 @@ class ScreenshotsTabTest {
     String description = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> getTileDescription(tab, 0));
     assertTrue(description.contains("Image too small"));
     assertTrue(description.contains("[span class=\"screenshot-tile-status"));
-    assertTrue(description.contains("[size=150%]"));
-    assertTrue(description.contains("[font="));
-    assertTrue(description.contains(new FontIcon(ScreenshotStatus.ERROR.icon()).getText()));
+    assertTrue(description.contains(ScreenshotStatus.ERROR.glyph()));
   }
 
   @Test

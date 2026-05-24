@@ -82,7 +82,6 @@
 
 .screenshot-tile-status {
   -fx-font-size: 1.05em;
-  -fx-font-weight: bold;
 }
 
 .screenshot-tile-status.screenshot-status-muted {

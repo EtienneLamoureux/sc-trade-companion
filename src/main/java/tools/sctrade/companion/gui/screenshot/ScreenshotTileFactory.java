@@ -8,7 +8,6 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.imgscalr.Scalr;
-import org.kordamp.ikonli.javafx.FontIcon;
 import tools.sctrade.companion.gui.TileFactory;
 
 /**
@@ -64,12 +63,9 @@ public class ScreenshotTileFactory implements TileFactory<Screenshot> {
       default -> status.defaultText();
     };
 
-    FontIcon icon = new FontIcon(status.icon());
-    String fontFamily = icon.getFont().getFamily();
-    String iconText = icon.getText();
+    String glyph = status.glyph();
 
-    return "[span class=\"screenshot-tile-status " + status.styleClass() + "\"]"
-        + "[size=150%][font='" + fontFamily + "']" + iconText + "[/font][/size] "
+    return "[span class=\"screenshot-tile-status " + status.styleClass() + "\"]" + glyph + " "
         + sanitizeBbCodeText(statusText) + "[/span]";
   }
 
