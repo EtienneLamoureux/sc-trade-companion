@@ -108,19 +108,23 @@ public class ScreenshotsTab extends javafx.scene.layout.BorderPane {
     List<Node> orderedNodes = new java.util.ArrayList<>();
     HashSet<Integer> activeHashes = new HashSet<>();
 
+    DoubleBinding tileWidth = Bindings.createDoubleBinding(
+        () -> Math.max(0d, scrollPane.getViewportBounds().getWidth() * TILE_WIDTH_RATIO),
+        scrollPane.viewportBoundsProperty());
+
     for (int i = 0; i < screenshots.size(); i++) {
       Screenshot screenshot = screenshots.get(i);
       Integer hash = screenshot.hashCode();
       if (!tilesByHash.containsKey(hash)) {
         Tile tile = screenshotTileFactory.build(screenshot);
-        configureTileWidth(tile);
+        configureTileWidth(tile, tileWidth);
         tilesByHash.put(hash, tile);
       }
 
       orderedNodes.add(tilesByHash.get(hash));
       activeHashes.add(hash);
       if (i < screenshots.size() - 1) {
-        orderedNodes.add(createSeparator());
+        orderedNodes.add(createSeparator(tileWidth));
       }
     }
 
@@ -128,19 +132,19 @@ public class ScreenshotsTab extends javafx.scene.layout.BorderPane {
     tileList.getChildren().setAll(orderedNodes);
   }
 
-  private void configureTileWidth(Tile tile) {
-    DoubleBinding tileWidth = Bindings.createDoubleBinding(
-        () -> Math.max(0d, scrollPane.getViewportBounds().getWidth() * TILE_WIDTH_RATIO),
-        scrollPane.viewportBoundsProperty());
+  private void configureTileWidth(Tile tile, DoubleBinding tileWidth) {
     tile.setMinWidth(0d);
     tile.prefWidthProperty().bind(tileWidth);
     tile.maxWidthProperty().bind(tileWidth);
   }
 
-  private Separator createSeparator() {
+  private Separator createSeparator(DoubleBinding tileWidth) {
     Separator separator = new Separator();
     separator.getStyleClass().add("screenshot-tile-separator");
     separator.setPadding(new Insets(8, 0, 8, 0));
+    separator.setPrefWidth(0d);
+    separator.prefWidthProperty().bind(tileWidth);
+    separator.maxWidthProperty().bind(tileWidth);
     return separator;
   }
 

@@ -12,7 +12,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.kordamp.ikonli.javafx.FontIcon;
 import tools.sctrade.companion.gui.JavaFxTestUtil;
 
 class ScreenshotTileFactoryTest {
@@ -35,10 +34,7 @@ class ScreenshotTileFactoryTest {
     assertTrue(tile.getGraphic() instanceof ImageView);
     assertTrue(tile.getDescription().contains("Success"));
     assertTrue(tile.getDescription().contains("[span class=\"screenshot-tile-status"));
-    assertTrue(tile.getDescription().contains("[size=150%]"));
-    assertTrue(tile.getDescription().contains("[font="));
-    assertTrue(
-        tile.getDescription().contains(new FontIcon(ScreenshotStatus.SUCCESS.icon()).getText()));
+    assertTrue(tile.getDescription().contains(ScreenshotStatus.SUCCESS.glyph()));
   }
 
   @Test
@@ -51,10 +47,7 @@ class ScreenshotTileFactoryTest {
 
     assertTrue(tile.getDescription().contains("Image too small"));
     assertTrue(tile.getDescription().contains("[span class=\"screenshot-tile-status"));
-    assertTrue(tile.getDescription().contains("[size=150%]"));
-    assertTrue(tile.getDescription().contains("[font="));
-    assertTrue(
-        tile.getDescription().contains(new FontIcon(ScreenshotStatus.ERROR.icon()).getText()));
+    assertTrue(tile.getDescription().contains(ScreenshotStatus.ERROR.glyph()));
   }
 
   @Test
