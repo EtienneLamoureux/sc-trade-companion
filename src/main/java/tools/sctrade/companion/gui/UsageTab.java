@@ -5,7 +5,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -36,14 +35,8 @@ public class UsageTab extends BorderPane {
    * Creates a new instance of the usage tab.
    */
   public UsageTab() {
-    WebView dosAndDonts = createTextPane("usageDosDonts");
-    dosAndDonts.getStyleClass().add("usage-right-pane");
-    dosAndDonts.setPrefWidth(SIDE_PANE_WIDTH);
-    dosAndDonts.setMinWidth(240d);
-
     DoubleBinding availableWidth = Bindings.createDoubleBinding(
-        () -> Math.max(0d,
-            getWidth() - (2 * CONTENT_PADDING) - (3 * CONTENT_SPACING) - (2 * SIDE_PANE_WIDTH)),
+        () -> Math.max(0d, getWidth() - (2 * CONTENT_PADDING) - CONTENT_SPACING - SIDE_PANE_WIDTH),
         widthProperty());
     DoubleBinding availableHeight = Bindings.createDoubleBinding(
         () -> Math.max(0d, getHeight() - (2 * CONTENT_PADDING)), heightProperty());
@@ -53,10 +46,11 @@ public class UsageTab extends BorderPane {
 
     TabPane leftMiddleTabs = createLeftMiddleTabs(computedVideoHeight);
     leftMiddleTabs.getStyleClass().add("usage-left-middle-tabs");
-    HBox.setHgrow(leftMiddleTabs, Priority.ALWAYS);
+    leftMiddleTabs.setMaxWidth(Double.MAX_VALUE);
+    VBox.setVgrow(leftMiddleTabs, Priority.ALWAYS);
     installResizePlaybackRecovery(leftMiddleTabs);
 
-    HBox content = new HBox(CONTENT_SPACING, leftMiddleTabs, dosAndDonts);
+    VBox content = new VBox(leftMiddleTabs);
     content.getStyleClass().add("usage-content");
 
     ScrollPane scrollPane = new ScrollPane(content);
@@ -96,6 +90,12 @@ public class UsageTab extends BorderPane {
   private HBox createTabContent(String instructionKey, String videoPath,
       DoubleBinding computedVideoHeight) {
     WebView instructions = createInstructionsPane(instructionKey);
+    WebView dosAndDonts = createDosAndDontsPane();
+
+    VBox leftPane = new VBox(12, instructions, dosAndDonts);
+    leftPane.getStyleClass().add("usage-left-stack");
+    leftPane.setPrefWidth(SIDE_PANE_WIDTH);
+    leftPane.setMinWidth(240d);
 
     VBox middlePane = createVideoPane(videoPath);
     middlePane.getStyleClass().add("usage-middle-pane");
@@ -104,7 +104,7 @@ public class UsageTab extends BorderPane {
         .bind(computedVideoHeight.greaterThanOrEqualTo(MIN_MIDDLE_VIDEO_HEIGHT));
     middlePane.managedProperty().bind(middlePane.visibleProperty());
 
-    HBox tabContent = new HBox(CONTENT_SPACING, instructions, middlePane);
+    HBox tabContent = new HBox(CONTENT_SPACING, leftPane, middlePane);
     tabContent.getStyleClass().add("usage-tab-content");
     return tabContent;
   }
@@ -115,6 +115,14 @@ public class UsageTab extends BorderPane {
     instructions.setPrefWidth(SIDE_PANE_WIDTH);
     instructions.setMinWidth(240d);
     return instructions;
+  }
+
+  private WebView createDosAndDontsPane() {
+    WebView dosAndDonts = createTextPane("usageDosDonts");
+    dosAndDonts.getStyleClass().add("usage-dos-donts-pane");
+    dosAndDonts.setPrefWidth(SIDE_PANE_WIDTH);
+    dosAndDonts.setMinWidth(240d);
+    return dosAndDonts;
   }
 
   private WebView createTextPane(String contentKey) {
@@ -162,13 +170,8 @@ public class UsageTab extends BorderPane {
     mediaView.setPreserveRatio(true);
     mediaView.setSmooth(true);
 
-    Button playbackButton = new Button("Pause");
-    playbackButton.setOnAction(e -> togglePlayback(mediaPlayer, playbackButton));
-    mediaPlayer.statusProperty().addListener(
-        (obs, oldStatus, newStatus) -> updatePlaybackButton(mediaPlayer, playbackButton));
     mediaPlayer.setOnReady(() -> {
       mediaPlayer.play();
-      updatePlaybackButton(mediaPlayer, playbackButton);
     });
     mediaPlayer.setAutoPlay(true);
 
@@ -177,11 +180,7 @@ public class UsageTab extends BorderPane {
     mediaView.fitWidthProperty().bind(mediaSurface.widthProperty());
     mediaView.fitHeightProperty().bind(mediaSurface.heightProperty());
 
-    HBox controls = new HBox(playbackButton);
-    controls.setAlignment(Pos.CENTER_LEFT);
-    controls.getStyleClass().add("usage-video-controls");
-
-    VBox videoPane = new VBox(8, mediaSurface, controls);
+    VBox videoPane = new VBox(mediaSurface);
     videoPane.setAlignment(Pos.TOP_CENTER);
     VBox.setVgrow(mediaSurface, Priority.ALWAYS);
     return videoPane;
@@ -203,7 +202,6 @@ public class UsageTab extends BorderPane {
           if (mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
             mediaPlayer.play();
           }
-          updatePlaybackButton(mediaPlayer, findPlaybackButton(middlePane));
         });
   }
 
@@ -234,7 +232,6 @@ public class UsageTab extends BorderPane {
           if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
             mediaPlayer.pause();
           }
-          updatePlaybackButton(mediaPlayer, findPlaybackButton(middlePane));
         });
   }
 
@@ -246,25 +243,4 @@ public class UsageTab extends BorderPane {
         .orElseThrow(() -> new IllegalStateException("MediaView not found in video pane"));
   }
 
-  private Button findPlaybackButton(VBox middlePane) {
-    return middlePane.getChildren().stream().filter(HBox.class::isInstance).map(HBox.class::cast)
-        .findFirst()
-        .flatMap(hBox -> hBox.getChildren().stream().filter(Button.class::isInstance)
-            .map(Button.class::cast).findFirst())
-        .orElseThrow(() -> new IllegalStateException("Playback button not found in video pane"));
-  }
-
-  private void togglePlayback(MediaPlayer mediaPlayer, Button playbackButton) {
-    if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-      mediaPlayer.pause();
-    } else {
-      mediaPlayer.play();
-    }
-    updatePlaybackButton(mediaPlayer, playbackButton);
-  }
-
-  private void updatePlaybackButton(MediaPlayer mediaPlayer, Button playbackButton) {
-    playbackButton
-        .setText(mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING ? "Pause" : "Play");
-  }
 }

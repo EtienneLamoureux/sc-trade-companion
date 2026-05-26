@@ -45,7 +45,6 @@
 
 .usage-content {
   -fx-padding: 16;
-  -fx-spacing: 16;
   -fx-alignment: TOP_LEFT;
 }
 
@@ -60,12 +59,16 @@
 }
 
 .usage-left-pane,
-.usage-right-pane,
+.usage-dos-donts-pane,
 .usage-middle-pane {
   -fx-background-color: -color-bg-subtle;
   -fx-border-color: -color-border-default;
   -fx-border-radius: 8;
   -fx-background-radius: 8;
+}
+
+.usage-left-stack {
+  -fx-spacing: 12;
 }
 
 .usage-middle-pane {
