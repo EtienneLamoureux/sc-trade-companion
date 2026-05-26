@@ -1,8 +1,24 @@
 package tools.sctrade.companion.gui;
 
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
+import javafx.beans.value.ChangeListener;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.web.WebView;
+import javafx.util.Duration;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 /**
@@ -10,18 +26,245 @@ import tools.sctrade.companion.utils.LocalizationUtil;
  * this app.
  */
 public class UsageTab extends BorderPane {
+  private static final double CONTENT_PADDING = 16d;
+  private static final double CONTENT_SPACING = 16d;
+  private static final double SIDE_PANE_WIDTH = 320d;
+  private static final double VIDEO_ASPECT_RATIO = 9d / 16d;
+  private static final double MIN_MIDDLE_VIDEO_HEIGHT = 200d;
+
   /**
    * Creates a new instance of the usage tab.
    */
   public UsageTab() {
-    WebView instructions = new WebView();
-    instructions.getEngine()
-        .loadContent(CompanionTheme.wrapInstructionsHtml(LocalizationUtil.get("instructions")));
+    WebView dosAndDonts = createTextPane("usageDosDonts");
+    dosAndDonts.getStyleClass().add("usage-right-pane");
+    dosAndDonts.setPrefWidth(SIDE_PANE_WIDTH);
+    dosAndDonts.setMinWidth(240d);
 
-    ScrollPane scrollPane = new ScrollPane(instructions);
+    DoubleBinding availableWidth = Bindings.createDoubleBinding(
+        () -> Math.max(0d,
+            getWidth() - (2 * CONTENT_PADDING) - (3 * CONTENT_SPACING) - (2 * SIDE_PANE_WIDTH)),
+        widthProperty());
+    DoubleBinding availableHeight = Bindings.createDoubleBinding(
+        () -> Math.max(0d, getHeight() - (2 * CONTENT_PADDING)), heightProperty());
+    DoubleBinding computedVideoHeight = Bindings.createDoubleBinding(
+        () -> Math.min(availableHeight.get(), availableWidth.get() * VIDEO_ASPECT_RATIO),
+        availableHeight, availableWidth);
+
+    TabPane leftMiddleTabs = createLeftMiddleTabs(computedVideoHeight);
+    leftMiddleTabs.getStyleClass().add("usage-left-middle-tabs");
+    HBox.setHgrow(leftMiddleTabs, Priority.ALWAYS);
+    installResizePlaybackRecovery(leftMiddleTabs);
+
+    HBox content = new HBox(CONTENT_SPACING, leftMiddleTabs, dosAndDonts);
+    content.getStyleClass().add("usage-content");
+
+    ScrollPane scrollPane = new ScrollPane(content);
     scrollPane.getStyleClass().add("usage-scroll-pane");
-    scrollPane.setFitToHeight(true);
+    scrollPane.setPannable(true);
+    scrollPane.setFitToHeight(false);
     scrollPane.setFitToWidth(true);
     setCenter(scrollPane);
+  }
+
+  private TabPane createLeftMiddleTabs(DoubleBinding computedVideoHeight) {
+    Tab commodityTab = new Tab(LocalizationUtil.get("usageVideoTabCommodities"),
+        createTabContent("usageInstructionsCommodities", "/videos/example-kiosk-commodity.mp4",
+            computedVideoHeight));
+    commodityTab.setClosable(false);
+
+    Tab itemTab = new Tab(LocalizationUtil.get("usageVideoTabGearComponents"), createTabContent(
+        "usageInstructionsGearComponents", "/videos/example-kiosk-item.mp4", computedVideoHeight));
+    itemTab.setClosable(false);
+
+    TabPane tabPane = new TabPane(commodityTab, itemTab);
+    tabPane.getStyleClass().add("usage-video-tab-pane");
+    tabPane.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
+    tabPane.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+      if (newTab != null) {
+        if (oldTab != null) {
+          pauseVideoPlayback(oldTab);
+        }
+        refreshVideoPlayback(newTab);
+        Platform.runLater(() -> refreshVideoPlayback(newTab));
+      }
+    });
+    refreshVideoPlayback(commodityTab);
+    return tabPane;
+  }
+
+  private HBox createTabContent(String instructionKey, String videoPath,
+      DoubleBinding computedVideoHeight) {
+    WebView instructions = createInstructionsPane(instructionKey);
+
+    VBox middlePane = createVideoPane(videoPath);
+    middlePane.getStyleClass().add("usage-middle-pane");
+    HBox.setHgrow(middlePane, Priority.ALWAYS);
+    middlePane.visibleProperty()
+        .bind(computedVideoHeight.greaterThanOrEqualTo(MIN_MIDDLE_VIDEO_HEIGHT));
+    middlePane.managedProperty().bind(middlePane.visibleProperty());
+
+    HBox tabContent = new HBox(CONTENT_SPACING, instructions, middlePane);
+    tabContent.getStyleClass().add("usage-tab-content");
+    return tabContent;
+  }
+
+  private WebView createInstructionsPane(String instructionKey) {
+    WebView instructions = createTextPane(instructionKey);
+    instructions.getStyleClass().add("usage-left-pane");
+    instructions.setPrefWidth(SIDE_PANE_WIDTH);
+    instructions.setMinWidth(240d);
+    return instructions;
+  }
+
+  private WebView createTextPane(String contentKey) {
+    WebView textView = new WebView();
+    textView.getEngine().loadContent(wrapNoScrollHtml(LocalizationUtil.get(contentKey)));
+    textView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+      if (newState != javafx.concurrent.Worker.State.SUCCEEDED) {
+        return;
+      }
+      Object heightValue = textView.getEngine().executeScript(
+          "Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)");
+      if (heightValue instanceof Number numberHeight) {
+        textView.setPrefHeight(Math.max(320d, numberHeight.doubleValue()));
+      }
+    });
+    return textView;
+  }
+
+  private String wrapNoScrollHtml(String htmlContent) {
+    String wrapped = CompanionTheme.wrapInstructionsHtml(htmlContent);
+    return wrapped.replace("</head>", """
+        <style>
+          html, body {
+            overflow: hidden !important;
+          }
+          ::-webkit-scrollbar {
+            display: none;
+          }
+        </style>
+        </head>
+        """);
+  }
+
+  private VBox createVideoPane(String videoPath) {
+    MediaPlayer mediaPlayer =
+        new MediaPlayer(new Media(getClass().getResource(videoPath).toExternalForm()));
+    mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+    mediaPlayer.setOnEndOfMedia(() -> {
+      mediaPlayer.seek(Duration.ZERO);
+      mediaPlayer.play();
+    });
+
+    MediaView mediaView = new MediaView(mediaPlayer);
+    mediaView.getStyleClass().add("usage-video-view");
+    mediaView.setPreserveRatio(true);
+    mediaView.setSmooth(true);
+
+    Button playbackButton = new Button("Pause");
+    playbackButton.setOnAction(e -> togglePlayback(mediaPlayer, playbackButton));
+    mediaPlayer.statusProperty().addListener(
+        (obs, oldStatus, newStatus) -> updatePlaybackButton(mediaPlayer, playbackButton));
+    mediaPlayer.setOnReady(() -> {
+      mediaPlayer.play();
+      updatePlaybackButton(mediaPlayer, playbackButton);
+    });
+    mediaPlayer.setAutoPlay(true);
+
+    StackPane mediaSurface = new StackPane(mediaView);
+    StackPane.setAlignment(mediaView, Pos.TOP_CENTER);
+    mediaView.fitWidthProperty().bind(mediaSurface.widthProperty());
+    mediaView.fitHeightProperty().bind(mediaSurface.heightProperty());
+
+    HBox controls = new HBox(playbackButton);
+    controls.setAlignment(Pos.CENTER_LEFT);
+    controls.getStyleClass().add("usage-video-controls");
+
+    VBox videoPane = new VBox(8, mediaSurface, controls);
+    videoPane.setAlignment(Pos.TOP_CENTER);
+    VBox.setVgrow(mediaSurface, Priority.ALWAYS);
+    return videoPane;
+  }
+
+  private void triggerVideoPlayback(Tab tab) {
+    refreshVideoPlayback(tab);
+  }
+
+  private void refreshVideoPlayback(Tab tab) {
+    if (!(tab.getContent() instanceof HBox tabContent)) {
+      return;
+    }
+    tabContent.getChildren().stream()
+        .filter(node -> node.getStyleClass().contains("usage-middle-pane")).findFirst()
+        .filter(VBox.class::isInstance).map(VBox.class::cast).ifPresent(middlePane -> {
+          MediaView mediaView = findMediaView(middlePane);
+          MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
+          if (mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+            mediaPlayer.play();
+          }
+          updatePlaybackButton(mediaPlayer, findPlaybackButton(middlePane));
+        });
+  }
+
+  private void installResizePlaybackRecovery(TabPane tabPane) {
+    ChangeListener<Number> listener = (obs, oldValue, newValue) -> {
+      Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
+      if (selectedTab == null) {
+        return;
+      }
+      refreshVideoPlayback(selectedTab);
+      Platform.runLater(() -> refreshVideoPlayback(selectedTab));
+    };
+    widthProperty().addListener(listener);
+    heightProperty().addListener(listener);
+    tabPane.widthProperty().addListener(listener);
+    tabPane.heightProperty().addListener(listener);
+  }
+
+  private void pauseVideoPlayback(Tab tab) {
+    if (!(tab.getContent() instanceof HBox tabContent)) {
+      return;
+    }
+    tabContent.getChildren().stream()
+        .filter(node -> node.getStyleClass().contains("usage-middle-pane")).findFirst()
+        .filter(VBox.class::isInstance).map(VBox.class::cast).ifPresent(middlePane -> {
+          MediaView mediaView = findMediaView(middlePane);
+          MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
+          if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            mediaPlayer.pause();
+          }
+          updatePlaybackButton(mediaPlayer, findPlaybackButton(middlePane));
+        });
+  }
+
+  private MediaView findMediaView(VBox middlePane) {
+    return middlePane.getChildren().stream().filter(StackPane.class::isInstance)
+        .map(StackPane.class::cast).findFirst()
+        .flatMap(stackPane -> stackPane.getChildren().stream().filter(MediaView.class::isInstance)
+            .map(MediaView.class::cast).findFirst())
+        .orElseThrow(() -> new IllegalStateException("MediaView not found in video pane"));
+  }
+
+  private Button findPlaybackButton(VBox middlePane) {
+    return middlePane.getChildren().stream().filter(HBox.class::isInstance).map(HBox.class::cast)
+        .findFirst()
+        .flatMap(hBox -> hBox.getChildren().stream().filter(Button.class::isInstance)
+            .map(Button.class::cast).findFirst())
+        .orElseThrow(() -> new IllegalStateException("Playback button not found in video pane"));
+  }
+
+  private void togglePlayback(MediaPlayer mediaPlayer, Button playbackButton) {
+    if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+      mediaPlayer.pause();
+    } else {
+      mediaPlayer.play();
+    }
+    updatePlaybackButton(mediaPlayer, playbackButton);
+  }
+
+  private void updatePlaybackButton(MediaPlayer mediaPlayer, Button playbackButton) {
+    playbackButton
+        .setText(mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING ? "Pause" : "Play");
   }
 }
