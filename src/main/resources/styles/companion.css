@@ -43,6 +43,50 @@
   -fx-background-color: transparent;
 }
 
+.usage-content {
+  -fx-padding: 16;
+  -fx-spacing: 16;
+  -fx-alignment: TOP_LEFT;
+}
+
+.usage-left-middle-tabs {
+  -fx-tab-min-width: 120;
+}
+
+.usage-tab-content {
+  -fx-padding: 0;
+  -fx-spacing: 16;
+  -fx-alignment: TOP_LEFT;
+}
+
+.usage-left-pane,
+.usage-right-pane,
+.usage-middle-pane {
+  -fx-background-color: -color-bg-subtle;
+  -fx-border-color: -color-border-default;
+  -fx-border-radius: 8;
+  -fx-background-radius: 8;
+}
+
+.usage-middle-pane {
+  -fx-padding: 8;
+  -fx-background-color: transparent;
+  -fx-border-color: transparent;
+  -fx-border-width: 0;
+}
+
+.usage-video-tab-pane {
+  -fx-tab-min-width: 120;
+}
+
+.usage-video-view {
+  -fx-min-height: 320;
+  -fx-pref-height: 360;
+  -fx-background-color: transparent;
+  -fx-border-color: transparent;
+  -fx-border-width: 0;
+}
+
 .logs-table {
   -fx-fixed-cell-size: 24px;
 }
