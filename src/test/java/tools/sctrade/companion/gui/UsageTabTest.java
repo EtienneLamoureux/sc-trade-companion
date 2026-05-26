@@ -10,8 +10,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -20,7 +20,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
-import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -33,18 +32,16 @@ class UsageTabTest {
   }
 
   @Test
-  void givenUsageTabWhenInitializedThenShowTabbedLeftAndMiddleWithRightPane() {
+  void givenUsageTabWhenInitializedThenShowTabbedInstructionsAndVideoContent() {
     UsageTab usageTab = JavaFxTestUtil.supplyOnFxThreadAndWait(UsageTab::new);
 
     ScrollPane scrollPane = assertInstanceOf(ScrollPane.class, usageTab.getCenter());
-    HBox content = assertInstanceOf(HBox.class, scrollPane.getContent());
+    VBox content = assertInstanceOf(VBox.class, scrollPane.getContent());
     TabPane leftMiddleTabs =
         assertInstanceOf(TabPane.class, findByStyleClass(content, "usage-left-middle-tabs"));
-    Node rightPane = findByStyleClass(content, "usage-right-pane");
 
     assertNotNull(leftMiddleTabs);
-    assertNotNull(rightPane);
-    assertInstanceOf(WebView.class, rightPane);
+    assertEquals(1, content.getChildren().size());
   }
 
   @Test
@@ -52,7 +49,7 @@ class UsageTabTest {
     UsageTab usageTab = JavaFxTestUtil.supplyOnFxThreadAndWait(UsageTab::new);
 
     ScrollPane scrollPane = assertInstanceOf(ScrollPane.class, usageTab.getCenter());
-    HBox content = assertInstanceOf(HBox.class, scrollPane.getContent());
+    VBox content = assertInstanceOf(VBox.class, scrollPane.getContent());
     TabPane tabPane =
         assertInstanceOf(TabPane.class, findByStyleClass(content, "usage-left-middle-tabs"));
 
@@ -65,12 +62,14 @@ class UsageTabTest {
     for (Tab tab : tabPane.getTabs()) {
       HBox tabContent =
           assertInstanceOf(HBox.class, tab.getContent(), "Tab content should be two-pane HBox");
-      Node leftPane = findByStyleClass(tabContent, "usage-left-pane");
+      Node leftPane = findByStyleClass(tabContent, "usage-left-stack");
       Node middlePane = findByStyleClass(tabContent, "usage-middle-pane");
+      Node dosAndDontsPane = findByStyleClass(tabContent, "usage-dos-donts-pane");
       assertInstanceOf(VBox.class, middlePane);
       assertInstanceOf(MediaView.class, findMediaView((VBox) middlePane));
-      assertInstanceOf(Button.class, findPlaybackButton((VBox) middlePane));
+      assertEquals(1, ((VBox) middlePane).getChildren().size());
       assertNotNull(leftPane);
+      assertNotNull(dosAndDontsPane);
     }
   }
 
@@ -86,7 +85,7 @@ class UsageTabTest {
     });
 
     ScrollPane scrollPane = assertInstanceOf(ScrollPane.class, usageTab.getCenter());
-    HBox content = assertInstanceOf(HBox.class, scrollPane.getContent());
+    VBox content = assertInstanceOf(VBox.class, scrollPane.getContent());
     TabPane tabPane =
         assertInstanceOf(TabPane.class, findByStyleClass(content, "usage-left-middle-tabs"));
     HBox selectedTabContent =
@@ -146,14 +145,13 @@ class UsageTabTest {
   }
 
   @Test
-  void givenSelectedUsageTabVideoWhenLoadedThenShowsNativeControls() {
+  void givenSelectedUsageTabVideoWhenLoadedThenHasNoControlButton() {
     UsageTab usageTab = JavaFxTestUtil.supplyOnFxThreadAndWait(UsageTab::new);
     TabPane tabPane = getLeftMiddleTabs(usageTab);
     VBox middlePane = getMiddlePane(tabPane.getTabs().get(0));
-    Button playbackButton = findPlaybackButton(middlePane);
 
-    assertNotNull(playbackButton);
-    assertTrue(playbackButton.getText().equals("Play") || playbackButton.getText().equals("Pause"));
+    assertEquals(1, middlePane.getChildren().size());
+    assertInstanceOf(StackPane.class, middlePane.getChildren().get(0));
   }
 
   @Test
@@ -231,14 +229,20 @@ class UsageTabTest {
     assertTrue(css.contains(".usage-video-view {"));
   }
 
-  private Node findByStyleClass(HBox content, String styleClass) {
-    return content.getChildren().stream().filter(node -> node.getStyleClass().contains(styleClass))
-        .findFirst().orElse(null);
+  private Node findByStyleClass(Parent content, String styleClass) {
+    if (content.getStyleClass().contains(styleClass)) {
+      return content;
+    }
+    return content.getChildrenUnmodifiable().stream()
+        .filter(node -> node.getStyleClass().contains(styleClass) || node instanceof Parent)
+        .map(node -> node.getStyleClass().contains(styleClass) ? node
+            : findByStyleClass((Parent) node, styleClass))
+        .filter(java.util.Objects::nonNull).findFirst().orElse(null);
   }
 
   private TabPane getLeftMiddleTabs(UsageTab usageTab) {
     ScrollPane scrollPane = assertInstanceOf(ScrollPane.class, usageTab.getCenter());
-    HBox content = assertInstanceOf(HBox.class, scrollPane.getContent());
+    VBox content = assertInstanceOf(VBox.class, scrollPane.getContent());
     return assertInstanceOf(TabPane.class, findByStyleClass(content, "usage-left-middle-tabs"));
   }
 
@@ -254,15 +258,6 @@ class UsageTabTest {
         .filter(StackPane.class::isInstance).map(StackPane.class::cast)
         .flatMap(stackPane -> stackPane.getChildren().stream().filter(MediaView.class::isInstance))
         .findFirst().orElseThrow(() -> new AssertionError("MediaView not found in video pane")));
-  }
-
-  private Button findPlaybackButton(VBox middlePane) {
-    return assertInstanceOf(Button.class,
-        middlePane.getChildren().stream().filter(javafx.scene.layout.HBox.class::isInstance)
-            .map(javafx.scene.layout.HBox.class::cast)
-            .flatMap(hBox -> hBox.getChildren().stream().filter(Button.class::isInstance))
-            .findFirst()
-            .orElseThrow(() -> new AssertionError("Playback button not found in video pane")));
   }
 
   private String readCompanionCss() {
