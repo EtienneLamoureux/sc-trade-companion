@@ -64,12 +64,10 @@ class UsageTabTest {
           assertInstanceOf(HBox.class, tab.getContent(), "Tab content should be two-pane HBox");
       Node leftPane = findByStyleClass(tabContent, "usage-left-stack");
       Node middlePane = findByStyleClass(tabContent, "usage-middle-pane");
-      Node dosAndDontsPane = findByStyleClass(tabContent, "usage-dos-donts-pane");
       assertInstanceOf(VBox.class, middlePane);
       assertInstanceOf(MediaView.class, findMediaView((VBox) middlePane));
       assertEquals(1, ((VBox) middlePane).getChildren().size());
       assertNotNull(leftPane);
-      assertNotNull(dosAndDontsPane);
     }
   }
 
@@ -122,20 +120,11 @@ class UsageTabTest {
   }
 
   @Test
-  void givenEnglishBundleWhenReadingUsageInstructionsGearThenContainsBuyAndSellSteps() {
+  void givenEnglishBundleWhenReadingUsageInstructionsGearThenContainsExpectedKioskSteps() {
     String instructions = LocalizationUtil.get("usageInstructionsGearComponents");
 
-    assertTrue(instructions.contains("<code>Buy</code>"));
-    assertTrue(instructions.contains("<code>Sell</code>"));
-  }
-
-  @Test
-  void givenEnglishBundleWhenReadingUsageDosAndDontsThenContainsExpectedLines() {
-    String dosAndDonts = LocalizationUtil.get("usageDosDonts");
-
-    assertTrue(dosAndDonts.contains("Close and aligned"));
-    assertTrue(dosAndDonts.contains("Overlapping UI elements (Hints, markers)"));
-    assertTrue(dosAndDonts.contains("Glare"));
+    assertTrue(instructions.contains("Select the location"));
+    assertTrue(instructions.contains("Scroll and repeat to capture all listings"));
   }
 
   @Test

@@ -96,9 +96,8 @@ public class UsageTab extends BorderPane {
   private HBox createTabContent(String instructionKey, String videoPath,
       DoubleBinding computedVideoHeight, ScrollPane pageScrollPane) {
     WebView instructions = createInstructionsPane(instructionKey, pageScrollPane);
-    WebView dosAndDonts = createDosAndDontsPane(pageScrollPane);
 
-    VBox leftPane = new VBox(12, instructions, dosAndDonts);
+    VBox leftPane = new VBox(12, instructions);
     leftPane.getStyleClass().add("usage-left-stack");
     leftPane.setPrefWidth(SIDE_PANE_WIDTH);
     leftPane.setMinWidth(240d);
@@ -121,14 +120,6 @@ public class UsageTab extends BorderPane {
     instructions.setPrefWidth(SIDE_PANE_WIDTH);
     instructions.setMinWidth(240d);
     return instructions;
-  }
-
-  private WebView createDosAndDontsPane(ScrollPane pageScrollPane) {
-    WebView dosAndDonts = createTextPane("usageDosDonts", pageScrollPane);
-    dosAndDonts.getStyleClass().add("usage-dos-donts-pane");
-    dosAndDonts.setPrefWidth(SIDE_PANE_WIDTH);
-    dosAndDonts.setMinWidth(240d);
-    return dosAndDonts;
   }
 
   private WebView createTextPane(String contentKey, ScrollPane pageScrollPane) {
