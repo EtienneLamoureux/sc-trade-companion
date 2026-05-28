@@ -98,6 +98,11 @@ class UsageTabTest {
   }
 
   @Test
+  void givenWheelDeltaWhenCalculatingPageScrollThenScrollValueIncreases() {
+    assertEquals(0.8d, UsageTab.calculatePageScrollVvalue(0d, -240d));
+  }
+
+  @Test
   void givenEnglishBundleWhenReadingCommodityInstructionsThenNoSystemTrayMention() {
     String instructions = LocalizationUtil.get("usageInstructionsCommodities");
 

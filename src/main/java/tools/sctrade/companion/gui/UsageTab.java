@@ -8,6 +8,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -30,11 +31,14 @@ public class UsageTab extends BorderPane {
   private static final double SIDE_PANE_WIDTH = 320d;
   private static final double VIDEO_ASPECT_RATIO = 9d / 16d;
   private static final double MIN_MIDDLE_VIDEO_HEIGHT = 200d;
+  private final ScrollPane pageScrollPane;
 
   /**
    * Creates a new instance of the usage tab.
    */
   public UsageTab() {
+    pageScrollPane = new ScrollPane();
+
     DoubleBinding availableWidth = Bindings.createDoubleBinding(
         () -> Math.max(0d, getWidth() - (2 * CONTENT_PADDING) - CONTENT_SPACING - SIDE_PANE_WIDTH),
         widthProperty());
@@ -44,7 +48,7 @@ public class UsageTab extends BorderPane {
         () -> Math.min(availableHeight.get(), availableWidth.get() * VIDEO_ASPECT_RATIO),
         availableHeight, availableWidth);
 
-    TabPane leftMiddleTabs = createLeftMiddleTabs(computedVideoHeight);
+    TabPane leftMiddleTabs = createLeftMiddleTabs(computedVideoHeight, pageScrollPane);
     leftMiddleTabs.getStyleClass().add("usage-left-middle-tabs");
     leftMiddleTabs.setMaxWidth(Double.MAX_VALUE);
     VBox.setVgrow(leftMiddleTabs, Priority.ALWAYS);
@@ -53,22 +57,24 @@ public class UsageTab extends BorderPane {
     VBox content = new VBox(leftMiddleTabs);
     content.getStyleClass().add("usage-content");
 
-    ScrollPane scrollPane = new ScrollPane(content);
-    scrollPane.getStyleClass().add("usage-scroll-pane");
-    scrollPane.setPannable(true);
-    scrollPane.setFitToHeight(false);
-    scrollPane.setFitToWidth(true);
-    setCenter(scrollPane);
+    pageScrollPane.setContent(content);
+    pageScrollPane.getStyleClass().add("usage-scroll-pane");
+    pageScrollPane.setPannable(true);
+    pageScrollPane.setFitToHeight(false);
+    pageScrollPane.setFitToWidth(true);
+    setCenter(pageScrollPane);
   }
 
-  private TabPane createLeftMiddleTabs(DoubleBinding computedVideoHeight) {
+  private TabPane createLeftMiddleTabs(DoubleBinding computedVideoHeight,
+      ScrollPane pageScrollPane) {
     Tab commodityTab = new Tab(LocalizationUtil.get("usageVideoTabCommodities"),
         createTabContent("usageInstructionsCommodities", "/videos/example-kiosk-commodity.mp4",
-            computedVideoHeight));
+            computedVideoHeight, pageScrollPane));
     commodityTab.setClosable(false);
 
-    Tab itemTab = new Tab(LocalizationUtil.get("usageVideoTabGearComponents"), createTabContent(
-        "usageInstructionsGearComponents", "/videos/example-kiosk-item.mp4", computedVideoHeight));
+    Tab itemTab = new Tab(LocalizationUtil.get("usageVideoTabGearComponents"),
+        createTabContent("usageInstructionsGearComponents", "/videos/example-kiosk-item.mp4",
+            computedVideoHeight, pageScrollPane));
     itemTab.setClosable(false);
 
     TabPane tabPane = new TabPane(commodityTab, itemTab);
@@ -88,9 +94,9 @@ public class UsageTab extends BorderPane {
   }
 
   private HBox createTabContent(String instructionKey, String videoPath,
-      DoubleBinding computedVideoHeight) {
-    WebView instructions = createInstructionsPane(instructionKey);
-    WebView dosAndDonts = createDosAndDontsPane();
+      DoubleBinding computedVideoHeight, ScrollPane pageScrollPane) {
+    WebView instructions = createInstructionsPane(instructionKey, pageScrollPane);
+    WebView dosAndDonts = createDosAndDontsPane(pageScrollPane);
 
     VBox leftPane = new VBox(12, instructions, dosAndDonts);
     leftPane.getStyleClass().add("usage-left-stack");
@@ -109,23 +115,23 @@ public class UsageTab extends BorderPane {
     return tabContent;
   }
 
-  private WebView createInstructionsPane(String instructionKey) {
-    WebView instructions = createTextPane(instructionKey);
+  private WebView createInstructionsPane(String instructionKey, ScrollPane pageScrollPane) {
+    WebView instructions = createTextPane(instructionKey, pageScrollPane);
     instructions.getStyleClass().add("usage-left-pane");
     instructions.setPrefWidth(SIDE_PANE_WIDTH);
     instructions.setMinWidth(240d);
     return instructions;
   }
 
-  private WebView createDosAndDontsPane() {
-    WebView dosAndDonts = createTextPane("usageDosDonts");
+  private WebView createDosAndDontsPane(ScrollPane pageScrollPane) {
+    WebView dosAndDonts = createTextPane("usageDosDonts", pageScrollPane);
     dosAndDonts.getStyleClass().add("usage-dos-donts-pane");
     dosAndDonts.setPrefWidth(SIDE_PANE_WIDTH);
     dosAndDonts.setMinWidth(240d);
     return dosAndDonts;
   }
 
-  private WebView createTextPane(String contentKey) {
+  private WebView createTextPane(String contentKey, ScrollPane pageScrollPane) {
     WebView textView = new WebView();
     textView.getEngine().loadContent(wrapNoScrollHtml(LocalizationUtil.get(contentKey)));
     textView.getEngine().getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
@@ -138,7 +144,28 @@ public class UsageTab extends BorderPane {
         textView.setPrefHeight(Math.max(320d, numberHeight.doubleValue()));
       }
     });
+    installOuterScrollRelay(textView, pageScrollPane);
     return textView;
+  }
+
+  private void installOuterScrollRelay(WebView textView, ScrollPane pageScrollPane) {
+    textView.addEventFilter(ScrollEvent.SCROLL, event -> {
+      if (pageScrollPane.getContent() == null) {
+        return;
+      }
+
+      pageScrollPane
+          .setVvalue(calculatePageScrollVvalue(pageScrollPane.getVvalue(), event.getDeltaY()));
+      event.consume();
+    });
+  }
+
+  static double calculatePageScrollVvalue(double currentVvalue, double deltaY) {
+    return clamp(currentVvalue - (deltaY / 300d));
+  }
+
+  private static double clamp(double value) {
+    return Math.max(0d, Math.min(1d, value));
   }
 
   private String wrapNoScrollHtml(String htmlContent) {
