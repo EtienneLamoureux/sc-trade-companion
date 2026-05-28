@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -102,7 +104,7 @@ class UsageTabTest {
 
   @Test
   void givenEnglishBundleWhenReadingCommodityInstructionsThenNoSystemTrayMention() {
-    String instructions = LocalizationUtil.get("usageInstructionsCommodities");
+    String instructions = englishBundle().getString("usageInstructionsCommodities");
 
     assertFalse(instructions.toLowerCase().contains("system tray"),
         "Instructions should not mention the system tray");
@@ -110,18 +112,18 @@ class UsageTabTest {
 
   @Test
   void givenEnglishBundleWhenReadingTabScreenshotsKeyThenReturnsScreenshots() {
-    assertEquals("Screenshots", LocalizationUtil.get("tabScreenshots"));
+    assertEquals("Screenshots", englishBundle().getString("tabScreenshots"));
   }
 
   @Test
   void givenEnglishBundleWhenReadingUsageVideoTabsThenReturnsExpectedLabels() {
-    assertEquals("Commodities", LocalizationUtil.get("usageVideoTabCommodities"));
-    assertEquals("Gear & components", LocalizationUtil.get("usageVideoTabGearComponents"));
+    assertEquals("Commodities", englishBundle().getString("usageVideoTabCommodities"));
+    assertEquals("Gear & components", englishBundle().getString("usageVideoTabGearComponents"));
   }
 
   @Test
   void givenEnglishBundleWhenReadingUsageInstructionsGearThenContainsExpectedKioskSteps() {
-    String instructions = LocalizationUtil.get("usageInstructionsGearComponents");
+    String instructions = englishBundle().getString("usageInstructionsGearComponents");
 
     assertTrue(instructions.contains("Select the location"));
     assertTrue(instructions.contains("Scroll and repeat to capture all listings"));
@@ -261,5 +263,9 @@ class UsageTabTest {
     } catch (IOException e) {
       throw new AssertionError("Unable to read companion.css", e);
     }
+  }
+
+  private ResourceBundle englishBundle() {
+    return ResourceBundle.getBundle("bundles.localization", Locale.ROOT);
   }
 }

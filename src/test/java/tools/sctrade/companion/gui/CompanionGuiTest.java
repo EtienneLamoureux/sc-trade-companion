@@ -57,7 +57,7 @@ class CompanionGuiTest {
 
     assertEquals("SC Trade Companion 1.5.2", stage.getTitle());
     assertEquals(1050.0, stage.getWidth());
-    assertEquals(550.0, stage.getHeight());
+    assertEquals(550.0, stage.getScene().getHeight());
 
     Scene scene = stage.getScene();
     StackPane stackRoot = assertInstanceOf(StackPane.class, scene.getRoot());
@@ -236,7 +236,8 @@ class CompanionGuiTest {
           "Closing modal content should have fixed height");
 
       Label closingTitle = assertInstanceOf(Label.class, closingContent.lookup("#closingTitle"));
-      assertEquals("Closing...", closingTitle.getText());
+      assertEquals(tools.sctrade.companion.utils.LocalizationUtil.get("closingTitle"),
+          closingTitle.getText());
       assertTrue(closingTitle.getStyleClass().contains("title-2"),
           "Closing label should use title-2 style");
 
