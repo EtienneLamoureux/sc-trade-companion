@@ -44,7 +44,7 @@ import tools.sctrade.companion.utils.TimeUtil;
  */
 public class CompanionGui implements NotificationRepository, UpdateAvailablePopup {
   private static final double DEFAULT_APP_WIDTH = 1050d;
-  private static final double DEFAULT_APP_HEIGHT = 600d;
+  private static final double DEFAULT_APP_HEIGHT = 550d;
   private transient UserService userService;
   private transient GameLogPathSubject gameLogService;
   private transient SettingRepository settings;
@@ -85,9 +85,9 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
 
     stage.setTitle(
         String.format(Locale.ROOT, "%s %s", LocalizationUtil.get("applicationTitle"), version));
+    stage.setScene(buildScene());
     stage.setWidth(DEFAULT_APP_WIDTH);
     stage.setHeight(DEFAULT_APP_HEIGHT);
-    stage.setScene(buildScene());
     stage.getIcons().addAll(Arrays.asList("icon128", "icon64", "icon32", "icon16").stream()
         .map(this::getFxIcon).toList());
     centerStage();
@@ -148,6 +148,7 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
     ScreenshotsTab screenshotsTab = new ScreenshotsTab(screenshotRepository);
 
     BorderPane root = new BorderPane();
+    root.setMinSize(0, 0);
     mainRoot = root;
     root.getStyleClass().add("companion-root");
     root.setTop(buildNavBar(usageTab, settingsTab, screenshotsTab, logsTab));
@@ -160,6 +161,7 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
     closingModalPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
     StackPane stackRoot = new StackPane(root, closingModalPane);
+    stackRoot.setMinSize(0, 0);
     StackPane.setAlignment(closingModalPane, Pos.CENTER);
     closingModalPane.prefWidthProperty().bind(stackRoot.widthProperty());
     closingModalPane.prefHeightProperty().bind(stackRoot.heightProperty());
