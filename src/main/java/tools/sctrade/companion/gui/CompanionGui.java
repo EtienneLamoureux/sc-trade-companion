@@ -43,6 +43,8 @@ import tools.sctrade.companion.utils.TimeUtil;
  * The main GUI class for the companion application.
  */
 public class CompanionGui implements NotificationRepository, UpdateAvailablePopup {
+  private static final double DEFAULT_APP_WIDTH = 1050d;
+  private static final double DEFAULT_APP_HEIGHT = 550d;
   private transient UserService userService;
   private transient GameLogPathSubject gameLogService;
   private transient SettingRepository settings;
@@ -83,8 +85,8 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
 
     stage.setTitle(
         String.format(Locale.ROOT, "%s %s", LocalizationUtil.get("applicationTitle"), version));
-    stage.setWidth(600);
-    stage.setHeight(575);
+    stage.setWidth(DEFAULT_APP_WIDTH);
+    stage.setHeight(DEFAULT_APP_HEIGHT);
     stage.setScene(buildScene());
     stage.getIcons().addAll(Arrays.asList("icon128", "icon64", "icon32", "icon16").stream()
         .map(this::getFxIcon).toList());
@@ -162,7 +164,7 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
     closingModalPane.prefWidthProperty().bind(stackRoot.widthProperty());
     closingModalPane.prefHeightProperty().bind(stackRoot.heightProperty());
 
-    Scene scene = new Scene(stackRoot, 600, 575);
+    Scene scene = new Scene(stackRoot, DEFAULT_APP_WIDTH, DEFAULT_APP_HEIGHT);
     scene.getStylesheets().add(getClass().getResource("/styles/companion.css").toExternalForm());
     return scene;
   }

@@ -59,7 +59,6 @@
 }
 
 .usage-left-pane,
-.usage-dos-donts-pane,
 .usage-middle-pane {
   -fx-background-color: -color-bg-subtle;
   -fx-border-color: -color-border-default;
