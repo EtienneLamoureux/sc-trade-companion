@@ -44,7 +44,7 @@ import tools.sctrade.companion.utils.TimeUtil;
  */
 public class CompanionGui implements NotificationRepository, UpdateAvailablePopup {
   private static final double DEFAULT_APP_WIDTH = 1050d;
-  private static final double DEFAULT_APP_HEIGHT = 550d;
+  private static final double DEFAULT_APP_HEIGHT = 600d;
   private transient UserService userService;
   private transient GameLogPathSubject gameLogService;
   private transient SettingRepository settings;
