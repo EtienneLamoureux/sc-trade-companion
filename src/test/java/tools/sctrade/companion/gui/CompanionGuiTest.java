@@ -57,7 +57,7 @@ class CompanionGuiTest {
 
     assertEquals("SC Trade Companion 1.5.2", stage.getTitle());
     assertEquals(1050.0, stage.getWidth());
-    assertEquals(550.0, stage.getScene().getHeight());
+    assertEquals(600.0, stage.getScene().getHeight());
 
     Scene scene = stage.getScene();
     StackPane stackRoot = assertInstanceOf(StackPane.class, scene.getRoot());

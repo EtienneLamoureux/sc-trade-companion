@@ -48,7 +48,7 @@ class UsageTabTest {
   }
 
   @Test
-  void givenUsageTabWhenInitializedThenEachTabContainsInstructionsAndVideoPane() {
+  void givenUsageTabWhenInitializedThenOnlySelectedTabInitializesVideoPlayer() {
     UsageTab usageTab = JavaFxTestUtil.supplyOnFxThreadAndWait(UsageTab::new);
 
     ScrollPane scrollPane = assertInstanceOf(ScrollPane.class, usageTab.getCenter());
@@ -62,16 +62,26 @@ class UsageTabTest {
     assertEquals(LocalizationUtil.get("usageVideoTabGearComponents"),
         tabPane.getTabs().get(1).getText());
 
-    for (Tab tab : tabPane.getTabs()) {
-      HBox tabContent =
-          assertInstanceOf(HBox.class, tab.getContent(), "Tab content should be two-pane HBox");
-      Node leftPane = findByStyleClass(tabContent, "usage-left-stack");
-      Node middlePane = findByStyleClass(tabContent, "usage-middle-pane");
-      assertInstanceOf(VBox.class, middlePane);
-      assertInstanceOf(MediaView.class, findMediaView((VBox) middlePane));
-      assertEquals(1, ((VBox) middlePane).getChildren().size());
-      assertNotNull(leftPane);
-    }
+    Tab commodityTab = tabPane.getTabs().get(0);
+    Tab itemTab = tabPane.getTabs().get(1);
+    assertEquals(commodityTab, tabPane.getSelectionModel().getSelectedItem());
+
+    HBox commodityTabContent = assertInstanceOf(HBox.class, commodityTab.getContent(),
+        "Tab content should be two-pane HBox");
+    Node commodityLeftPane = findByStyleClass(commodityTabContent, "usage-left-stack");
+    VBox commodityMiddlePane =
+        assertInstanceOf(VBox.class, findByStyleClass(commodityTabContent, "usage-middle-pane"));
+    assertInstanceOf(MediaView.class, findMediaView(commodityMiddlePane));
+    assertEquals(1, commodityMiddlePane.getChildren().size());
+    assertNotNull(commodityLeftPane);
+
+    HBox itemTabContent =
+        assertInstanceOf(HBox.class, itemTab.getContent(), "Tab content should be two-pane HBox");
+    Node itemLeftPane = findByStyleClass(itemTabContent, "usage-left-stack");
+    VBox itemMiddlePane =
+        assertInstanceOf(VBox.class, findByStyleClass(itemTabContent, "usage-middle-pane"));
+    assertEquals(0, itemMiddlePane.getChildren().size());
+    assertNotNull(itemLeftPane);
   }
 
   @Test

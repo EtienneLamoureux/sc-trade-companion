@@ -19,6 +19,8 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.web.WebView;
 import javafx.util.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.utils.LocalizationUtil;
 import tools.sctrade.companion.utils.ResourceUtil;
 
@@ -27,11 +29,13 @@ import tools.sctrade.companion.utils.ResourceUtil;
  * this app.
  */
 public class UsageTab extends BorderPane {
+  private static final Logger logger = LoggerFactory.getLogger(UsageTab.class);
   private static final double CONTENT_PADDING = 16d;
   private static final double CONTENT_SPACING = 16d;
   private static final double SIDE_PANE_WIDTH = 320d;
   private static final double VIDEO_ASPECT_RATIO = 9d / 16d;
   private static final double MIN_MIDDLE_VIDEO_HEIGHT = 200d;
+  private static final String VIDEO_PATH_PROPERTY = "videoPath";
   private final ScrollPane pageScrollPane;
 
   /**
@@ -176,32 +180,9 @@ public class UsageTab extends BorderPane {
   }
 
   private VBox createVideoPane(String videoPath) {
-    MediaPlayer mediaPlayer = new MediaPlayer(
-        new Media(ResourceUtil.copyResourceToTempFile(videoPath).toUri().toString()));
-    mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-    mediaPlayer.setOnEndOfMedia(() -> {
-      mediaPlayer.seek(Duration.ZERO);
-      mediaPlayer.play();
-    });
-
-    MediaView mediaView = new MediaView(mediaPlayer);
-    mediaView.getStyleClass().add("usage-video-view");
-    mediaView.setPreserveRatio(true);
-    mediaView.setSmooth(true);
-
-    mediaPlayer.setOnReady(() -> {
-      mediaPlayer.play();
-    });
-    mediaPlayer.setAutoPlay(true);
-
-    StackPane mediaSurface = new StackPane(mediaView);
-    StackPane.setAlignment(mediaView, Pos.TOP_CENTER);
-    mediaView.fitWidthProperty().bind(mediaSurface.widthProperty());
-    mediaView.fitHeightProperty().bind(mediaSurface.heightProperty());
-
-    VBox videoPane = new VBox(mediaSurface);
+    VBox videoPane = new VBox();
     videoPane.setAlignment(Pos.TOP_CENTER);
-    VBox.setVgrow(mediaSurface, Priority.ALWAYS);
+    videoPane.getProperties().put(VIDEO_PATH_PROPERTY, videoPath);
     return videoPane;
   }
 
@@ -216,11 +197,13 @@ public class UsageTab extends BorderPane {
     tabContent.getChildren().stream()
         .filter(node -> node.getStyleClass().contains("usage-middle-pane")).findFirst()
         .filter(VBox.class::isInstance).map(VBox.class::cast).ifPresent(middlePane -> {
-          MediaView mediaView = findMediaView(middlePane);
-          MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
-          if (mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
-            mediaPlayer.play();
-          }
+          initializeVideoPaneIfNeeded(middlePane);
+          findMediaViewOptional(middlePane).ifPresent(mediaView -> {
+            MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
+            if (mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+              mediaPlayer.play();
+            }
+          });
         });
   }
 
@@ -246,20 +229,70 @@ public class UsageTab extends BorderPane {
     tabContent.getChildren().stream()
         .filter(node -> node.getStyleClass().contains("usage-middle-pane")).findFirst()
         .filter(VBox.class::isInstance).map(VBox.class::cast).ifPresent(middlePane -> {
-          MediaView mediaView = findMediaView(middlePane);
-          MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
-          if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            mediaPlayer.pause();
-          }
+          findMediaViewOptional(middlePane).ifPresent(mediaView -> {
+            MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
+            if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+              mediaPlayer.pause();
+            }
+          });
         });
   }
 
   private MediaView findMediaView(VBox middlePane) {
-    return middlePane.getChildren().stream().filter(StackPane.class::isInstance)
-        .map(StackPane.class::cast).findFirst()
-        .flatMap(stackPane -> stackPane.getChildren().stream().filter(MediaView.class::isInstance)
-            .map(MediaView.class::cast).findFirst())
+    return findMediaViewOptional(middlePane)
         .orElseThrow(() -> new IllegalStateException("MediaView not found in video pane"));
+  }
+
+  private java.util.Optional<MediaView> findMediaViewOptional(VBox middlePane) {
+    return middlePane.getChildren().stream().filter(StackPane.class::isInstance)
+        .map(StackPane.class::cast).findFirst().flatMap(stackPane -> stackPane.getChildren()
+            .stream().filter(MediaView.class::isInstance).map(MediaView.class::cast).findFirst());
+  }
+
+  private void initializeVideoPaneIfNeeded(VBox middlePane) {
+    if (!middlePane.getChildren().isEmpty()) {
+      return;
+    }
+
+    Object videoPathObject = middlePane.getProperties().get(VIDEO_PATH_PROPERTY);
+    if (!(videoPathObject instanceof String videoPath)) {
+      logger.warn("Missing video path for usage tab video pane");
+      return;
+    }
+
+    final Media media;
+    try {
+      media = new Media(ResourceUtil.copyResourceToTempFile(videoPath).toUri().toString());
+    } catch (RuntimeException e) {
+      logger.warn("Could not initialize media for usage video {}", videoPath, e);
+      return;
+    }
+    media.setOnError(() -> logger.warn("Could not load usage video {}: {}", videoPath,
+        media.getError() != null ? media.getError().getMessage() : "unknown media error"));
+
+    MediaPlayer mediaPlayer = new MediaPlayer(media);
+    mediaPlayer.setOnError(() -> logger.warn("Could not play usage video {}: {}", videoPath,
+        mediaPlayer.getError() != null ? mediaPlayer.getError().getMessage()
+            : "unknown player error"));
+    mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+    mediaPlayer.setOnEndOfMedia(() -> {
+      mediaPlayer.seek(Duration.ZERO);
+      mediaPlayer.play();
+    });
+    mediaPlayer.setOnReady(mediaPlayer::play);
+    mediaPlayer.setAutoPlay(true);
+
+    MediaView mediaView = new MediaView(mediaPlayer);
+    mediaView.getStyleClass().add("usage-video-view");
+    mediaView.setPreserveRatio(true);
+    mediaView.setSmooth(true);
+
+    StackPane mediaSurface = new StackPane(mediaView);
+    StackPane.setAlignment(mediaView, Pos.TOP_CENTER);
+    mediaView.fitWidthProperty().bind(mediaSurface.widthProperty());
+    mediaView.fitHeightProperty().bind(mediaSurface.heightProperty());
+    VBox.setVgrow(mediaSurface, Priority.ALWAYS);
+    middlePane.getChildren().setAll(mediaSurface);
   }
 
 }
