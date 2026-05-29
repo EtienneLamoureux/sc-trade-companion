@@ -20,6 +20,7 @@ import javafx.scene.media.MediaView;
 import javafx.scene.web.WebView;
 import javafx.util.Duration;
 import tools.sctrade.companion.utils.LocalizationUtil;
+import tools.sctrade.companion.utils.ResourceUtil;
 
 /**
  * The usage tab for the companion GUI. This is where users can see the instructions on how to use
@@ -175,8 +176,8 @@ public class UsageTab extends BorderPane {
   }
 
   private VBox createVideoPane(String videoPath) {
-    MediaPlayer mediaPlayer =
-        new MediaPlayer(new Media(getClass().getResource(videoPath).toExternalForm()));
+    MediaPlayer mediaPlayer = new MediaPlayer(
+        new Media(ResourceUtil.copyResourceToTempFile(videoPath).toUri().toString()));
     mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
     mediaPlayer.setOnEndOfMedia(() -> {
       mediaPlayer.seek(Duration.ZERO);
