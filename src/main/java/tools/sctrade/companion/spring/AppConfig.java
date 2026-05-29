@@ -12,6 +12,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingDeque;
 import org.apache.commons.io.input.TailerListener;
 import org.jnativehook.keyboard.NativeKeyEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -75,11 +77,14 @@ import tools.sctrade.companion.output.item.ItemCsvWriter;
 import tools.sctrade.companion.output.item.ScTradeToolsItemPublisher;
 import tools.sctrade.companion.output.item.ScTradeToolsItemRepository;
 import tools.sctrade.companion.output.item.ScTradeToolsItemShopRepository;
+import tools.sctrade.companion.utils.Consumer;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
 @EnableCaching
 public class AppConfig {
+  private static final Logger logger = LoggerFactory.getLogger(AppConfig.class);
+
   @Autowired(required = false)
   private BuildProperties buildProperties;
 
@@ -294,7 +299,7 @@ public class AppConfig {
       NotificationService notificationService) {
     ItemService itemService = new ItemService(itemKioskImagesQueue, notificationService,
         itemSubmissionFactory, Arrays.asList(itemCsvWriter, scTradeToolsItemPublisher));
-    CompletableFuture.runAsync(itemService::startConsuming);
+    startConsumerWithAutoRestart(itemService, "Item Kiosk", notificationService);
 
     return itemService;
   }
@@ -308,7 +313,7 @@ public class AppConfig {
     CommodityService commodityService =
         new CommodityService(commodityKioskImagesQueue, commoditySubmissionFactory,
             Arrays.asList(commodityCsvLogger, scTradeToolsCommodityPublisher), notificationService);
-    CompletableFuture.runAsync(commodityService::startConsuming);
+    startConsumerWithAutoRestart(commodityService, "Commodity Kiosk", notificationService);
 
     return commodityService;
   }
@@ -369,5 +374,27 @@ public class AppConfig {
 
   private String getVersion() {
     return buildProperties == null ? "TEST" : buildProperties.getVersion();
+  }
+
+  /**
+   * Starts a consumer with automatic restart capability. If the consumer thread dies (by any
+   * means), it is automatically restarted in a new thread.
+   *
+   * @param consumer The consumer to start.
+   * @param consumerName A human-readable name for the consumer (e.g., "Item Kiosk").
+   * @param notificationService Used to notify the user when the consumer needs to restart.
+   */
+  private void startConsumerWithAutoRestart(Consumer<BufferedImage> consumer, String consumerName,
+      NotificationService notificationService) {
+    CompletableFuture.runAsync(() -> {
+      while (true) {
+        try {
+          consumer.startConsuming();
+        } catch (Exception e) {
+          logger.info("Restarting consumer: {}", consumerName);
+          notificationService.info("Screenshot consumer (" + consumerName + ") restarting...");
+        }
+      }
+    });
   }
 }

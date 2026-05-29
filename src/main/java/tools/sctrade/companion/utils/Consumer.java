@@ -4,8 +4,17 @@ import java.util.concurrent.BlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.notification.NotificationService;
-import tools.sctrade.companion.exceptions.ThreadingException;
 
+/**
+ * Abstract consumer for processing items from a blocking queue.
+ *
+ * <p>
+ * Processes items continuously in an infinite loop. Errors retrieving items from the queue
+ * (including InterruptedException) are treated as recoverable and processing continues. Errors
+ * during item consumption are logged and rethrown to allow the caller to restart the consumer. This
+ * distinction allows callers to implement automatic restart logic while keeping queue-access issues
+ * transparent.
+ */
 public abstract class Consumer<T> {
   private final Logger logger = LoggerFactory.getLogger(Consumer.class);
 
@@ -17,26 +26,20 @@ public abstract class Consumer<T> {
     this.notificationService = notificationService;
   }
 
-  public void startConsuming() {
+  public void startConsuming() throws Exception {
     while (true) {
-      T item = waitForAndGetNextItem();
-
       try {
+        T item = queue.take();
         consume(item);
+      } catch (InterruptedException e) {
+        logger.warn("Consumer thread interrupted; resuming processing...");
       } catch (Exception e) {
-        logger.error("Error while processing", e);
+        logger.error("Error processing item", e);
         notificationService.error(e);
+        throw e;
       }
     }
   }
 
   protected abstract void consume(T item) throws Exception;
-
-  private T waitForAndGetNextItem() {
-    try {
-      return queue.take();
-    } catch (InterruptedException e) {
-      throw new ThreadingException(e);
-    }
-  }
 }
