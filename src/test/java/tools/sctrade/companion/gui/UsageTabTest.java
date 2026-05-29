@@ -17,6 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -177,6 +178,69 @@ class UsageTabTest {
   }
 
   @Test
+  void givenItemUsageVideoWhenSelectedThenMediaPlayerStartsPlaying() {
+    AtomicReference<Stage> stageRef = new AtomicReference<>();
+    AtomicReference<UsageTab> usageRef = new AtomicReference<>();
+    JavaFxTestUtil.runOnFxThreadAndWait(() -> {
+      Stage stage = new Stage();
+      UsageTab usageTab = new UsageTab();
+      stage.setScene(new Scene(usageTab, 920, 680));
+      stage.show();
+      stageRef.set(stage);
+      usageRef.set(usageTab);
+    });
+
+    TabPane tabPane = getLeftMiddleTabs(usageRef.get());
+    JavaFxTestUtil.runOnFxThreadAndWait(() -> tabPane.getSelectionModel().select(1));
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new AssertionError("Interrupted while waiting for item video playback", e);
+    }
+    JavaFxTestUtil.runOnFxThreadAndWait(() -> {
+      // Allow item tab playback callbacks to run.
+    });
+
+    MediaPlayer selectedPlayer =
+        findMediaView(getMiddlePane(tabPane.getTabs().get(1))).getMediaPlayer();
+    assertNotNull(selectedPlayer);
+    assertEquals(MediaPlayer.Status.PLAYING, selectedPlayer.getStatus());
+    assertNotNull(selectedPlayer.getMedia());
+    assertFalse(selectedPlayer.getMedia().getError() != null);
+  }
+
+  @Test
+  void givenItemUsageVideoWhenSelectedThenRenderedFrameIsNotBlank() {
+    AtomicReference<Stage> stageRef = new AtomicReference<>();
+    AtomicReference<UsageTab> usageRef = new AtomicReference<>();
+    JavaFxTestUtil.runOnFxThreadAndWait(() -> {
+      Stage stage = new Stage();
+      UsageTab usageTab = new UsageTab();
+      stage.setScene(new Scene(usageTab, 920, 680));
+      stage.show();
+      stageRef.set(stage);
+      usageRef.set(usageTab);
+    });
+
+    TabPane tabPane = getLeftMiddleTabs(usageRef.get());
+    JavaFxTestUtil.runOnFxThreadAndWait(() -> tabPane.getSelectionModel().select(1));
+    try {
+      Thread.sleep(1500);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new AssertionError("Interrupted while waiting for item video rendering", e);
+    }
+
+    Image snapshot = JavaFxTestUtil.supplyOnFxThreadAndWait(() -> {
+      MediaView mediaView = findMediaView(getMiddlePane(tabPane.getTabs().get(1)));
+      return mediaView.snapshot(null, null);
+    });
+
+    assertTrue(hasVisiblePixelVariance(snapshot));
+  }
+
+  @Test
   void givenUsageVideoWhenResizedThenKeepsMediaPaneConfigured() {
     AtomicReference<Stage> stageRef = new AtomicReference<>();
     AtomicReference<UsageTab> usageRef = new AtomicReference<>();
@@ -267,5 +331,29 @@ class UsageTabTest {
 
   private ResourceBundle englishBundle() {
     return ResourceBundle.getBundle("bundles.localization", Locale.ROOT);
+  }
+
+  private boolean hasVisiblePixelVariance(Image image) {
+    int width = (int) image.getWidth();
+    int height = (int) image.getHeight();
+    if (width == 0 || height == 0) {
+      return false;
+    }
+
+    javafx.scene.image.PixelReader reader = image.getPixelReader();
+    int minX = width / 4;
+    int maxX = width - minX;
+    int minY = height / 4;
+    int maxY = height - minY;
+    java.util.Set<Integer> colors = new java.util.HashSet<>();
+    for (int y = minY; y < maxY; y++) {
+      for (int x = minX; x < maxX; x++) {
+        colors.add(reader.getArgb(x, y));
+        if (colors.size() > 10) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }
