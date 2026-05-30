@@ -73,6 +73,19 @@ class ScreenshotProducerTest {
     assertEquals(0, emptyRepo.getSnapshot().size());
   }
 
+  @Test
+  void givenSameImageWithDifferentTypes_whenProducing_thenDistinctScreenshotsAreStored() {
+    TestablescreenshotProducer itemProducer =
+        new TestablescreenshotProducer(queue, screenshotRepository, ScreenshotType.ITEM_KIOSK);
+    TestablescreenshotProducer commodityProducer =
+        new TestablescreenshotProducer(queue, screenshotRepository, ScreenshotType.COMMODITY_KIOSK);
+
+    itemProducer.callProduce(image);
+    commodityProducer.callProduce(image);
+
+    assertEquals(2, screenshotRepository.getSnapshot().size());
+  }
+
   /**
    * Test subclass that exposes {@code produce()} so tests do not need to be in the same package as
    * {@link tools.sctrade.companion.utils.patterns.Producer}.

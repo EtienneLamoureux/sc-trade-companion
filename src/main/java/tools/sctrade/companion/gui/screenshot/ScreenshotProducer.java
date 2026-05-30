@@ -32,8 +32,9 @@ public class ScreenshotProducer extends Producer<BufferedImage> {
   protected void produce(BufferedImage image) {
     super.produce(image);
 
-    Screenshot screenshot = new Screenshot(HashUtil.hash(image), image, "...",
-        ScreenshotStatus.QUEUED, null, null, screenshotType);
+    String screenshotId = HashUtil.hash(screenshotType.name() + ":" + HashUtil.hash(image));
+    Screenshot screenshot = new Screenshot(screenshotId, image, "...", ScreenshotStatus.QUEUED,
+        null, null, screenshotType);
     screenshotRepository.upsert(screenshot);
   }
 }

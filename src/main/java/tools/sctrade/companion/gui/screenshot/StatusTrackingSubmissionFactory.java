@@ -39,7 +39,7 @@ public class StatusTrackingSubmissionFactory<T> implements SubmissionFactory<T> 
 
   @Override
   public T build(BufferedImage screenCapture) {
-    String id = HashUtil.hash(screenCapture);
+    String id = HashUtil.hash(screenshotType.name() + ":" + HashUtil.hash(screenCapture));
     screenshotRepository.upsert(screenshotFactory.build(id, screenCapture, screenshotType));
 
     try {
