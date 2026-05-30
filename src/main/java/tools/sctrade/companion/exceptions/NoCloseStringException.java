@@ -6,7 +6,7 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 /**
  * Exception thrown when no nearby (Levenshtein distance) string could be found.
  */
-public class NoCloseStringException extends RuntimeException {
+public class NoCloseStringException extends RecoverableProcessingException {
   private static final long serialVersionUID = -1310636886842761669L;
 
   /**

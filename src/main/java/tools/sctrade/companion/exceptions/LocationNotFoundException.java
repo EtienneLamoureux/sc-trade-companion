@@ -8,7 +8,7 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 /**
  * Exception thrown when a location is not found in the image.
  */
-public class LocationNotFoundException extends RuntimeException {
+public class LocationNotFoundException extends RecoverableProcessingException {
   private static final long serialVersionUID = -2418133626570478149L;
 
   /**

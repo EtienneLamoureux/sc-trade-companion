@@ -391,8 +391,13 @@ public class AppConfig {
         try {
           consumer.startConsuming();
         } catch (Exception e) {
-          logger.info("Restarting consumer: {}", consumerName);
-          notificationService.info("Screenshot consumer (" + consumerName + ") restarting...");
+          logger.error("Restarting consumer: {}", consumerName, e);
+          try {
+            notificationService.info("Screenshot consumer (" + consumerName + ") restarting...");
+          } catch (Exception notificationException) {
+            logger.warn("Failed to notify restart for consumer: {}", consumerName,
+                notificationException);
+          }
         }
       }
     });

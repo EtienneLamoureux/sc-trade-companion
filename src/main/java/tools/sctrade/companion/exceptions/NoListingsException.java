@@ -5,7 +5,7 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 /**
  * Exception thrown when no listings are found in the image.
  */
-public class NoListingsException extends RuntimeException {
+public class NoListingsException extends RecoverableProcessingException {
   private static final long serialVersionUID = -3711903740803747206L;
 
   /**

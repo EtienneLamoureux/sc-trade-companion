@@ -30,4 +30,5 @@ public class ItemService extends Consumer<BufferedImage> {
       publishers.forEach(p -> p.processAsynchronously(submission));
     }
   }
+
 }

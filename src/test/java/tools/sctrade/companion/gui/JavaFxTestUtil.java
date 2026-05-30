@@ -4,6 +4,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 import javafx.application.Platform;
 
@@ -50,6 +51,26 @@ public final class JavaFxTestUtil {
     AtomicReference<T> value = new AtomicReference<>();
     runOnFxThreadAndWait(() -> value.set(supplier.get()));
     return value.get();
+  }
+
+  public static void waitForCondition(BooleanSupplier condition, long timeoutMillis,
+      long pollIntervalMillis, String timeoutMessage) {
+    long deadline = System.currentTimeMillis() + timeoutMillis;
+    while (System.currentTimeMillis() < deadline) {
+      boolean satisfied = supplyOnFxThreadAndWait(condition::getAsBoolean);
+      if (satisfied) {
+        return;
+      }
+
+      try {
+        Thread.sleep(pollIntervalMillis);
+      } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+        throw new AssertionError("Interrupted while waiting for condition", e);
+      }
+    }
+
+    throw new AssertionError(timeoutMessage);
   }
 
   private static void await(CountDownLatch latch) {

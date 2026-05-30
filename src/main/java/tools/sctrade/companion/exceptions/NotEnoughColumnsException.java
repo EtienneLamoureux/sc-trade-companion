@@ -7,7 +7,7 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 /**
  * Exception thrown when the number of columns in the OCR result is less than expected.
  */
-public class NotEnoughColumnsException extends RuntimeException {
+public class NotEnoughColumnsException extends RecoverableProcessingException {
   private static final long serialVersionUID = -850092263296022156L;
 
   /**

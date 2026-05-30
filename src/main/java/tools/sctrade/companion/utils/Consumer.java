@@ -4,6 +4,7 @@ import java.util.concurrent.BlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import tools.sctrade.companion.domain.notification.NotificationService;
+import tools.sctrade.companion.exceptions.RecoverableProcessingException;
 
 /**
  * Abstract consumer for processing items from a blocking queue.
@@ -33,6 +34,9 @@ public abstract class Consumer<T> {
         consume(item);
       } catch (InterruptedException e) {
         logger.warn("Consumer thread interrupted; resuming processing...");
+      } catch (RecoverableProcessingException e) {
+        logger.warn("Recoverable error processing item", e);
+        notificationService.warn(e.getMessage());
       } catch (Exception e) {
         logger.error("Error processing item", e);
         notificationService.error(e);
