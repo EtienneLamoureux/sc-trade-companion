@@ -121,10 +121,19 @@ public class CompanionGui implements NotificationRepository, UpdateAvailablePopu
 
   @Override
   public void add(NotificationLevel level, String message) {
-    if (logsTab != null) {
-      logsTab.addLog(
-          new Object[] {TimeUtil.getNowAsString(TimeFormat.LOG_ENTRY), level.toString(), message});
+    if (logsTab == null) {
+      return;
     }
+
+    Runnable appendLog = () -> logsTab.addLog(
+        new Object[] {TimeUtil.getNowAsString(TimeFormat.LOG_ENTRY), level.toString(), message});
+
+    if (Platform.isFxApplicationThread()) {
+      appendLog.run();
+      return;
+    }
+
+    Platform.runLater(appendLog);
   }
 
   private void openReleasePage() {

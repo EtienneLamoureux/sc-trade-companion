@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,6 +13,10 @@ import atlantafx.base.controls.ModalPane;
 import atlantafx.base.controls.RingProgressIndicator;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
@@ -24,6 +29,7 @@ import javafx.stage.WindowEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.domain.gamelog.GameLogPathSubject;
+import tools.sctrade.companion.domain.notification.NotificationLevel;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
 import tools.sctrade.companion.domain.user.User;
@@ -243,6 +249,67 @@ class CompanionGuiTest {
 
       assertInstanceOf(RingProgressIndicator.class, closingContent.lookup("#closingProgress"));
     });
+  }
+
+  @Test
+  void givenGuiWhenLogAddedFromBackgroundThreadThenLogIsDisplayedWithoutThreadViolation() {
+    CompanionGui gui = new CompanionGui(mock(UserService.class), mock(GameLogPathSubject.class),
+        new SettingRepository(), new ScreenshotRepository(), "1.5.2");
+    GuardedLogsTab logsTab = JavaFxTestUtil.supplyOnFxThreadAndWait(GuardedLogsTab::new);
+    injectLogsTab(gui, logsTab);
+
+    AtomicReference<Throwable> backgroundError = new AtomicReference<>();
+    CountDownLatch latch = new CountDownLatch(1);
+    Thread worker = new Thread(() -> {
+      try {
+        gui.add(NotificationLevel.INFO, "bg message");
+      } catch (Throwable t) {
+        backgroundError.set(t);
+      } finally {
+        latch.countDown();
+      }
+    });
+    worker.start();
+    assertTrue(awaitLatch(latch), "Background notification call should complete");
+    JavaFxTestUtil.runOnFxThreadAndWait(() -> {
+      // flush pending runLater tasks
+    });
+    int count = JavaFxTestUtil.supplyOnFxThreadAndWait(logsTab::getLogCount);
+    assertEquals(1, count, "Exactly one log entry should be appended");
+    assertNull(backgroundError.get(), "Background notification should not throw");
+  }
+
+  private static void injectLogsTab(CompanionGui gui, LogsTab logsTab) {
+    try {
+      java.lang.reflect.Field logsTabField = CompanionGui.class.getDeclaredField("logsTab");
+      logsTabField.setAccessible(true);
+      logsTabField.set(gui, logsTab);
+    } catch (ReflectiveOperationException e) {
+      throw new AssertionError("Unable to inject logs tab", e);
+    }
+  }
+
+  private static boolean awaitLatch(CountDownLatch latch) {
+    try {
+      return latch.await(2, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new AssertionError("Interrupted while waiting for latch", e);
+    }
+  }
+
+  private static class GuardedLogsTab extends LogsTab {
+    @Override
+    public void addLog(Object[] row) {
+      if (!Platform.isFxApplicationThread()) {
+        throw new IllegalStateException("Log writes must run on JavaFX thread");
+      }
+      super.addLog(row);
+    }
+
+    int getLogCount() {
+      return ((javafx.scene.control.TableView<?>) getCenter()).getItems().size();
+    }
   }
 
   private Stage buildInitializedStage() {
