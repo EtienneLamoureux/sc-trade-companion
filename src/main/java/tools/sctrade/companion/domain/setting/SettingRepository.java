@@ -4,9 +4,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public class SettingRepository {
    * Creates a new setting repository.
    */
   public SettingRepository() {
-    this.settings = new EnumMap<>(Setting.class);
+    this.settings = new ConcurrentHashMap<>();
     filePath = Paths.get(".", "settings").normalize().toAbsolutePath();
 
     loadUserDefinedSettingsFromDisk();
@@ -56,8 +56,13 @@ public class SettingRepository {
    * @return The value of the setting.
    */
   public <T> T get(Setting setting, T defaultValue) {
+    String value = settings.get(setting);
+    if (value == null) {
+      return defaultValue;
+    }
+
     try {
-      return setting.cast(settings.get(setting).toString());
+      return setting.cast(value);
     } catch (Exception e) {
       logger.warn("Could not retreive the value of the {} setting", setting);
       return defaultValue;
