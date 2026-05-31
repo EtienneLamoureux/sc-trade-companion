@@ -1,6 +1,5 @@
 package tools.sctrade.companion.gui.screenshot;
 
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.inOrder;
@@ -37,24 +36,23 @@ class ScreenshotSubmissionFacadeTest {
 
   @Test
   void givenScreenCapture_whenProcess_thenUpsertsQueuedScreenshotBeforeAsyncDelegation() {
-    String id = TYPE.computeId(image);
-    Screenshot queued = new Screenshot(id, image, null, ScreenshotStatus.QUEUED, null, null, TYPE);
-    when(screenshotFactory.buildQueued(anyString(), same(image), eq(TYPE))).thenReturn(queued);
+    Screenshot queued = new Screenshot("q", image, null, ScreenshotStatus.QUEUED, null, null, TYPE);
+    when(screenshotFactory.buildQueued(same(image), eq(TYPE))).thenReturn(queued);
     ScreenshotSubmissionFacade facade = new ScreenshotSubmissionFacade(asyncProcessor,
         screenshotRepository, screenshotFactory, TYPE);
 
     facade.process(image);
 
     InOrder inOrder = inOrder(screenshotFactory, screenshotRepository, asyncProcessor);
-    inOrder.verify(screenshotFactory).buildQueued(id, image, TYPE);
+    inOrder.verify(screenshotFactory).buildQueued(image, TYPE);
     inOrder.verify(screenshotRepository).upsert(queued);
     inOrder.verify(asyncProcessor).process(image);
   }
 
   @Test
   void givenScreenCapture_whenProcess_thenDelegatesOriginalImageToAsyncProcessor() {
-    when(screenshotFactory.buildQueued(anyString(), same(image), eq(TYPE)))
-        .thenReturn(new Screenshot("id", image, null, ScreenshotStatus.QUEUED, null, null, TYPE));
+    when(screenshotFactory.buildQueued(same(image), eq(TYPE)))
+        .thenReturn(new Screenshot("q", image, null, ScreenshotStatus.QUEUED, null, null, TYPE));
     ScreenshotSubmissionFacade facade = new ScreenshotSubmissionFacade(asyncProcessor,
         screenshotRepository, screenshotFactory, TYPE);
 

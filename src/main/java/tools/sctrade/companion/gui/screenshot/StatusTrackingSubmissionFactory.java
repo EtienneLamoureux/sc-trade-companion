@@ -38,16 +38,14 @@ public class StatusTrackingSubmissionFactory<T> implements SubmissionFactory<T> 
 
   @Override
   public T build(BufferedImage screenCapture) {
-    String id = screenshotType.computeId(screenCapture);
-    screenshotRepository.upsert(screenshotFactory.build(id, screenCapture, screenshotType));
+    screenshotRepository.upsert(screenshotFactory.build(screenCapture, screenshotType));
 
     try {
       T result = submissionFactory.build(screenCapture);
-      screenshotRepository
-          .upsert(screenshotFactory.build(id, screenCapture, result, screenshotType));
+      screenshotRepository.upsert(screenshotFactory.build(screenCapture, result, screenshotType));
       return result;
     } catch (RuntimeException e) {
-      screenshotRepository.upsert(screenshotFactory.build(id, screenCapture, e, screenshotType));
+      screenshotRepository.upsert(screenshotFactory.build(screenCapture, e, screenshotType));
       throw e;
     }
   }

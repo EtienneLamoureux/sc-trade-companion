@@ -6,6 +6,7 @@ import tools.sctrade.companion.domain.commodity.CommodityListing;
 import tools.sctrade.companion.domain.commodity.CommoditySubmission;
 import tools.sctrade.companion.domain.item.ItemListing;
 import tools.sctrade.companion.domain.item.ItemSubmission;
+import tools.sctrade.companion.utils.HashUtil;
 import tools.sctrade.companion.utils.LocalizationUtil;
 
 /**
@@ -22,60 +23,56 @@ public class ScreenshotFactory {
   /**
    * Builds a queued-status screenshot record.
    *
-   * @param id screenshot id
    * @param image original screenshot image
    * @param type screenshot type
    * @return queued-status screenshot record
    */
-  public Screenshot buildQueued(String id, BufferedImage image, ScreenshotType type) {
-    return new Screenshot(id, scaleToThumbnail(image), null, ScreenshotStatus.QUEUED, null, null,
-        type);
+  public Screenshot buildQueued(BufferedImage image, ScreenshotType type) {
+    return new Screenshot(computeId(type, image), scaleToThumbnail(image), null,
+        ScreenshotStatus.QUEUED, null, null, type);
   }
 
   /**
    * Builds a processing-status screenshot record.
    *
-   * @param id screenshot id
    * @param image original screenshot image
    * @param type screenshot type
    * @return processing-status screenshot record
    */
-  public Screenshot build(String id, BufferedImage image, ScreenshotType type) {
-    return new Screenshot(id, scaleToThumbnail(image), null, ScreenshotStatus.PROCESSING, null,
-        null, type);
+  public Screenshot build(BufferedImage image, ScreenshotType type) {
+    return new Screenshot(computeId(type, image), scaleToThumbnail(image), null,
+        ScreenshotStatus.PROCESSING, null, null, type);
   }
 
   /**
    * Builds a success-status screenshot record.
    *
-   * @param id screenshot id
    * @param image original screenshot image
    * @param submission decoded submission object
    * @param type screenshot type
    * @return success-status screenshot record
    */
-  public Screenshot build(String id, BufferedImage image, Object submission, ScreenshotType type) {
+  public Screenshot build(BufferedImage image, Object submission, ScreenshotType type) {
     if (submission instanceof ItemSubmission itemSubmission) {
-      return buildFromItemSubmission(id, image, itemSubmission, type);
+      return buildFromItemSubmission(computeId(type, image), image, itemSubmission, type);
     }
 
-    return new Screenshot(id, scaleToThumbnail(image), extractLocation(submission),
-        ScreenshotStatus.SUCCESS, null, extractContent(submission), type);
+    return new Screenshot(computeId(type, image), scaleToThumbnail(image),
+        extractLocation(submission), ScreenshotStatus.SUCCESS, null, extractContent(submission),
+        type);
   }
 
   /**
    * Builds an error-status screenshot record.
    *
-   * @param id screenshot id
    * @param image original screenshot image
    * @param exception exception raised while processing
    * @param type screenshot type
    * @return error-status screenshot record
    */
-  public Screenshot build(String id, BufferedImage image, RuntimeException exception,
-      ScreenshotType type) {
-    return new Screenshot(id, scaleToThumbnail(image), null, ScreenshotStatus.ERROR,
-        exception.getMessage(), null, type);
+  public Screenshot build(BufferedImage image, RuntimeException exception, ScreenshotType type) {
+    return new Screenshot(computeId(type, image), scaleToThumbnail(image), null,
+        ScreenshotStatus.ERROR, exception.getMessage(), null, type);
   }
 
   private Screenshot buildFromItemSubmission(String id, BufferedImage image,
@@ -141,5 +138,9 @@ public class ScreenshotFactory {
     }
 
     return null;
+  }
+
+  private String computeId(ScreenshotType type, BufferedImage image) {
+    return HashUtil.hash(type.name() + ":" + HashUtil.hash(image));
   }
 }

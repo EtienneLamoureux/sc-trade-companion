@@ -41,10 +41,9 @@ class ScreenshotFactoryTest {
 
   @Test
   void givenAnyInput_whenBuildingQueuedScreenshot_thenStatusAndCoreFieldsAreSet() {
-    Screenshot screenshot =
-        screenshotFactory.buildQueued("id", image, ScreenshotType.COMMODITY_KIOSK);
+    Screenshot screenshot = screenshotFactory.buildQueued(image, ScreenshotType.COMMODITY_KIOSK);
 
-    assertEquals("id", screenshot.id());
+    assertNotNull(screenshot.id());
     assertEquals(ScreenshotStatus.QUEUED, screenshot.status());
     assertEquals(ScreenshotType.COMMODITY_KIOSK, screenshot.type());
     assertNotNull(screenshot.image());
@@ -52,7 +51,7 @@ class ScreenshotFactoryTest {
 
   @Test
   void givenAnyInput_whenBuildingProcessingScreenshot_thenStatusIsProcessing() {
-    Screenshot screenshot = screenshotFactory.build("id", image, ScreenshotType.COMMODITY_KIOSK);
+    Screenshot screenshot = screenshotFactory.build(image, ScreenshotType.COMMODITY_KIOSK);
 
     assertEquals(ScreenshotStatus.PROCESSING, screenshot.status());
   }
@@ -63,7 +62,7 @@ class ScreenshotFactoryTest {
         TransactionType.SELLS, "Aluminum", List.of(1), "batch", Instant.now())));
 
     Screenshot screenshot =
-        screenshotFactory.build("id", image, commoditySubmission, ScreenshotType.COMMODITY_KIOSK);
+        screenshotFactory.build(image, commoditySubmission, ScreenshotType.COMMODITY_KIOSK);
 
     assertEquals("Area18", screenshot.location());
     assertEquals(LocalizationUtil.get("infoScreenshotListingsRead").formatted(1),
@@ -76,7 +75,7 @@ class ScreenshotFactoryTest {
         .thenReturn(List.of(new ItemListing("item", 1.0, "Orison", "shop")));
 
     Screenshot screenshot =
-        screenshotFactory.build("id", image, itemSubmission, ScreenshotType.ITEM_KIOSK);
+        screenshotFactory.build(image, itemSubmission, ScreenshotType.ITEM_KIOSK);
 
     assertEquals("Orison", screenshot.location());
     assertEquals(LocalizationUtil.get("infoScreenshotListingsRead").formatted(1),
@@ -88,7 +87,7 @@ class ScreenshotFactoryTest {
     ItemSubmission emptyItemSubmission = new ItemSubmission(new User("id", "label"), List.of());
 
     Screenshot screenshot =
-        screenshotFactory.build("id", image, emptyItemSubmission, ScreenshotType.ITEM_KIOSK);
+        screenshotFactory.build(image, emptyItemSubmission, ScreenshotType.ITEM_KIOSK);
 
     assertEquals(ScreenshotStatus.ERROR, screenshot.status());
     assertEquals(LocalizationUtil.get("warnNoLocation"), screenshot.error());
@@ -100,7 +99,7 @@ class ScreenshotFactoryTest {
         List.of(new ItemListing("item", 1.0, "Orison", null)));
 
     Screenshot screenshot =
-        screenshotFactory.build("id", image, itemSubmissionWithoutShop, ScreenshotType.ITEM_KIOSK);
+        screenshotFactory.build(image, itemSubmissionWithoutShop, ScreenshotType.ITEM_KIOSK);
 
     assertEquals(ScreenshotStatus.ERROR, screenshot.status());
     assertEquals(LocalizationUtil.get("warnNoShop"), screenshot.error());
@@ -109,7 +108,7 @@ class ScreenshotFactoryTest {
   @Test
   void givenUnknownSubmissionType_whenBuildingSuccessScreenshot_thenLocationAndContentAreNull() {
     Screenshot screenshot =
-        screenshotFactory.build("id", image, "unknown", ScreenshotType.COMMODITY_KIOSK);
+        screenshotFactory.build(image, "unknown", ScreenshotType.COMMODITY_KIOSK);
 
     assertNull(screenshot.location());
     assertNull(screenshot.content());
@@ -117,8 +116,8 @@ class ScreenshotFactoryTest {
 
   @Test
   void givenRuntimeException_whenBuildingErrorScreenshot_thenStatusAndErrorAreSet() {
-    Screenshot screenshot = screenshotFactory.build("id", image, new RuntimeException("boom"),
-        ScreenshotType.ITEM_KIOSK);
+    Screenshot screenshot =
+        screenshotFactory.build(image, new RuntimeException("boom"), ScreenshotType.ITEM_KIOSK);
 
     assertEquals(ScreenshotStatus.ERROR, screenshot.status());
     assertEquals("boom", screenshot.error());
@@ -128,7 +127,7 @@ class ScreenshotFactoryTest {
   void givenOversizeImage_whenBuildingProcessingScreenshot_thenStoredImageIsScaledToThumbnail() {
     BufferedImage large = new BufferedImage(500, 400, BufferedImage.TYPE_INT_RGB);
 
-    Screenshot screenshot = screenshotFactory.build("id", large, ScreenshotType.COMMODITY_KIOSK);
+    Screenshot screenshot = screenshotFactory.build(large, ScreenshotType.COMMODITY_KIOSK);
 
     assertTrue(screenshot.image().getWidth() <= ScreenshotFactory.THUMBNAIL_SIZE);
     assertTrue(screenshot.image().getHeight() <= ScreenshotFactory.THUMBNAIL_SIZE);
