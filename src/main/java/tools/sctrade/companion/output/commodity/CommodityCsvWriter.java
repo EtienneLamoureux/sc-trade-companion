@@ -45,7 +45,7 @@ public class CommodityCsvWriter extends AsynchronousProcessor<CommoditySubmissio
    * Processes a commodity submission by writing its listings to a CSV file.
    */
   @Override
-  public void process(CommoditySubmission submission) {
+  public void doProcess(CommoditySubmission submission) {
     var filePath = buildFilePath();
 
     try {

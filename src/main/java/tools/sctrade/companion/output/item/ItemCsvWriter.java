@@ -45,7 +45,7 @@ public class ItemCsvWriter extends AsynchronousProcessor<ItemSubmission> {
    * Processes an item submission by writing its listings to a CSV file.
    */
   @Override
-  public void process(ItemSubmission submission) {
+  public void doProcess(ItemSubmission submission) {
     var filePath = buildFilePath();
 
     try {

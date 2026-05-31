@@ -14,11 +14,9 @@ import tools.sctrade.companion.domain.image.ImageWriter;
 import tools.sctrade.companion.domain.notification.NotificationService;
 import tools.sctrade.companion.domain.setting.Setting;
 import tools.sctrade.companion.domain.setting.SettingRepository;
-import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
-import tools.sctrade.companion.gui.screenshot.ScreenshotType;
-import tools.sctrade.companion.utils.AsynchronousProcessor;
 import tools.sctrade.companion.utils.GraphicsDeviceUtil;
 import tools.sctrade.companion.utils.LocalizationUtil;
+import tools.sctrade.companion.utils.Processor;
 import tools.sctrade.companion.utils.SoundUtil;
 
 /**
@@ -29,7 +27,7 @@ public class ScreenPrinter implements Runnable {
 
   private final Logger logger = LoggerFactory.getLogger(ScreenPrinter.class);
 
-  private AsynchronousProcessor<BufferedImage> processor;
+  private Processor<BufferedImage> processor;
   private List<ImageManipulation> postprocessingManipulations;
   private ImageWriter<Optional<Path>> imageWriter;
   private SoundUtil soundPlayer;
@@ -39,26 +37,22 @@ public class ScreenPrinter implements Runnable {
   /**
    * Creates a new instance of the screen printer.
    *
-   * @param screenshotRepository The repository used to persist screenshot records.
-   * @param screenshotType The type of screenshot this printer produces.
+   * @param processor The processor that handles the captured screen image.
    * @param imageWriter The image writer to save the screen capture.
    * @param soundPlayer The sound player to play a sound when capturing the screen.
    * @param notificationService The notification service to notify the user of the screen capture
    * @param settings The settings repository.
    */
-  public ScreenPrinter(AsynchronousProcessor<BufferedImage> processor,
-      ScreenshotRepository screenshotRepository, ScreenshotType screenshotType,
-      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
-      NotificationService notificationService, SettingRepository settings) {
-    this(processor, screenshotRepository, screenshotType, Collections.emptyList(), imageWriter,
-        soundPlayer, notificationService, settings);
+  public ScreenPrinter(Processor<BufferedImage> processor, ImageWriter<Optional<Path>> imageWriter,
+      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
+    this(processor, Collections.emptyList(), imageWriter, soundPlayer, notificationService,
+        settings);
   }
 
   /**
    * Creates a new instance of the screen printer.
    *
-   * @param screenshotRepository The repository used to persist screenshot records.
-   * @param screenshotType The type of screenshot this printer produces.
+   * @param processor The processor that handles the captured screen image.
    * @param postprocessingManipulations The postprocessing manipulations to apply to the screen
    *        capture, after capturing it but before handing it over to the image processors.
    * @param imageWriter The image writer to save the screen capture.
@@ -66,8 +60,7 @@ public class ScreenPrinter implements Runnable {
    * @param notificationService The notification service to notify the user of the screen capture
    * @param settings The settings repository.
    */
-  public ScreenPrinter(AsynchronousProcessor<BufferedImage> processor,
-      ScreenshotRepository screenshotRepository, ScreenshotType screenshotType,
+  public ScreenPrinter(Processor<BufferedImage> processor,
       List<ImageManipulation> postprocessingManipulations, ImageWriter<Optional<Path>> imageWriter,
       SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
     this.processor = processor;
@@ -90,7 +83,7 @@ public class ScreenPrinter implements Runnable {
       logger.debug("Printed screen");
 
       logger.debug("Launching image processing...");
-      processor.processAsynchronously(screenCapture);
+      processor.process(screenCapture);
       logger.debug("Launched image processing");
       notificationService.info(LocalizationUtil.get("infoProcessingScreenshot"));
 

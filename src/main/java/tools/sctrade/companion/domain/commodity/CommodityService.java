@@ -64,7 +64,7 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
    * @throws InterruptedException If the thread is interrupted
    */
   @Override
-  public void process(BufferedImage screenCapture) throws Exception {
+  public void doProcess(BufferedImage screenCapture) throws Exception {
     CommoditySubmission submission = submissionFactory.build(screenCapture);
     notificationService.info(LocalizationUtil.get("infoCommodityListingsRead"));
 
@@ -113,7 +113,7 @@ public class CommodityService extends AsynchronousProcessor<BufferedImage> {
 
       if (submission.isLocated()) {
         logger.debug("Calling publishers...");
-        publishers.stream().forEach(n -> n.processAsynchronously(submission));
+        publishers.stream().forEach(n -> n.process(submission));
         logger.debug("Called publishers");
       } else {
         logger.error("No commodity listings had a valid location");

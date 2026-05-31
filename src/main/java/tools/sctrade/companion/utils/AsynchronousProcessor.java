@@ -10,7 +10,7 @@ import tools.sctrade.companion.domain.notification.NotificationService;
  *
  * @param <T> the type of the unit of work
  */
-public abstract class AsynchronousProcessor<T> {
+public abstract class AsynchronousProcessor<T> implements Processor<T> {
   private final Logger logger = LoggerFactory.getLogger(AsynchronousProcessor.class);
 
   protected NotificationService notificationService;
@@ -30,9 +30,9 @@ public abstract class AsynchronousProcessor<T> {
    * @param unitOfWork the unit of work to process
    */
   @Async
-  public void processAsynchronously(T unitOfWork) {
+  public void process(T unitOfWork) {
     try {
-      process(unitOfWork);
+      doProcess(unitOfWork);
     } catch (Exception e) {
       logger.error("Error while processing", e);
       notificationService.error(e);
@@ -45,5 +45,5 @@ public abstract class AsynchronousProcessor<T> {
    * @param unitOfWork the unit of work to process
    * @throws Exception if an error occurs while processing
    */
-  protected abstract void process(T unitOfWork) throws Exception;
+  protected abstract void doProcess(T unitOfWork) throws Exception;
 }

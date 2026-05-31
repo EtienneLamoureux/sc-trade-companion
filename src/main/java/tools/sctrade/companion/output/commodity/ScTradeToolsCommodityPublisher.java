@@ -53,7 +53,7 @@ public class ScTradeToolsCommodityPublisher extends AsynchronousProcessor<Commod
   }
 
   @Override
-  public void process(CommoditySubmission submission) {
+  public void doProcess(CommoditySubmission submission) {
     logger.debug("Sending {} commodity listings to SC Trade Tools...",
         submission.getListings().size());
 

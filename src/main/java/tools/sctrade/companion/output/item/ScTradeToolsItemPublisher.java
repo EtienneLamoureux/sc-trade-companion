@@ -39,7 +39,7 @@ public class ScTradeToolsItemPublisher extends AsynchronousProcessor<ItemSubmiss
   }
 
   @Override
-  public void process(ItemSubmission submission) {
+  public void doProcess(ItemSubmission submission) {
     logger.debug("Sending {} item listings to SC Trade Tools...", submission.getListings().size());
 
     try {

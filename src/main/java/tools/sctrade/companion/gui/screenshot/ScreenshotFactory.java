@@ -20,6 +20,19 @@ public class ScreenshotFactory {
   static final int THUMBNAIL_SIZE = 150;
 
   /**
+   * Builds a queued-status screenshot record.
+   *
+   * @param id screenshot id
+   * @param image original screenshot image
+   * @param type screenshot type
+   * @return queued-status screenshot record
+   */
+  public Screenshot buildQueued(String id, BufferedImage image, ScreenshotType type) {
+    return new Screenshot(id, scaleToThumbnail(image), null, ScreenshotStatus.QUEUED, null, null,
+        type);
+  }
+
+  /**
    * Builds a processing-status screenshot record.
    *
    * @param id screenshot id

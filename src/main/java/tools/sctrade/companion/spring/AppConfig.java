@@ -1,5 +1,6 @@
 package tools.sctrade.companion.spring;
 
+import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -53,6 +54,7 @@ import tools.sctrade.companion.domain.user.idgenerators.WindowsUserIdGenerator;
 import tools.sctrade.companion.gui.CompanionGui;
 import tools.sctrade.companion.gui.screenshot.ScreenshotFactory;
 import tools.sctrade.companion.gui.screenshot.ScreenshotRepository;
+import tools.sctrade.companion.gui.screenshot.ScreenshotSubmissionFacade;
 import tools.sctrade.companion.gui.screenshot.ScreenshotType;
 import tools.sctrade.companion.gui.screenshot.StatusTrackingSubmissionFactory;
 import tools.sctrade.companion.gui.version.CompanionVersionChecker;
@@ -71,6 +73,7 @@ import tools.sctrade.companion.output.item.ItemCsvWriter;
 import tools.sctrade.companion.output.item.ScTradeToolsItemPublisher;
 import tools.sctrade.companion.output.item.ScTradeToolsItemRepository;
 import tools.sctrade.companion.output.item.ScTradeToolsItemShopRepository;
+import tools.sctrade.companion.utils.Processor;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
@@ -238,6 +241,14 @@ public class AppConfig {
         ScreenshotType.COMMODITY_KIOSK, screenshotFactory);
   }
 
+  @Bean("CommodityScreenshotSubmissionFacade")
+  public Processor<BufferedImage> buildCommodityScreenshotSubmissionFacade(
+      CommodityService commodityService, ScreenshotRepository screenshotRepository,
+      ScreenshotFactory screenshotFactory) {
+    return new ScreenshotSubmissionFacade(commodityService, screenshotRepository, screenshotFactory,
+        ScreenshotType.COMMODITY_KIOSK);
+  }
+
   @Bean("ItemListingFactory")
   public ItemListingFactory buildItemListingFactory(
       ScTradeToolsItemRepository scTradeToolsItemRepository) {
@@ -271,6 +282,13 @@ public class AppConfig {
       ScreenshotRepository screenshotRepository, ScreenshotFactory screenshotFactory) {
     return new StatusTrackingSubmissionFactory<>(itemSubmissionFactory, screenshotRepository,
         ScreenshotType.ITEM_KIOSK, screenshotFactory);
+  }
+
+  @Bean("ItemScreenshotSubmissionFacade")
+  public Processor<BufferedImage> buildItemScreenshotSubmissionFacade(ItemService itemService,
+      ScreenshotRepository screenshotRepository, ScreenshotFactory screenshotFactory) {
+    return new ScreenshotSubmissionFacade(itemService, screenshotRepository, screenshotFactory,
+        ScreenshotType.ITEM_KIOSK);
   }
 
   @Bean("ItemService")
@@ -309,25 +327,27 @@ public class AppConfig {
   }
 
   @Bean("CommodityScreenPrinter")
-  public ScreenPrinter buildCommodityScreenPrinter(CommodityService commodityService,
-      ScreenshotRepository screenshotRepository, ImageWriter<Optional<Path>> imageWriter,
-      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
+  public ScreenPrinter buildCommodityScreenPrinter(
+      @Qualifier("CommodityScreenshotSubmissionFacade") Processor<BufferedImage> commoditySubmissionFacade,
+      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
+      NotificationService notificationService, SettingRepository settings) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
-    return new ScreenPrinter(commodityService, screenshotRepository, ScreenshotType.COMMODITY_KIOSK,
-        postprocessingManipulations, imageWriter, soundPlayer, notificationService, settings);
+    return new ScreenPrinter(commoditySubmissionFacade, postprocessingManipulations, imageWriter,
+        soundPlayer, notificationService, settings);
   }
 
   @Bean("ItemScreenPrinter")
-  public ScreenPrinter buildItemScreenPrinter(ItemService itemService,
-      ScreenshotRepository screenshotRepository, ImageWriter<Optional<Path>> imageWriter,
-      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
+  public ScreenPrinter buildItemScreenPrinter(
+      @Qualifier("ItemScreenshotSubmissionFacade") Processor<BufferedImage> itemSubmissionFacade,
+      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
+      NotificationService notificationService, SettingRepository settings) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
-    return new ScreenPrinter(itemService, screenshotRepository, ScreenshotType.ITEM_KIOSK,
-        postprocessingManipulations, imageWriter, soundPlayer, notificationService, settings);
+    return new ScreenPrinter(itemSubmissionFacade, postprocessingManipulations, imageWriter,
+        soundPlayer, notificationService, settings);
   }
 
   @Bean("CommodityKeyListener")

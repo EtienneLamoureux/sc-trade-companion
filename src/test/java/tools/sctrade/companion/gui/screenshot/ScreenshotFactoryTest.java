@@ -1,6 +1,7 @@
 package tools.sctrade.companion.gui.screenshot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -36,6 +37,17 @@ class ScreenshotFactoryTest {
   void setUp() {
     screenshotFactory = new ScreenshotFactory();
     image = new BufferedImage(2, 2, BufferedImage.TYPE_INT_RGB);
+  }
+
+  @Test
+  void givenAnyInput_whenBuildingQueuedScreenshot_thenStatusAndCoreFieldsAreSet() {
+    Screenshot screenshot =
+        screenshotFactory.buildQueued("id", image, ScreenshotType.COMMODITY_KIOSK);
+
+    assertEquals("id", screenshot.id());
+    assertEquals(ScreenshotStatus.QUEUED, screenshot.status());
+    assertEquals(ScreenshotType.COMMODITY_KIOSK, screenshot.type());
+    assertNotNull(screenshot.image());
   }
 
   @Test
