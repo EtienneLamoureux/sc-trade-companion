@@ -2,7 +2,6 @@ package tools.sctrade.companion.gui.screenshot;
 
 import java.awt.image.BufferedImage;
 import tools.sctrade.companion.domain.SubmissionFactory;
-import tools.sctrade.companion.utils.HashUtil;
 
 /**
  * Decorator that wraps a {@link SubmissionFactory} and tracks screenshot processing state.
@@ -39,7 +38,7 @@ public class StatusTrackingSubmissionFactory<T> implements SubmissionFactory<T> 
 
   @Override
   public T build(BufferedImage screenCapture) {
-    String id = computeId(screenshotType, screenCapture);
+    String id = screenshotType.computeId(screenCapture);
     screenshotRepository.upsert(screenshotFactory.build(id, screenCapture, screenshotType));
 
     try {
@@ -51,9 +50,5 @@ public class StatusTrackingSubmissionFactory<T> implements SubmissionFactory<T> 
       screenshotRepository.upsert(screenshotFactory.build(id, screenCapture, e, screenshotType));
       throw e;
     }
-  }
-
-  static String computeId(ScreenshotType type, BufferedImage screenCapture) {
-    return HashUtil.hash(type.name() + ":" + HashUtil.hash(screenCapture));
   }
 }

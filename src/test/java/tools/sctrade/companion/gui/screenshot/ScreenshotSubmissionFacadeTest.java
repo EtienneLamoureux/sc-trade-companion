@@ -37,7 +37,7 @@ class ScreenshotSubmissionFacadeTest {
 
   @Test
   void givenScreenCapture_whenProcess_thenUpsertsQueuedScreenshotBeforeAsyncDelegation() {
-    String id = StatusTrackingSubmissionFactory.computeId(TYPE, image);
+    String id = TYPE.computeId(image);
     Screenshot queued = new Screenshot(id, image, null, ScreenshotStatus.QUEUED, null, null, TYPE);
     when(screenshotFactory.buildQueued(anyString(), same(image), eq(TYPE))).thenReturn(queued);
     ScreenshotSubmissionFacade facade = new ScreenshotSubmissionFacade(asyncProcessor,

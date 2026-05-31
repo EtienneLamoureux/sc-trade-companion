@@ -32,7 +32,7 @@ public class ScreenshotSubmissionFacade implements Processor<BufferedImage> {
 
   @Override
   public void process(BufferedImage screenCapture) {
-    String id = StatusTrackingSubmissionFactory.computeId(screenshotType, screenCapture);
+    String id = screenshotType.computeId(screenCapture);
     screenshotRepository.upsert(screenshotFactory.buildQueued(id, screenCapture, screenshotType));
     asyncProcessor.process(screenCapture);
   }
