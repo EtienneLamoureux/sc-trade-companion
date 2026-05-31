@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.sctrade.companion.domain.SubmissionFactory;
@@ -101,32 +99,14 @@ class StatusTrackingSubmissionFactoryTest {
   }
 
   @Test
-  void givenProducerAndConsumerForSameImageType_whenProcessing_thenSingleScreenshotRecordIsUpdated() {
-    BlockingQueue<BufferedImage> queue = new ArrayBlockingQueue<>(5);
-    TestableScreenshotProducer producer =
-        new TestableScreenshotProducer(queue, screenshotRepository, ScreenshotType.ITEM_KIOSK);
+  void whenSameImageIsProcessedTwiceWithSameType_thenSingleScreenshotRecordIsUpserted() {
     SubmissionFactory<String> delegate = screenCapture -> "result";
     var factory = new StatusTrackingSubmissionFactory<>(delegate, screenshotRepository,
         ScreenshotType.ITEM_KIOSK, new ScreenshotFactory());
 
-    producer.callProduce(image);
+    factory.build(image);
     factory.build(image);
 
     assertEquals(1, screenshotRepository.getSnapshot().size());
-  }
-
-  /**
-   * Test subclass that exposes {@code produce()} so tests do not need to be in the same package as
-   * {@link tools.sctrade.companion.utils.patterns.Producer}.
-   */
-  private static class TestableScreenshotProducer extends ScreenshotProducer {
-    TestableScreenshotProducer(BlockingQueue<BufferedImage> queue,
-        ScreenshotRepository screenshotRepository, ScreenshotType screenshotType) {
-      super(queue, screenshotRepository, screenshotType);
-    }
-
-    void callProduce(BufferedImage image) {
-      produce(image);
-    }
   }
 }
