@@ -1,19 +1,13 @@
 package tools.sctrade.companion.spring;
 
-import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.LinkedBlockingDeque;
 import org.apache.commons.io.input.TailerListener;
 import org.jnativehook.keyboard.NativeKeyEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,13 +71,11 @@ import tools.sctrade.companion.output.item.ItemCsvWriter;
 import tools.sctrade.companion.output.item.ScTradeToolsItemPublisher;
 import tools.sctrade.companion.output.item.ScTradeToolsItemRepository;
 import tools.sctrade.companion.output.item.ScTradeToolsItemShopRepository;
-import tools.sctrade.companion.utils.Consumer;
 import tools.sctrade.companion.utils.SoundUtil;
 
 @Configuration
 @EnableCaching
 public class AppConfig {
-  private static final Logger logger = LoggerFactory.getLogger(AppConfig.class);
 
   @Autowired(required = false)
   private BuildProperties buildProperties;
@@ -94,10 +86,6 @@ public class AppConfig {
   private String outputIntermediaryImages;
   @Value("${tools.sctrade.root-url:https://sc-trade.tools}")
   private String scTradeToolsRootUrl;
-
-  private final BlockingQueue<BufferedImage> itemKioskImagesQueue = new LinkedBlockingDeque<>();
-  private final BlockingQueue<BufferedImage> commodityKioskImagesQueue =
-      new LinkedBlockingDeque<>();
 
   @Bean("SettingRepository")
   public SettingRepository buildSettingRepository() {
@@ -143,12 +131,6 @@ public class AppConfig {
 
     return new LineListener(oldLogLineProcessor);
   }
-
-  // @Bean("FileTailer")
-  // public FileTailer buildFileTailer(Subject<Path> subject, TailerListener listener,
-  // NotificationService notificationService) {
-  // return new FileTailer(subject, listener, notificationService);
-  // }
 
   @Bean("CompanionGui")
   public CompanionGui buildCompanionGui(UserService userService, GameLogPathSubject gameLogService,
@@ -297,11 +279,8 @@ public class AppConfig {
       @Qualifier("ItemCsvWriter") ItemCsvWriter itemCsvWriter,
       ScTradeToolsItemPublisher scTradeToolsItemPublisher,
       NotificationService notificationService) {
-    ItemService itemService = new ItemService(itemKioskImagesQueue, notificationService,
-        itemSubmissionFactory, Arrays.asList(itemCsvWriter, scTradeToolsItemPublisher));
-    startConsumerWithAutoRestart(itemService, "Item Kiosk", notificationService);
-
-    return itemService;
+    return new ItemService(notificationService, itemSubmissionFactory,
+        Arrays.asList(itemCsvWriter, scTradeToolsItemPublisher));
   }
 
   @Bean("CommodityService")
@@ -310,12 +289,8 @@ public class AppConfig {
       @Qualifier("CommodityCsvWriter") CommodityCsvWriter commodityCsvLogger,
       ScTradeToolsCommodityPublisher scTradeToolsCommodityPublisher,
       NotificationService notificationService) {
-    CommodityService commodityService =
-        new CommodityService(commodityKioskImagesQueue, commoditySubmissionFactory,
-            Arrays.asList(commodityCsvLogger, scTradeToolsCommodityPublisher), notificationService);
-    startConsumerWithAutoRestart(commodityService, "Commodity Kiosk", notificationService);
-
-    return commodityService;
+    return new CommodityService(commoditySubmissionFactory,
+        Arrays.asList(commodityCsvLogger, scTradeToolsCommodityPublisher), notificationService);
   }
 
   @Bean
@@ -334,25 +309,24 @@ public class AppConfig {
   }
 
   @Bean("CommodityScreenPrinter")
-  public ScreenPrinter buildCommodityScreenPrinter(ScreenshotRepository screenshotRepository,
-      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
-      NotificationService notificationService, SettingRepository settings) {
+  public ScreenPrinter buildCommodityScreenPrinter(CommodityService commodityService,
+      ScreenshotRepository screenshotRepository, ImageWriter<Optional<Path>> imageWriter,
+      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
-    return new ScreenPrinter(commodityKioskImagesQueue, screenshotRepository,
-        ScreenshotType.COMMODITY_KIOSK, postprocessingManipulations, imageWriter, soundPlayer,
-        notificationService, settings);
+    return new ScreenPrinter(commodityService, screenshotRepository, ScreenshotType.COMMODITY_KIOSK,
+        postprocessingManipulations, imageWriter, soundPlayer, notificationService, settings);
   }
 
   @Bean("ItemScreenPrinter")
-  public ScreenPrinter buildItemScreenPrinter(ScreenshotRepository screenshotRepository,
-      ImageWriter<Optional<Path>> imageWriter, SoundUtil soundPlayer,
-      NotificationService notificationService, SettingRepository settings) {
+  public ScreenPrinter buildItemScreenPrinter(ItemService itemService,
+      ScreenshotRepository screenshotRepository, ImageWriter<Optional<Path>> imageWriter,
+      SoundUtil soundPlayer, NotificationService notificationService, SettingRepository settings) {
     List<ImageManipulation> postprocessingManipulations = new ArrayList<>();
     postprocessingManipulations.add(new UpscaleTo4k());
 
-    return new ScreenPrinter(itemKioskImagesQueue, screenshotRepository, ScreenshotType.ITEM_KIOSK,
+    return new ScreenPrinter(itemService, screenshotRepository, ScreenshotType.ITEM_KIOSK,
         postprocessingManipulations, imageWriter, soundPlayer, notificationService, settings);
   }
 
@@ -374,32 +348,5 @@ public class AppConfig {
 
   private String getVersion() {
     return buildProperties == null ? "TEST" : buildProperties.getVersion();
-  }
-
-  /**
-   * Starts a consumer with automatic restart capability. If the consumer thread dies (by any
-   * means), it is automatically restarted in a new thread.
-   *
-   * @param consumer The consumer to start.
-   * @param consumerName A human-readable name for the consumer (e.g., "Item Kiosk").
-   * @param notificationService Used to notify the user when the consumer needs to restart.
-   */
-  private void startConsumerWithAutoRestart(Consumer<BufferedImage> consumer, String consumerName,
-      NotificationService notificationService) {
-    CompletableFuture.runAsync(() -> {
-      while (true) {
-        try {
-          consumer.startConsuming();
-        } catch (Exception e) {
-          logger.error("Restarting consumer: {}", consumerName, e);
-          try {
-            notificationService.info("Screenshot consumer (" + consumerName + ") restarting...");
-          } catch (Exception notificationException) {
-            logger.warn("Failed to notify restart for consumer: {}", consumerName,
-                notificationException);
-          }
-        }
-      }
-    });
   }
 }
