@@ -2,6 +2,7 @@ package tools.sctrade.companion.gui.screenshot;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.awt.image.BufferedImage;
@@ -109,5 +110,15 @@ class ScreenshotFactoryTest {
 
     assertEquals(ScreenshotStatus.ERROR, screenshot.status());
     assertEquals("boom", screenshot.error());
+  }
+
+  @Test
+  void givenOversizeImage_whenBuildingProcessingScreenshot_thenStoredImageIsScaledToThumbnail() {
+    BufferedImage large = new BufferedImage(500, 400, BufferedImage.TYPE_INT_RGB);
+
+    Screenshot screenshot = screenshotFactory.build("id", large, ScreenshotType.COMMODITY_KIOSK);
+
+    assertTrue(screenshot.image().getWidth() <= ScreenshotFactory.THUMBNAIL_SIZE);
+    assertTrue(screenshot.image().getHeight() <= ScreenshotFactory.THUMBNAIL_SIZE);
   }
 }

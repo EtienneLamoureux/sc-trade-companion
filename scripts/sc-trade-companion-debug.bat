@@ -32,10 +32,10 @@ echo.
 
 REM Show the command that will be executed
 echo Executing command:
-echo bin\jre\bin\java.exe -Xmx512m -Djava.net.preferIPv4Stack=true -cp !CLASSPATH! tools.sctrade.companion.CompanionApplication
+echo bin\jre\bin\java.exe -Xmx2024m -Djava.net.preferIPv4Stack=true -cp !CLASSPATH! tools.sctrade.companion.CompanionApplication
 echo.
 
 REM Run with java.exe (console) instead of javaw.exe to capture errors
-bin\jre\bin\java.exe -Xmx512m -Djava.net.preferIPv4Stack=true -cp !CLASSPATH! tools.sctrade.companion.CompanionApplication
+bin\jre\bin\java.exe -Xmx2024m -Djava.net.preferIPv4Stack=true -cp !CLASSPATH! tools.sctrade.companion.CompanionApplication
 
 pause

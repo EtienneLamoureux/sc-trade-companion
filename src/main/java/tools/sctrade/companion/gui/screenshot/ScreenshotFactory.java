@@ -1,6 +1,7 @@
 package tools.sctrade.companion.gui.screenshot;
 
 import java.awt.image.BufferedImage;
+import org.imgscalr.Scalr;
 import tools.sctrade.companion.domain.commodity.CommodityListing;
 import tools.sctrade.companion.domain.commodity.CommoditySubmission;
 import tools.sctrade.companion.domain.item.ItemListing;
@@ -9,8 +10,14 @@ import tools.sctrade.companion.utils.LocalizationUtil;
 
 /**
  * Builds screenshot records for processing lifecycle events.
+ *
+ * <p>
+ * All {@code build} overloads scale the provided image to a {@value #THUMBNAIL_SIZE} px thumbnail
+ * before storing it in the {@link Screenshot} record.
  */
 public class ScreenshotFactory {
+
+  static final int THUMBNAIL_SIZE = 150;
 
   /**
    * Builds a processing-status screenshot record.
@@ -21,7 +28,8 @@ public class ScreenshotFactory {
    * @return processing-status screenshot record
    */
   public Screenshot build(String id, BufferedImage image, ScreenshotType type) {
-    return new Screenshot(id, image, null, ScreenshotStatus.PROCESSING, null, null, type);
+    return new Screenshot(id, scaleToThumbnail(image), null, ScreenshotStatus.PROCESSING, null,
+        null, type);
   }
 
   /**
@@ -38,8 +46,8 @@ public class ScreenshotFactory {
       return buildFromItemSubmission(id, image, itemSubmission, type);
     }
 
-    return new Screenshot(id, image, extractLocation(submission), ScreenshotStatus.SUCCESS, null,
-        extractContent(submission), type);
+    return new Screenshot(id, scaleToThumbnail(image), extractLocation(submission),
+        ScreenshotStatus.SUCCESS, null, extractContent(submission), type);
   }
 
   /**
@@ -53,24 +61,35 @@ public class ScreenshotFactory {
    */
   public Screenshot build(String id, BufferedImage image, RuntimeException exception,
       ScreenshotType type) {
-    return new Screenshot(id, image, null, ScreenshotStatus.ERROR, exception.getMessage(), null,
-        type);
+    return new Screenshot(id, scaleToThumbnail(image), null, ScreenshotStatus.ERROR,
+        exception.getMessage(), null, type);
   }
 
   private Screenshot buildFromItemSubmission(String id, BufferedImage image,
       ItemSubmission itemSubmission, ScreenshotType type) {
     if (itemSubmission.isEmpty() || hasMissingLocation(itemSubmission)) {
-      return new Screenshot(id, image, null, ScreenshotStatus.ERROR,
+      return new Screenshot(id, scaleToThumbnail(image), null, ScreenshotStatus.ERROR,
           LocalizationUtil.get("warnNoLocation"), null, type);
     }
 
     if (hasMissingShop(itemSubmission)) {
-      return new Screenshot(id, image, null, ScreenshotStatus.ERROR,
+      return new Screenshot(id, scaleToThumbnail(image), null, ScreenshotStatus.ERROR,
           LocalizationUtil.get("warnNoShop"), null, type);
     }
 
-    return new Screenshot(id, image, extractLocation(itemSubmission), ScreenshotStatus.SUCCESS,
-        null, extractContent(itemSubmission), type);
+    return new Screenshot(id, scaleToThumbnail(image), extractLocation(itemSubmission),
+        ScreenshotStatus.SUCCESS, null, extractContent(itemSubmission), type);
+  }
+
+  private BufferedImage scaleToThumbnail(BufferedImage image) {
+    if (image == null) {
+      return null;
+    }
+    if (image.getWidth() <= THUMBNAIL_SIZE && image.getHeight() <= THUMBNAIL_SIZE) {
+      return image;
+    }
+    return Scalr.resize(image, Scalr.Method.QUALITY, Scalr.Mode.FIT_TO_WIDTH, THUMBNAIL_SIZE,
+        THUMBNAIL_SIZE);
   }
 
   private boolean hasMissingLocation(ItemSubmission itemSubmission) {

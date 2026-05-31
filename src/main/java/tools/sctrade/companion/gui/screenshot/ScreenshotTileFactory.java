@@ -1,13 +1,11 @@
 package tools.sctrade.companion.gui.screenshot;
 
 import atlantafx.base.controls.Tile;
-import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import org.imgscalr.Scalr;
 import tools.sctrade.companion.gui.TileFactory;
 
 /**
@@ -81,16 +79,8 @@ public class ScreenshotTileFactory implements TileFactory<Screenshot> {
       return cached;
     }
 
-    BufferedImage scaled = scaleImage(screenshot.image(), MAX_IMAGE_SIZE);
-    Image image = SwingFXUtils.toFXImage(scaled, null);
+    Image image = SwingFXUtils.toFXImage(screenshot.image(), null);
     imageByScreenshotId.put(id, image);
     return image;
-  }
-
-  private BufferedImage scaleImage(BufferedImage image, int maxSize) {
-    if (image.getWidth() <= maxSize && image.getHeight() <= maxSize) {
-      return image;
-    }
-    return Scalr.resize(image, Scalr.Method.QUALITY, Scalr.Mode.FIT_TO_WIDTH, maxSize, maxSize);
   }
 }
